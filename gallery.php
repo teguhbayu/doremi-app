@@ -19,56 +19,56 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                     <div
                         class="group relative overflow-hidden rounded-2xl shadow-md hover:shadow-xl transition-all duration-300">
-                        <img src="https://placehold.co/600x400/AFD3E2/146C94?text=Kamar+Standar" alt="Kamar"
+                        <img src="images/kamar.png" alt="Kamar"
                             class="w-full h-64 object-cover transform group-hover:scale-105 transition-transform duration-500" />
                         <div
                             class="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                            <span class="text-white font-medium text-lg">Kamar Tipe Standar</span>
+                            <span class="text-white font-medium text-lg">Kamar</span>
                         </div>
                     </div>
                     <div
                         class="group relative overflow-hidden rounded-2xl shadow-md hover:shadow-xl transition-all duration-300">
-                        <img src="https://placehold.co/600x400/19A7CE/F6F1F1?text=Ruang+Belajar" alt="Ruang Belajar"
+                        <img src="images/badminton.png" alt="Ruang Belajar"
                             class="w-full h-64 object-cover transform group-hover:scale-105 transition-transform duration-500" />
                         <div
                             class="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                            <span class="text-white font-medium text-lg">Area Belajar Bersama</span>
+                            <span class="text-white font-medium text-lg">Lapangan Badminton</span>
                         </div>
                     </div>
                     <div
                         class="group relative overflow-hidden rounded-2xl shadow-md hover:shadow-xl transition-all duration-300">
-                        <img src="https://placehold.co/600x400/146C94/F6F1F1?text=Lobby+Utama" alt="Lobby"
+                        <img src="images/basket.png" alt="Lobby"
                             class="w-full h-64 object-cover transform group-hover:scale-105 transition-transform duration-500" />
                         <div
                             class="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                            <span class="text-white font-medium text-lg">Lobby & Resepsionis</span>
+                            <span class="text-white font-medium text-lg">Lapangan Basket</span>
                         </div>
                     </div>
                     <div
                         class="group relative overflow-hidden rounded-2xl shadow-md hover:shadow-xl transition-all duration-300">
-                        <img src="https://placehold.co/600x400/F6F1F1/146C94?text=Area+Parkir" alt="Parkir"
+                        <img src="images/kantin.png" alt="Parkir"
                             class="w-full h-64 object-cover transform group-hover:scale-105 transition-transform duration-500" />
                         <div
                             class="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                            <span class="text-white font-medium text-lg">Area Parkir Luas</span>
+                            <span class="text-white font-medium text-lg">Kantin</span>
                         </div>
                     </div>
                     <div
                         class="group relative overflow-hidden rounded-2xl shadow-md hover:shadow-xl transition-all duration-300">
-                        <img src="https://placehold.co/600x400/AFD3E2/146C94?text=Pantry+Bersama" alt="Pantry"
+                        <img src="images/market.png" alt="Pantry"
                             class="w-full h-64 object-cover transform group-hover:scale-105 transition-transform duration-500" />
                         <div
                             class="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                            <span class="text-white font-medium text-lg">Dapur & Pantry Bersama</span>
+                            <span class="text-white font-medium text-lg">Mini Market</span>
                         </div>
                     </div>
                     <div
                         class="group relative overflow-hidden rounded-2xl shadow-md hover:shadow-xl transition-all duration-300">
-                        <img src="https://placehold.co/600x400/19A7CE/F6F1F1?text=Taman" alt="Taman"
+                        <img src="images/organisasi.png" alt="Taman"
                             class="w-full h-64 object-cover transform group-hover:scale-105 transition-transform duration-500" />
                         <div
                             class="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                            <span class="text-white font-medium text-lg">Taman Bersantai</span>
+                            <span class="text-white font-medium text-lg">Ruang Organisasi</span>
                         </div>
                     </div>
                 </div>
