@@ -28,7 +28,7 @@
                     </div>
                     <div
                         class="tw-group tw-relative tw-overflow-hidden tw-rounded-2xl tw-shadow-md hover:tw-shadow-xl tw-transition-all tw-duration-300">
-                        <img src="images/badminton.png" alt="Ruang Belajar"
+                        <img src="images/badminton.png" alt="Lapangan Badminton"
                             class="tw-w-full tw-h-64 tw-object-cover tw-transform group-hover:tw-scale-105 tw-transition-transform tw-duration-500" />
                         <div
                             class="tw-absolute tw-inset-0 tw-bg-gradient-to-t tw-from-primary/80 tw-to-transparent tw-opacity-0 group-hover:tw-opacity-100 tw-transition-opacity tw-flex tw-items-end tw-p-4">
@@ -37,7 +37,7 @@
                     </div>
                     <div
                         class="tw-group tw-relative tw-overflow-hidden tw-rounded-2xl tw-shadow-md hover:tw-shadow-xl tw-transition-all tw-duration-300">
-                        <img src="images/basket.png" alt="Lobby"
+                        <img src="images/basket.png" alt="Lapangan Basket"
                             class="tw-w-full tw-h-64 tw-object-cover tw-transform group-hover:tw-scale-105 tw-transition-transform tw-duration-500" />
                         <div
                             class="tw-absolute tw-inset-0 tw-bg-gradient-to-t tw-from-primary/80 tw-to-transparent tw-opacity-0 group-hover:tw-opacity-100 tw-transition-opacity tw-flex tw-items-end tw-p-4">
@@ -46,7 +46,7 @@
                     </div>
                     <div
                         class="tw-group tw-relative tw-overflow-hidden tw-rounded-2xl tw-shadow-md hover:tw-shadow-xl tw-transition-all tw-duration-300">
-                        <img src="images/kantin.png" alt="Parkir"
+                        <img src="images/kantin.png" alt="Kantin"
                             class="tw-w-full tw-h-64 tw-object-cover tw-transform group-hover:tw-scale-105 tw-transition-transform tw-duration-500" />
                         <div
                             class="tw-absolute tw-inset-0 tw-bg-gradient-to-t tw-from-primary/80 tw-to-transparent tw-opacity-0 group-hover:tw-opacity-100 tw-transition-opacity tw-flex tw-items-end tw-p-4">
@@ -55,7 +55,7 @@
                     </div>
                     <div
                         class="tw-group tw-relative tw-overflow-hidden tw-rounded-2xl tw-shadow-md hover:tw-shadow-xl tw-transition-all tw-duration-300">
-                        <img src="images/market.png" alt="Pantry"
+                        <img src="images/market.png" alt="Mini Market"
                             class="tw-w-full tw-h-64 tw-object-cover tw-transform group-hover:tw-scale-105 tw-transition-transform tw-duration-500" />
                         <div
                             class="tw-absolute tw-inset-0 tw-bg-gradient-to-t tw-from-primary/80 tw-to-transparent tw-opacity-0 group-hover:tw-opacity-100 tw-transition-opacity tw-flex tw-items-end tw-p-4">
@@ -64,7 +64,7 @@
                     </div>
                     <div
                         class="tw-group tw-relative tw-overflow-hidden tw-rounded-2xl tw-shadow-md hover:tw-shadow-xl tw-transition-all tw-duration-300">
-                        <img src="images/organisasi.png" alt="Taman"
+                        <img src="images/organisasi.png" alt="Ruang Organisasi"
                             class="tw-w-full tw-h-64 tw-object-cover tw-transform group-hover:tw-scale-105 tw-transition-transform tw-duration-500" />
                         <div
                             class="tw-absolute tw-inset-0 tw-bg-gradient-to-t tw-from-primary/80 tw-to-transparent tw-opacity-0 group-hover:tw-opacity-100 tw-transition-opacity tw-flex tw-items-end tw-p-4">
