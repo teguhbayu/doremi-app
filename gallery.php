@@ -6,69 +6,69 @@
 <?php include 'head.php'; ?>
 <body>
     <?php include 'header.php'; ?>
-    <div class="pt-16 flex-1 h-full w-full relative overflow-y-auto overflow-x-hidden">
-        <div id="gallery-container" class="min-h-full bg-background pt-8 pb-16">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center mb-10">
-                    <h2 class="text-3xl font-extrabold text-primary">Galeri DOREMI</h2>
-                    <p class="mt-4 text-lg text-gray-500">
+    <div class="tw-pt-16 tw-flex-1 tw-h-full tw-w-full tw-relative tw-overflow-y-auto tw-overflow-x-hidden">
+        <div id="gallery-container" class="tw-min-h-full tw-bg-background tw-pt-8 tw-pb-16">
+            <div class="tw-max-w-7xl tw-mx-auto tw-px-4 sm:tw-px-6 lg:tw-px-8">
+                <div class="tw-text-center tw-mb-10">
+                    <h2 class="tw-text-3xl tw-font-extrabold tw-text-primary">Galeri DOREMI</h2>
+                    <p class="tw-mt-4 tw-text-lg tw-text-gray-500">
                         Intip kenyamanan fasilitas asrama kami.
                     </p>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                <div class="tw-grid tw-grid-cols-1 sm:tw-grid-cols-2 md:tw-grid-cols-3 tw-gap-6">
                     <div
-                        class="group relative overflow-hidden rounded-2xl shadow-md hover:shadow-xl transition-all duration-300">
+                        class="tw-group tw-relative tw-overflow-hidden tw-rounded-2xl tw-shadow-md hover:tw-shadow-xl tw-transition-all tw-duration-300">
                         <img src="images/kamar.png" alt="Kamar"
-                            class="w-full h-64 object-cover transform group-hover:scale-105 transition-transform duration-500" />
+                            class="tw-w-full tw-h-64 tw-object-cover tw-transform group-hover:tw-scale-105 tw-transition-transform tw-duration-500" />
                         <div
-                            class="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                            <span class="text-white font-medium text-lg">Kamar</span>
+                            class="tw-absolute tw-inset-0 tw-bg-gradient-to-t tw-from-primary/80 tw-to-transparent tw-opacity-0 group-hover:tw-opacity-100 tw-transition-opacity tw-flex tw-items-end tw-p-4">
+                            <span class="tw-text-white tw-font-medium tw-text-lg">Kamar</span>
                         </div>
                     </div>
                     <div
-                        class="group relative overflow-hidden rounded-2xl shadow-md hover:shadow-xl transition-all duration-300">
+                        class="tw-group tw-relative tw-overflow-hidden tw-rounded-2xl tw-shadow-md hover:tw-shadow-xl tw-transition-all tw-duration-300">
                         <img src="images/badminton.png" alt="Ruang Belajar"
-                            class="w-full h-64 object-cover transform group-hover:scale-105 transition-transform duration-500" />
+                            class="tw-w-full tw-h-64 tw-object-cover tw-transform group-hover:tw-scale-105 tw-transition-transform tw-duration-500" />
                         <div
-                            class="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                            <span class="text-white font-medium text-lg">Lapangan Badminton</span>
+                            class="tw-absolute tw-inset-0 tw-bg-gradient-to-t tw-from-primary/80 tw-to-transparent tw-opacity-0 group-hover:tw-opacity-100 tw-transition-opacity tw-flex tw-items-end tw-p-4">
+                            <span class="tw-text-white tw-font-medium tw-text-lg">Lapangan Badminton</span>
                         </div>
                     </div>
                     <div
-                        class="group relative overflow-hidden rounded-2xl shadow-md hover:shadow-xl transition-all duration-300">
+                        class="tw-group tw-relative tw-overflow-hidden tw-rounded-2xl tw-shadow-md hover:tw-shadow-xl tw-transition-all tw-duration-300">
                         <img src="images/basket.png" alt="Lobby"
-                            class="w-full h-64 object-cover transform group-hover:scale-105 transition-transform duration-500" />
+                            class="tw-w-full tw-h-64 tw-object-cover tw-transform group-hover:tw-scale-105 tw-transition-transform tw-duration-500" />
                         <div
-                            class="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                            <span class="text-white font-medium text-lg">Lapangan Basket</span>
+                            class="tw-absolute tw-inset-0 tw-bg-gradient-to-t tw-from-primary/80 tw-to-transparent tw-opacity-0 group-hover:tw-opacity-100 tw-transition-opacity tw-flex tw-items-end tw-p-4">
+                            <span class="tw-text-white tw-font-medium tw-text-lg">Lapangan Basket</span>
                         </div>
                     </div>
                     <div
-                        class="group relative overflow-hidden rounded-2xl shadow-md hover:shadow-xl transition-all duration-300">
+                        class="tw-group tw-relative tw-overflow-hidden tw-rounded-2xl tw-shadow-md hover:tw-shadow-xl tw-transition-all tw-duration-300">
                         <img src="images/kantin.png" alt="Parkir"
-                            class="w-full h-64 object-cover transform group-hover:scale-105 transition-transform duration-500" />
+                            class="tw-w-full tw-h-64 tw-object-cover tw-transform group-hover:tw-scale-105 tw-transition-transform tw-duration-500" />
                         <div
-                            class="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                            <span class="text-white font-medium text-lg">Kantin</span>
+                            class="tw-absolute tw-inset-0 tw-bg-gradient-to-t tw-from-primary/80 tw-to-transparent tw-opacity-0 group-hover:tw-opacity-100 tw-transition-opacity tw-flex tw-items-end tw-p-4">
+                            <span class="tw-text-white tw-font-medium tw-text-lg">Kantin</span>
                         </div>
                     </div>
                     <div
-                        class="group relative overflow-hidden rounded-2xl shadow-md hover:shadow-xl transition-all duration-300">
+                        class="tw-group tw-relative tw-overflow-hidden tw-rounded-2xl tw-shadow-md hover:tw-shadow-xl tw-transition-all tw-duration-300">
                         <img src="images/market.png" alt="Pantry"
-                            class="w-full h-64 object-cover transform group-hover:scale-105 transition-transform duration-500" />
+                            class="tw-w-full tw-h-64 tw-object-cover tw-transform group-hover:tw-scale-105 tw-transition-transform tw-duration-500" />
                         <div
-                            class="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                            <span class="text-white font-medium text-lg">Mini Market</span>
+                            class="tw-absolute tw-inset-0 tw-bg-gradient-to-t tw-from-primary/80 tw-to-transparent tw-opacity-0 group-hover:tw-opacity-100 tw-transition-opacity tw-flex tw-items-end tw-p-4">
+                            <span class="tw-text-white tw-font-medium tw-text-lg">Mini Market</span>
                         </div>
                     </div>
                     <div
-                        class="group relative overflow-hidden rounded-2xl shadow-md hover:shadow-xl transition-all duration-300">
+                        class="tw-group tw-relative tw-overflow-hidden tw-rounded-2xl tw-shadow-md hover:tw-shadow-xl tw-transition-all tw-duration-300">
                         <img src="images/organisasi.png" alt="Taman"
-                            class="w-full h-64 object-cover transform group-hover:scale-105 transition-transform duration-500" />
+                            class="tw-w-full tw-h-64 tw-object-cover tw-transform group-hover:tw-scale-105 tw-transition-transform tw-duration-500" />
                         <div
-                            class="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                            <span class="text-white font-medium text-lg">Ruang Organisasi</span>
+                            class="tw-absolute tw-inset-0 tw-bg-gradient-to-t tw-from-primary/80 tw-to-transparent tw-opacity-0 group-hover:tw-opacity-100 tw-transition-opacity tw-flex tw-items-end tw-p-4">
+                            <span class="tw-text-white tw-font-medium tw-text-lg">Ruang Organisasi</span>
                         </div>
                     </div>
                 </div>

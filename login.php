@@ -8,61 +8,61 @@
 
 <body>
     <?php include 'header.php'; ?>
-    <div class="pt-16 flex-1 h-full w-full relative overflow-y-auto overflow-x-hidden">
+    <div class="tw-pt-16 tw-flex-1 tw-h-full tw-w-full tw-relative tw-overflow-y-auto tw-overflow-x-hidden">
         <div id="login-container"
-            class="min-h-full flex items-center justify-center bg-background px-4 sm:px-6 lg:px-8 py-12 relative overflow-hidden">
+            class="tw-min-h-full tw-flex tw-items-center tw-justify-center tw-bg-background tw-px-4 sm:tw-px-6 lg:tw-px-8 tw-py-12 tw-relative tw-overflow-hidden">
             <div
-                class="absolute top-1/4 left-1/4 w-72 h-72 bg-accent rounded-full mix-blend-multiply filter blur-2xl opacity-60">
+                class="tw-absolute tw-top-1/4 tw-left-1/4 tw-w-72 tw-h-72 tw-bg-accent tw-rounded-full tw-mix-blend-multiply tw-filter tw-blur-2xl tw-opacity-60">
             </div>
             <div
-                class="absolute bottom-1/4 right-1/4 w-80 h-80 bg-secondary rounded-full mix-blend-multiply filter blur-2xl opacity-40">
+                class="tw-absolute tw-bottom-1/4 tw-right-1/4 tw-w-80 tw-h-80 tw-bg-secondary tw-rounded-full tw-mix-blend-multiply tw-filter tw-blur-2xl tw-opacity-40">
             </div>
 
-            <div class="max-w-md w-full space-y-8 glass-panel p-10 rounded-3xl z-10 relative">
+            <div class="tw-max-w-md tw-w-full tw-space-y-8 glass-panel tw-p-10 tw-rounded-3xl tw-z-10 tw-relative">
                 <div>
-                    <h2 class="mt-2 text-center text-3xl font-extrabold text-primary">
+                    <h2 class="tw-mt-2 tw-text-center tw-text-3xl tw-font-extrabold tw-text-primary">
                         Selamat Datang Kembali
                     </h2>
-                    <p class="mt-2 text-center text-sm text-gray-600">
+                    <p class="tw-mt-2 tw-text-center tw-text-sm tw-text-gray-600">
                         Silakan masuk ke akun DOREMI Anda
                     </p>
                 </div>
-                <form class="mt-8 space-y-6" onsubmit="login(event)">
-                    <div class="rounded-md shadow-sm space-y-4">
-                        <div>
-                            <label for="username" class="sr-only">Username</label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <i class="iconsax text-2xl text-gray-400" icon-name="user-1"></i>
-                                </div>
+                <form class="tw-mt-8 tw-w-full tw-space-y-6" onsubmit="login(event)">
+                    <div class="tw-rounded-md tw-shadow-sm tw-space-y-4">
+                        <div class="tw-w-full">
+                            <label for="username" class="tw-sr-only">Username</label>
+                            <div class="tw-relative tw-w-full">
+                                <i class="iconsax tw-text-2xl z-[9999] tw-left-0 tw-pl-3 tw-absolute tw-pointer-events-none tw-text-gray-400"
+                                    icon-name="user-1"></i>
                                 <input id="username" name="username" type="text" required
-                                    class="appearance-none rounded-xl relative block w-full px-3 py-3 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-secondary focus:border-secondary focus:z-10 sm:text-sm transition-colors"
+                                    class="tw-appearance-none tw-rounded-xl tw-relative tw-block tw-w-[90%] tw-px-3 tw-py-3 tw-ps-10 tw-border tw-border-gray-300 tw-placeholder-gray-500 tw-text-gray-900 focus:tw-outline-none focus:tw-ring-secondary focus:tw-border-secondary focus:tw-z-10 sm:tw-text-sm tw-transition-colors"
                                     placeholder="Username" />
                             </div>
                         </div>
                         <div>
-                            <label for="password" class="sr-only">Password</label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <i class="iconsax text-2xl text-gray-400" icon-name="lock-1"></i>
+                            <label for="password" class="tw-sr-only">Password</label>
+                            <div class="tw-relative">
+                                <div
+                                    class="tw-absolute tw-inset-y-0 tw-left-0 tw-pl-3 tw-flex tw-items-center tw-pointer-events-none">
+                                    <i class="iconsax tw-text-2xl tw-text-gray-400" icon-name="lock-1"></i>
                                 </div>
                                 <input id="password" name="password" type="password" required
-                                    class="appearance-none rounded-xl relative block w-full px-3 py-3 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-secondary focus:border-secondary focus:z-10 sm:text-sm transition-colors"
+                                    class="tw-appearance-none tw-rounded-xl tw-relative tw-block tw-w-[90%] tw-px-3 tw-py-3 tw-pl-10 tw-border tw-border-gray-300 tw-placeholder-gray-500 tw-text-gray-900 focus:tw-outline-none focus:tw-ring-secondary focus:tw-border-secondary focus:tw-z-10 sm:tw-text-sm tw-transition-colors"
                                     placeholder="Password" />
                             </div>
                         </div>
                     </div>
 
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center">
+                    <div class="tw-flex tw-items-center tw-justify-between">
+                        <div class="tw-flex tw-items-center">
                             <input id="remember-me" name="remember-me" type="checkbox"
-                                class="h-4 w-4 text-secondary focus:ring-primary border-gray-300 rounded" />
-                            <label for="remember-me" class="ml-2 block text-sm text-gray-900">
+                                class="tw-h-4 tw-w-4 tw-text-secondary focus:tw-ring-primary tw-border-gray-300 tw-rounded" />
+                            <label for="remember-me" class="tw-ml-2 tw-block tw-text-sm tw-text-gray-900">
                                 Ingat saya
                             </label>
                         </div>
-                        <div class="text-sm">
-                            <a href="#" class="font-medium text-secondary hover:text-primary">
+                        <div class="tw-text-sm">
+                            <a href="#" class="tw-font-medium tw-text-secondary hover:tw-text-primary">
                                 Lupa password?
                             </a>
                         </div>
@@ -70,7 +70,7 @@
 
                     <div>
                         <button type="submit"
-                            class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-xl text-white bg-primary hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary shadow-lg transition-all transform hover:-translate-y-0.5">
+                            class="tw-group tw-relative tw-w-full tw-flex tw-justify-center tw-py-3 tw-px-4 tw-border tw-border-transparent tw-text-sm tw-font-medium tw-rounded-xl tw-text-white tw-bg-primary hover:tw-bg-opacity-90 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-offset-2 focus:tw-ring-primary tw-shadow-lg tw-transition-all tw-transform hover:-tw-translate-y-0.5">
                             Masuk
                         </button>
                     </div>
