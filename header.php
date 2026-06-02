@@ -1,3 +1,9 @@
+<?php
+if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
+    die('Access denied');
+}
+?>
+
 <header id="global-header"
     class="tw-bg-white tw-shadow-sm tw-z-40 tw-fixed tw-w-full tw-top-0 tw-transition-all tw-duration-300">
     <div class="tw-max-w-7xl tw-mx-auto tw-px-4 sm:tw-px-6 lg:tw-px-8">
