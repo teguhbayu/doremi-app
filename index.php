@@ -26,7 +26,7 @@
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 py-16 sm:py-24">
                     <div class="text-center">
                         <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
-                            <span class="block text-primary">DOREMI Dormitory</span>
+                            <span class="block text-primary">DOREMI</span>
                             <span class="block text-secondary mt-2">Kenyamanan & Keamanan Terpadu</span>
                         </h1>
                         <p

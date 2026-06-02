@@ -1,9 +1,9 @@
 <header id="global-header" class="bg-white shadow-sm z-40 fixed w-full top-0 transition-all duration-300">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
-            <div class="flex items-center cursor-pointer" onclick="navigate('landing')">
+            <div class="flex items-center cursor-pointer gap-1" onclick="navigate('landing')">
+                <img src="images/logo.png" alt="Logo DOREMI" class="aspect-[1/1] rounded-full object-cover size-10" />
                 <span class="text-2xl font-bold text-primary tracking-tight">DOREMI</span>
-                <span class="ml-2 text-sm text-secondary hidden sm:block">Dormitory</span>
             </div>
             <div class="flex items-center space-x-4">
                 <a href="index.php"
