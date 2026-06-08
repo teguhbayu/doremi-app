@@ -1,0 +1,45 @@
+<?php
+$menus = [];
+
+switch ($_SESSION["userRole"]) {
+    case "PENGURUS":
+        $menus = [
+            ["title" => "Home", "target" => "/doremi-app/dashboard/", "icon" => "home-2"],
+            ["title" => "Petugas", "target" => "/doremi-app/dashboard/petugas/", "icon" => "user-1"],
+        ];
+        break;
+}
+
+?>
+
+<nav class="fixed tw:bg-primary tw:!w-[300px] tw:h-dvh tw:px-6 tw:py-8.5">
+    <a class="tw:w-fit tw:no-underline tw:m-0 tw:p-0 tw:leading-none tw:flex tw:flex-col tw:gap-[5px]" href="index.php">
+        <h2 class="tw:font-bold tw:w-fit tw:text-[30px] tw:text-white tw:m-0 tw:leading-none">DOREMI</h2>
+        <p class="tw:font-medium tw:w-fit tw:text-[13px] tw:text-accent tw:m-0 tw:leading-none">ASTRATech Dormitory</p>
+    </a>
+    <div class="tw:flex tw:min-h-[70%] tw:flex-col tw:justify-between tw:item-start tw:mt-[100px]">
+        <div class=" tw:flex tw:flex-col tw:gap-2 ">
+
+            <?php foreach ($menus as $menu) { ?>
+                <a class="tw:no-underline tw:p-2 tw:rounded-lg tw:inline-flex tw:items-center tw:gap-2 <?php echo parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) == $menu["target"] ? "tw:bg-white tw:text-primary" : "tw:bg-primary tw:hover:bg-tertiary tw:text-white"; ?>  tw:transition-all tw:duration-500"
+                    href="<?php echo $menu["target"]; ?>">
+                    <i class="iconsax tw:text-2xl" icon-name="<?php echo $menu["icon"]; ?>"></i>
+                    <span>
+                        <?php echo $menu["title"]; ?>
+                    </span>
+                </a>
+
+            <?php } ?>
+        </div>
+        <div class="tw:rounded-[16px] tw:py-[21px] tw:flex tw:flex-col tw:gap-1 tw:px-5 tw:bg-tertiary w-full">
+            <h3 class="tw:font-semibold tw:text-white tw:text-[16px] tw:m-0 tw:p-0"><?php echo $_SESSION["userName"]; ?>
+            </h3>
+            <h3 class="tw:font-regular tw:text-accent tw:text-[12px] tw:m-0 tw:p-0"><?php echo $_SESSION["userRole"]; ?>
+            </h3>
+            <form method="post" action="/doremi-app/logout.php" class="tw:mt-2">
+                <button
+                    class="tw:p-2 tw:w-full tw:bg-red-500 tw:rounded-[16px] tw:text-white tw:hover:bg-red-400 tw:transition-all tw:duration-500 tw:border-none tw:hover:border-none">Logout</button>
+            </form>
+        </div>
+    </div>
+</nav>
