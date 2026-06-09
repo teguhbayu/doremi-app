@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $kamarSchema = v::keySet(
         v::key('nomor', v::stringType()->length(1, 20)),
-        v::key('kapasitas', v::numericVal()->positive())
+        v::key('kapasitas', v::digit())
     );
 
     $postData = [
@@ -47,10 +47,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
+    $kapasitasInt = (int) $kapasitas;
+    if ($kapasitasInt < 1 || $kapasitasInt > 4) {
+        header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&status=error&message=Jumlah penghuni minimal 1 dan maksimal 4 orang!');
+        exit;
+    }
+
+    $checkStmt = mysqli_prepare($db, "SELECT KamarID FROM kamar WHERE NomorKamar = ? AND IsDeleted = 0 AND KamarID != ? LIMIT 1");
+    mysqli_stmt_bind_param($checkStmt, 'si', $nomor, $id);
+    mysqli_stmt_execute($checkStmt);
+    $checkResult = mysqli_stmt_get_result($checkStmt);
+    $existingKamar = mysqli_fetch_assoc($checkResult);
+    mysqli_stmt_close($checkStmt);
+
+    if ($existingKamar) {
+        header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&status=error&message=Nomor kamar sudah terdaftar!');
+        exit;
+    }
+
     $now = date('Y-m-d H:i:s');
 
     $stmt = mysqli_prepare($db, "UPDATE kamar SET NomorKamar = ?, KapasitasPenghuni = ?, UpdatedAt = ? WHERE KamarID = ?");
-    mysqli_stmt_bind_param($stmt, 'sisi', $nomor, $kapasitas, $now, $id);
+    mysqli_stmt_bind_param($stmt, 'sisi', $nomor, $kapasitasInt, $now, $id);
 
     if (!mysqli_stmt_execute($stmt)) {
         header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&status=error&message=Terjadi Kesalahan saat mengupdate data!');
@@ -79,19 +97,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <form method="POST">
                 <div class="mb-3">
-                    <label for="kamarID" class="form-label">ID Kamar</label>
-                    <input type="text" class="form-control" id="kamarID"
-                        value="<?= htmlspecialchars($kamar['KamarID']) ?>" disabled>
-                </div>
-                <div class="mb-3">
                     <label for="nomorKamar" class="form-label">Nomor Kamar</label>
                     <input type="text" name="nomorKamar" class="form-control" id="nomorKamar"
                         value="<?= htmlspecialchars($kamar['NomorKamar']) ?>" required>
                 </div>
                 <div class="mb-3">
-                    <label for="kapasitasKamar" class="form-label">Kapasitas Penghuni</label>
+                    <label for="kapasitasKamar" class="form-label">Jumlah Penghuni</label>
                     <input type="number" name="kapasitasKamar" class="form-control" id="kapasitasKamar"
-                        value="<?= htmlspecialchars($kamar['KapasitasPenghuni']) ?>" required>
+                        value="<?= htmlspecialchars($kamar['KapasitasPenghuni']) ?>" min="1" max="4" required>
+                    <div class="form-text">Jumlah penghuni minimal 1 dan maksimal 4 orang per kamar.</div>
                 </div>
                 <div class="tw:w-full tw:flex tw:justify-end tw:mt-2">
                     <button type="submit"

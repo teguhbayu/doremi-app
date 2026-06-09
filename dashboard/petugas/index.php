@@ -32,20 +32,22 @@ $query = mysqli_query($db, "SELECT * FROM petugas WHERE IsDeleted = 0;");
                     </span>
                 </a>
             </div>
-            <table class="table tw:rounded-lg! tw:mt-3">
+            
+            <div class="tw:mt-3 tw:overflow-hidden tw:rounded-lg tw:border tw:border-gray-300">
+                <table id="petugasTable" class="table text-center align-middle tw:mb-0 tw:w-full">
                 <thead>
                     <tr>
-                        <th scope="col">ID</th>
-                        <th scope="col">Nama</th>
-                        <th scope="col">Jabatan</th>
-                        <th scope="col">Aksi</th>
+                        <th scope="col" class="text-center align-middle" style="width: 10%;">ID</th>
+                        <th scope="col" class="text-center align-left" style="width: 40%;">Nama</th>
+                        <th scope="col" class="text-center align-middle" style="width: 30%;">Jabatan</th>
+                        <th scope="col" class="text-center align-middle" style="width: 20%;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php while ($petugas = mysqli_fetch_assoc($query)) { ?>
                         <tr>
                             <th scope="row"><?php echo $petugas["PetugasID"]; ?></th>
-                            <td><?php echo $petugas["NamaPetugas"]; ?></td>
+                            <td class="tw:text-left"><?php echo $petugas["NamaPetugas"]; ?></td>
                             <td><?php echo $petugas["Jabatan"]; ?></td>
                             <td>
                                 <div class="tw:inline-flex tw:justify-center tw:items-center tw:gap-1 tw:text-black">
@@ -86,6 +88,9 @@ $query = mysqli_query($db, "SELECT * FROM petugas WHERE IsDeleted = 0;");
         </div>
     </div>
 
+    <?php require '../../bootstrap.php'; ?>
+    <?php require '../../validation_alert.php'; ?>
+
     <script>
         const deleteModal = document.getElementById('deleteModal')
         if (deleteModal) {
@@ -96,10 +101,51 @@ $query = mysqli_query($db, "SELECT * FROM petugas WHERE IsDeleted = 0;");
                 confirmDelete.href = `delete.php?id=${id}`
             })
         }
-    </script>
 
-    <?php require '../../bootstrap.php'; ?>
-    <?php require '../../validation_alert.php'; ?>
+         document.addEventListener('DOMContentLoaded', () => {
+            // if (typeof DataTable === 'undefined') {
+            //     console.error('DataTables gagal dimuat. Periksa akses CDN atau file asset.');
+            //     return;
+            // }
+
+            new DataTable('#petugasTable', {
+                autoWidth: false,
+                ordering: true,
+                searching: true,
+                paging: true,
+                info: true,
+                columnDefs: [
+                    {
+                        targets: [0, 3],
+                        orderable: false
+                    },
+                    {
+                        targets: '_all',
+                        className: 'text-center align-middle'
+                    }
+                ],
+                layout: {
+                    topStart: 'pageLength',
+                    topEnd: 'search',
+                    bottomStart: 'info',
+                    bottomEnd: 'paging'
+                },
+                language: {
+                    search: "Cari:",
+                    lengthMenu: "Tampilkan _MENU_ data",
+                    info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                    infoEmpty: "Tidak ada data",
+                    zeroRecords: "Data tidak ditemukan",
+                    paginate: {
+                        first: "Pertama",
+                        last: "Terakhir",
+                        next: "Berikutnya",
+                        previous: "Sebelumnya"
+                    }
+                }
+            });
+            });
+    </script>
 </body>
 
 </html>

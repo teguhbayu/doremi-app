@@ -58,3 +58,95 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #19a7ce;
 }
+
+.doremi-table {
+    width: 100% !important;
+    margin-bottom: 0 !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    font-size: 15px;
+}
+
+.doremi-table thead th {
+    background-color: #f8fafc !important;
+    color: #111827 !important;
+    font-weight: 700;
+    padding: 16px 18px !important;
+    border-bottom: 1px solid #d1d5db !important;
+    vertical-align: middle !important;
+}
+
+.doremi-table tbody td,
+.doremi-table tbody th {
+    padding: 14px 18px !important;
+    border-bottom: 1px solid #e5e7eb !important;
+    vertical-align: middle !important;
+}
+
+.doremi-table tbody tr:hover {
+    background-color: #f9fafb !important;
+}
+
+.doremi-table tbody tr:last-child td,
+.doremi-table tbody tr:last-child th {
+    border-bottom: none !important;
+}
+
+.doremi-table-wrapper {
+    margin-top: 16px;
+    overflow: hidden;
+    border: 1px solid #d1d5db;
+    border-radius: 14px;
+    background-color: white;
+}
+
+.dt-container .dt-length,
+.dt-container .dt-search {
+    padding: 16px;
+}
+
+.dt-container .dt-info {
+    padding: 16px;
+}
+
+.dt-container .dt-paging {
+    padding: 16px;
+}
+
+.dt-container .dt-search input {
+    border: 1px solid #d1d5db !important;
+    border-radius: 8px !important;
+    padding: 8px 12px !important;
+    outline: none !important;
+}
+
+.dt-container .dt-length select {
+    border: 1px solid #d1d5db !important;
+    border-radius: 8px !important;
+    padding: 6px 28px 6px 10px !important;
+    outline: none !important;
+}
+
+.dt-container .dt-paging .dt-paging-button {
+    border-radius: 8px !important;
+    padding: 8px 12px !important;
+    margin: 0 2px !important;
+    border: 1px solid transparent !important;
+}
+
+.dt-container .dt-paging .dt-paging-button.current {
+    border: 1px solid #d1d5db !important;
+    background: #f3f4f6 !important;
+    color: #111827 !important;
+}
+
+.dt-container .dt-paging .dt-paging-button:hover {
+    border: 1px solid #d1d5db !important;
+    background: #e5e7eb !important;
+    color: #111827 !important;
+}
+
+.dt-container .dt-orderable-asc,
+.dt-container .dt-orderable-desc {
+    vertical-align: middle !important;
+}
