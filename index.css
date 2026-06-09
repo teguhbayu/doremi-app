@@ -9,3 +9,11 @@
 
   --font-sans: "Inter", sans-serif;
 }
+
+:root {
+  @apply tw:transition-all tw:duration-500;
+}
+
+a {
+  @apply tw:no-underline;
+}

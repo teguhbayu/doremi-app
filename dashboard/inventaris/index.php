@@ -7,7 +7,11 @@ if (!isset($_SESSION['userId'])) {
 }
 require '../../db.php';
 
-$query = mysqli_query($db, "SELECT * FROM petugas WHERE IsDeleted = 0;");
+$query = mysqli_query($db, "SELECT i.*, k.NomorKamar, r.NamaRuangan 
+                            FROM inventaris i 
+                            LEFT JOIN kamar k ON i.KamarID = k.KamarID 
+                            LEFT JOIN ruangan r ON i.RuanganID = r.RuanganID 
+                            WHERE i.IsDeleted = 0;");
 ?>
 
 
@@ -20,7 +24,7 @@ $query = mysqli_query($db, "SELECT * FROM petugas WHERE IsDeleted = 0;");
     <main class="tw:ml-75 tw:grow">
         <div class="tw:pt-5 tw:px-5 tw:flex-1 tw:w-full">
             <h1 class="tw:font-bold tw:mb-5 tw:text-4xl tw:text-black">
-                Kelola Petugas
+                Kelola Inventaris
             </h1>
             <div class="tw:w-full tw:flex tw:justify-end">
 
@@ -36,26 +40,38 @@ $query = mysqli_query($db, "SELECT * FROM petugas WHERE IsDeleted = 0;");
                 <thead>
                     <tr>
                         <th scope="col">ID</th>
-                        <th scope="col">Nama</th>
-                        <th scope="col">Jabatan</th>
+                        <th scope="col">Nama Barang</th>
+                        <th scope="col">Jumlah</th>
+                        <th scope="col">Lokasi</th>
                         <th scope="col">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php while ($petugas = mysqli_fetch_assoc($query)) { ?>
+                    <?php while ($inventaris = mysqli_fetch_assoc($query)) { ?>
                         <tr>
-                            <th scope="row"><?php echo $petugas["PetugasID"]; ?></th>
-                            <td><?php echo $petugas["NamaPetugas"]; ?></td>
-                            <td><?php echo $petugas["Jabatan"]; ?></td>
+                            <th scope="row"><?php echo $inventaris["InventarisID"]; ?></th>
+                            <td><?php echo $inventaris["NamaBarang"]; ?></td>
+                            <td><?php echo $inventaris["Jumlah"]; ?></td>
+                            <td>
+                                <?php 
+                                    if ($inventaris["NomorKamar"]) {
+                                        echo "Kamar: " . $inventaris["NomorKamar"];
+                                    } elseif ($inventaris["NamaRuangan"]) {
+                                        echo "Ruangan: " . $inventaris["NamaRuangan"];
+                                    } else {
+                                        echo "N/A";
+                                    }
+                                ?>
+                            </td>
                             <td>
                                 <div class="tw:inline-flex tw:justify-center tw:items-center tw:gap-1 tw:text-black">
 
-                                    <a href="edit.php?id=<?php echo $petugas["PetugasID"] ?>">
+                                    <a href="edit.php?id=<?php echo $inventaris["InventarisID"] ?>">
                                         <i class="iconsax tw:text-lg" icon-name="edit-2"></i>
                                     </a>
                                     <button type="button" class="tw:bg-transparent tw:border-0 tw:p-0"
                                         data-bs-toggle="modal" data-bs-target="#deleteModal"
-                                        data-bs-id="<?php echo $petugas["PetugasID"] ?>">
+                                        data-bs-id="<?php echo $inventaris["InventarisID"] ?>">
                                         <i class="iconsax tw:text-lg" icon-name="trash"></i>
                                     </button>
                                 </div>
@@ -76,7 +92,7 @@ $query = mysqli_query($db, "SELECT * FROM petugas WHERE IsDeleted = 0;");
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Apakah Anda yakin ingin menghapus petugas ini?
+                    Apakah Anda yakin ingin menghapus inventaris ini?
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
