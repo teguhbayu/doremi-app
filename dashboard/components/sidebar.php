@@ -6,9 +6,9 @@ switch ($_SESSION["userRole"]) {
         $menus = [
             ["title" => "Home", "target" => "/doremi-app/dashboard/", "icon" => "home-2"],
             ["title" => "Petugas", "target" => "/doremi-app/dashboard/petugas/", "icon" => "user-1"],
-            ["title" => "Penghuni", "target" => "/doremi-app/dashboard/penghuni/", "icon" => "people"],
-            ["title" => "Kamar", "target" => "/doremi-app/dashboard/kamar/", "icon" => "house"],
-            ["title" => "Ruangan", "target" => "/doremi-app/dashboard/ruangan/", "icon" => "category"],
+            ["title" => "Penghuni", "target" => "/doremi-app/dashboard/penghuni/", "icon" => "group"],
+            ["title" => "Kamar", "target" => "/doremi-app/dashboard/kamar/", "icon" => "house-1"],
+            ["title" => "Ruangan", "target" => "/doremi-app/dashboard/ruangan/", "icon" => "buildings-1"],
             ["title" => "Inventaris", "target" => "/doremi-app/dashboard/inventaris/", "icon" => "archive-book"],
         ];
         break;
@@ -17,15 +17,29 @@ switch ($_SESSION["userRole"]) {
 ?>
 
 <nav class="tw:fixed tw:top-0 tw:left-0 tw:bg-primary tw:!w-[300px] tw:h-dvh tw:px-6 tw:py-8.5">
-    <a class="tw:w-fit tw:no-underline tw:m-0 tw:p-0 tw:leading-none tw:flex tw:flex-col tw:gap-[5px]" href="index.php">
-        <h2 class="tw:font-bold tw:w-fit tw:text-[30px] tw:text-white tw:m-0 tw:leading-none">DOREMI</h2>
-        <p class="tw:font-medium tw:w-fit tw:text-[13px] tw:text-accent tw:m-0 tw:leading-none">ASTRATech Dormitory</p>
-    </a>
-    <div class="tw:flex tw:min-h-[70%] tw:flex-col tw:justify-between tw:item-start tw:mt-[100px]">
+    <div class="tw:flex tw:min-h-[70%] tw:flex-col tw:justify-between tw:item-start tw:items-stretch tw:h-full">
+        <a class="tw:w-fit tw:no-underline tw:m-0 tw:p-0 tw:leading-none tw:flex tw:flex-col tw:gap-[5px]"
+            href="index.php">
+            <h2 class="tw:font-bold tw:w-fit tw:text-[30px] tw:text-white tw:m-0 tw:leading-none">DOREMI</h2>
+            <p class="tw:font-medium tw:w-fit tw:text-[13px] tw:text-accent tw:m-0 tw:leading-none">ASTRATech Dormitory
+            </p>
+        </a>
         <div class=" tw:flex tw:flex-col tw:gap-2 ">
 
-            <?php foreach ($menus as $menu) { ?>
-                <a class="tw:no-underline tw:p-2 tw:rounded-lg tw:inline-flex tw:items-center tw:gap-2 <?php echo parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) == $menu["target"] ? "tw:bg-white tw:text-primary" : "tw:bg-primary tw:hover:bg-tertiary tw:text-white"; ?>  tw:transition-all tw:duration-500"
+            <?php 
+            $currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+            foreach ($menus as $menu) { 
+                // Better matching logic: 
+                // 1. If it's the home dashboard, match exactly (or index.php)
+                // 2. Otherwise, check if current path starts with the menu target
+                $isActive = false;
+                if ($menu["target"] == "/doremi-app/dashboard/") {
+                    $isActive = ($currentPath == "/doremi-app/dashboard/" || $currentPath == "/doremi-app/dashboard/index.php");
+                } else {
+                    $isActive = str_starts_with($currentPath, $menu["target"]);
+                }
+            ?>
+                <a class="tw:no-underline tw:p-2 tw:rounded-lg tw:inline-flex tw:items-center tw:gap-2 <?php echo $isActive ? "tw:bg-white tw:text-primary" : "tw:bg-primary tw:hover:bg-tertiary tw:text-white"; ?>  tw:transition-all tw:duration-500"
                     href="<?php echo $menu["target"]; ?>">
                     <i class="iconsax tw:text-2xl" icon-name="<?php echo $menu["icon"]; ?>"></i>
                     <span>
