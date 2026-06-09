@@ -6,13 +6,17 @@ switch ($_SESSION["userRole"]) {
         $menus = [
             ["title" => "Home", "target" => "/doremi-app/dashboard/", "icon" => "home-2"],
             ["title" => "Petugas", "target" => "/doremi-app/dashboard/petugas/", "icon" => "user-1"],
+            ["title" => "Penghuni", "target" => "/doremi-app/dashboard/penghuni/", "icon" => "people"],
+            ["title" => "Kamar", "target" => "/doremi-app/dashboard/kamar/", "icon" => "house"],
+            ["title" => "Ruangan", "target" => "/doremi-app/dashboard/ruangan/", "icon" => "category"],
+            ["title" => "Inventaris", "target" => "/doremi-app/dashboard/inventaris/", "icon" => "archive-book"],
         ];
         break;
 }
 
 ?>
 
-<nav class="fixed tw:bg-primary tw:!w-[300px] tw:h-dvh tw:px-6 tw:py-8.5">
+<nav class="tw:fixed tw:top-0 tw:left-0 tw:bg-primary tw:!w-[300px] tw:h-dvh tw:px-6 tw:py-8.5">
     <a class="tw:w-fit tw:no-underline tw:m-0 tw:p-0 tw:leading-none tw:flex tw:flex-col tw:gap-[5px]" href="index.php">
         <h2 class="tw:font-bold tw:w-fit tw:text-[30px] tw:text-white tw:m-0 tw:leading-none">DOREMI</h2>
         <p class="tw:font-medium tw:w-fit tw:text-[13px] tw:text-accent tw:m-0 tw:leading-none">ASTRATech Dormitory</p>
