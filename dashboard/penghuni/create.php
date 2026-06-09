@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         v::key('no', v::digit()->length(10, 15)),
         v::key('jk', v::in(['L', 'P'])),
         v::key('kamarId', v::numericVal()),
-        v::key('alamat', v::stringType()->length(5, 255)),
+        v::key('alamat', v::stringType()->length(1, 255)),
         v::key('password', v::length(5, 100)),
         v::key('confirmPassword', v::length(5, 100))
     );

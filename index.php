@@ -1,4 +1,5 @@
 <?php
+session_start();
 ?>
 
 <!DOCTYPE html>
@@ -64,7 +65,7 @@
                             Semua yang Anda butuhkan untuk kehidupan asrama yang tenang.
                         </p>
                     </div>
-                    <div class="tw:grid tw:grid-cols-1 tw:md:tw:grid-cols-3 tw:gap-8">
+                    <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-3 tw:gap-8">
                         <div
                             class="tw:p-6 tw:bg-background tw:rounded-2xl tw:border tw:border-accent/30 tw:hover:shadow-xl tw:transition-shadow">
                             <div

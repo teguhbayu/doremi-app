@@ -2,7 +2,6 @@
 if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
     die('Access denied');
 }
-session_start();
 ?>
 
 <header id="global-header"
