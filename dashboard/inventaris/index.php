@@ -36,14 +36,15 @@ $query = mysqli_query($db, "SELECT i.*, k.NomorKamar, r.NamaRuangan
                     </span>
                 </a>
             </div>
-            <table class="table tw:rounded-lg! tw:mt-3">
+            <div class="tw:mt-3 tw:overflow-hidden tw:rounded-lg tw:border tw:border-gray-300">
+                <table id="inventarisTable" class="table text-center align-middle tw:mb-0 tw:w-full">
                 <thead>
                     <tr>
-                        <th scope="col">ID</th>
-                        <th scope="col">Nama Barang</th>
-                        <th scope="col">Jumlah</th>
-                        <th scope="col">Lokasi</th>
-                        <th scope="col">Aksi</th>
+                        <th scope="col" class="text-center align-middle" style="width: 10%;">ID</th>
+                        <th scope="col" class="text-center align-middle" style="width: 30%;">Nama Barang</th>
+                        <th scope="col" class="text-center align-middle" style="width: 10%;">Jumlah</th>
+                        <th scope="col" class="text-center align-middle" style="width: 30%;">Lokasi</th>
+                        <th scope="col" class="text-center align-middle" style="width: 20%;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -102,6 +103,9 @@ $query = mysqli_query($db, "SELECT i.*, k.NomorKamar, r.NamaRuangan
         </div>
     </div>
 
+    <?php require '../../bootstrap.php'; ?>
+    <?php require '../../validation_alert.php'; ?>
+
     <script>
         const deleteModal = document.getElementById('deleteModal')
         if (deleteModal) {
@@ -112,10 +116,44 @@ $query = mysqli_query($db, "SELECT i.*, k.NomorKamar, r.NamaRuangan
                 confirmDelete.href = `delete.php?id=${id}`
             })
         }
-    </script>
 
-    <?php require '../../bootstrap.php'; ?>
-    <?php require '../../validation_alert.php'; ?>
+        new DataTable('#inventarisTable', {
+                autoWidth: false,
+                ordering: true,
+                searching: true,
+                paging: true,
+                info: true,
+                columnDefs: [
+                    {
+                        targets: [0, 3],
+                        orderable: false
+                    },
+                    {
+                        targets: '_all',
+                        className: 'text-center align-middle'
+                    }
+                ],
+                layout: {
+                    topStart: 'pageLength',
+                    topEnd: 'search',
+                    bottomStart: 'info',
+                    bottomEnd: 'paging'
+                },
+                language: {
+                    search: "Cari:",
+                    lengthMenu: "Tampilkan _MENU_ data",
+                    info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                    infoEmpty: "Tidak ada data",
+                    zeroRecords: "Data tidak ditemukan",
+                    paginate: {
+                        first: "Pertama",
+                        last: "Terakhir",
+                        next: "Berikutnya",
+                        previous: "Sebelumnya"
+                    }
+                }
+            });
+    </script>
 </body>
 
 </html>

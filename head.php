@@ -19,4 +19,5 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
     <link rel="stylesheet" href="/doremi-app/css/styles.css" />
     <link href="https://iconsax.gitlab.io/i/icons.css" rel="stylesheet">
     <link rel="Doremi icon" href="/doremi-app/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.4/css/dataTables.dataTables.min.css">
 </head>

@@ -22,8 +22,8 @@ $query = mysqli_query($db, "SELECT p.*, k.NomorKamar FROM penghuni p LEFT JOIN k
             <h1 class="tw:font-bold tw:mb-5 tw:text-4xl tw:text-black">
                 Kelola Penghuni
             </h1>
-            <div class="tw:w-full tw:flex tw:justify-end">
 
+            <div class="tw:w-full tw:flex tw:justify-end">
                 <a href="create.php"
                     class="tw:bg-secondary tw:text-white tw:px-3 tw:py-2 tw:rounded-lg tw:hover:bg-accent tw:duration-300 tw:transition-all tw:inline-flex tw:items-center tw:gap-2">
                     <i class="iconsax tw:text-2xl " icon-name="add-square"></i>
@@ -32,14 +32,16 @@ $query = mysqli_query($db, "SELECT p.*, k.NomorKamar FROM penghuni p LEFT JOIN k
                     </span>
                 </a>
             </div>
-            <table class="table tw:rounded-lg! tw:mt-3">
+
+            <div class="tw:mt-3 tw:overflow-hidden tw:rounded-lg tw:border tw:border-gray-300">
+                <table id="penghuniTable" class="table text-center align-middle tw:mb-0 tw:w-full">
                 <thead>
                     <tr>
-                        <th scope="col">ID</th>
-                        <th scope="col">NIM</th>
-                        <th scope="col">Nama</th>
-                        <th scope="col">Kamar</th>
-                        <th scope="col">Aksi</th>
+                        <th scope="col" class="text-center align-middle" style="width: 10%;">ID</th>
+                        <th scope="col" class="text-center align-middle" style="width: 15%;">NIM</th>
+                        <th scope="col" class="text-center align-middle" style="width: 30%;">Nama</th>
+                        <th scope="col" class="text-center align-middle" style="width: 10%;">Kamar</th>
+                        <th scope="col" class="text-center align-middle" style="width: 20%;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -47,7 +49,7 @@ $query = mysqli_query($db, "SELECT p.*, k.NomorKamar FROM penghuni p LEFT JOIN k
                         <tr>
                             <th scope="row"><?php echo $penghuni["PenghuniID"]; ?></th>
                             <td><?php echo $penghuni["Nim"]; ?></td>
-                            <td><?php echo $penghuni["NamaPenghuni"]; ?></td>
+                            <td class="tw:text-left"><?php echo $penghuni["NamaPenghuni"]; ?></td>
                             <td><?php echo $penghuni["NomorKamar"] ?? 'N/A'; ?></td>
                             <td>
                                 <div class="tw:inline-flex tw:justify-center tw:items-center tw:gap-1 tw:text-black">
@@ -88,6 +90,9 @@ $query = mysqli_query($db, "SELECT p.*, k.NomorKamar FROM penghuni p LEFT JOIN k
         </div>
     </div>
 
+    <?php require '../../bootstrap.php'; ?>
+    <?php require '../../validation_alert.php'; ?>
+
     <script>
         const deleteModal = document.getElementById('deleteModal')
         if (deleteModal) {
@@ -98,10 +103,44 @@ $query = mysqli_query($db, "SELECT p.*, k.NomorKamar FROM penghuni p LEFT JOIN k
                 confirmDelete.href = `delete.php?id=${id}`
             })
         }
-    </script>
 
-    <?php require '../../bootstrap.php'; ?>
-    <?php require '../../validation_alert.php'; ?>
+        new DataTable('#penghuniTable', {
+                autoWidth: false,
+                ordering: true,
+                searching: true,
+                paging: true,
+                info: true,
+                columnDefs: [
+                    {
+                        targets: [0, 3],
+                        orderable: false
+                    },
+                    {
+                        targets: '_all',
+                        className: 'text-center align-middle'
+                    }
+                ],
+                layout: {
+                    topStart: 'pageLength',
+                    topEnd: 'search',
+                    bottomStart: 'info',
+                    bottomEnd: 'paging'
+                },
+                language: {
+                    search: "Cari:",
+                    lengthMenu: "Tampilkan _MENU_ data",
+                    info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                    infoEmpty: "Tidak ada data",
+                    zeroRecords: "Data tidak ditemukan",
+                    paginate: {
+                        first: "Pertama",
+                        last: "Terakhir",
+                        next: "Berikutnya",
+                        previous: "Sebelumnya"
+                    }
+                }
+            });
+    </script>
 </body>
 
 </html>

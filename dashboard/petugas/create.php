@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ,
         v::key('no', v::digit()->length(10, 15))
         ,
-        v::key('jabatan', v::alpha()->in(["PENGURUS", "SIGAP", "VIRTUS", "MAINTENANCE"]))
+        v::key('jabatan', v::alpha()->in(["PENGURUS", "SIGAP", "SERVANDA", "MAINTENANCE"]))
         ,
         v::key('password', v::length(5, 100))
         ,
@@ -105,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <option selected>Pilih Salah Satu</option>
                         <option value="PENGURUS">PENGURUS</option>
                         <option value="SIGAP">SIGAP</option>
-                        <option value="VIRTUS">VIRTUS</option>
+                        <option value="SERVANDA">SERVANDA</option>
                         <option value="MAINTENANCE">MAINTENANCE</option>
                     </select>
                 </div>

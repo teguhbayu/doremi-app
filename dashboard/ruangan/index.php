@@ -32,14 +32,15 @@ $query = mysqli_query($db, "SELECT * FROM ruangan WHERE IsDeleted = 0;");
                     </span>
                 </a>
             </div>
-            <table class="table tw:rounded-lg! tw:mt-3">
+            <div class="tw:mt-3 tw:overflow-hidden tw:rounded-lg tw:border tw:border-gray-300">
+                <table id="ruanganTable" class="table text-center align-middle tw:mb-0 tw:w-full">
                 <thead>
                     <tr>
-                        <th scope="col">ID</th>
-                        <th scope="col">Nama Ruangan</th>
-                        <th scope="col">Jenis</th>
-                        <th scope="col">Keterangan</th>
-                        <th scope="col">Aksi</th>
+                        <th scope="col" class="text-center align-middle" style="width: 10%;">ID</th>
+                        <th scope="col" class="text-center align-middle" style="width: 30%;">Nama Ruangan</th>
+                        <th scope="col" class="text-center align-middle" style="width: 20%;">Jenis</th>
+                        <th scope="col" class="text-center align-middle" style="width: 20%;">Keterangan</th>
+                        <th scope="col" class="text-center align-middle" style="width: 20%;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -88,6 +89,9 @@ $query = mysqli_query($db, "SELECT * FROM ruangan WHERE IsDeleted = 0;");
         </div>
     </div>
 
+    <?php require '../../bootstrap.php'; ?>
+    <?php require '../../validation_alert.php'; ?>
+
     <script>
         const deleteModal = document.getElementById('deleteModal')
         if (deleteModal) {
@@ -98,10 +102,52 @@ $query = mysqli_query($db, "SELECT * FROM ruangan WHERE IsDeleted = 0;");
                 confirmDelete.href = `delete.php?id=${id}`
             })
         }
+
+         document.addEventListener('DOMContentLoaded', () => {
+            // if (typeof DataTable === 'undefined') {
+            //     console.error('DataTables gagal dimuat. Periksa akses CDN atau file asset.');
+            //     return;
+            // }
+
+            new DataTable('#ruanganTable', {
+                autoWidth: false,
+                ordering: true,
+                searching: true,
+                paging: true,
+                info: true,
+                columnDefs: [
+                    {
+                        targets: [0, 3],
+                        orderable: false
+                    },
+                    {
+                        targets: '_all',
+                        className: 'text-center align-middle'
+                    }
+                ],
+                layout: {
+                    topStart: 'pageLength',
+                    topEnd: 'search',
+                    bottomStart: 'info',
+                    bottomEnd: 'paging'
+                },
+                language: {
+                    search: "Cari:",
+                    lengthMenu: "Tampilkan _MENU_ data",
+                    info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                    infoEmpty: "Tidak ada data",
+                    zeroRecords: "Data tidak ditemukan",
+                    paginate: {
+                        first: "Pertama",
+                        last: "Terakhir",
+                        next: "Berikutnya",
+                        previous: "Sebelumnya"
+                    }
+                }
+            });
+            });
     </script>
 
-    <?php require '../../bootstrap.php'; ?>
-    <?php require '../../validation_alert.php'; ?>
 </body>
 
 </html>
