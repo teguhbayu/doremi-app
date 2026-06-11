@@ -124,18 +124,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
 
                     <div class="tw:flex tw:items-center tw:justify-between">
-                        <div class="tw:flex tw:items-center">
-                            <input id="remember-me" name="remember-me" type="checkbox"
-                                class="tw:h-4 tw:w-4 tw:text-secondary focus:tw:ring-primary tw:border-gray-300 tw:rounded" />
-                            <label for="remember-me" class="tw:ml-2 tw:block tw:text-sm tw:text-gray-900">
-                                Ingat saya
-                            </label>
-                        </div>
-                        <div class="tw:text-sm">
-                            <a href="#" class="tw:font-medium tw:text-secondary tw:hover:text-primary">
-                                Lupa password?
-                            </a>
-                        </div>
                     </div>
 
                     <div>

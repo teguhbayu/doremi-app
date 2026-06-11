@@ -1,0 +1,283 @@
+<?php
+session_start();
+if (!isset($_SESSION['userId'])) {
+    header("Location: /doremi-app/login.php");
+    exit;
+}
+
+require '../../db.php';
+$role = $_SESSION['userRole'];
+$userId = $_SESSION['userId'];
+// Handle PENGHUNI view
+if ($role === 'PENGHUNI') {
+    $historyQuery = mysqli_query($db, "SELECT io.*, p.NamaPetugas 
+                                     FROM inoutpenghuni io 
+                                     LEFT JOIN petugas p ON io.PetugasID = p.PetugasID 
+                                     WHERE io.PenghuniID = $userId 
+                                     ORDER BY io.InOutID DESC");
+
+    $activeQuery = mysqli_query($db, "SELECT COUNT(*) as count FROM inoutpenghuni WHERE PenghuniID = $userId AND Status IN ('Pending', 'Keluar')");
+    $hasActiveRequest = mysqli_fetch_assoc($activeQuery)['count'] > 0;
+}
+
+if ($role === 'SIGAP') {
+    $pendingQuery = mysqli_query($db, "SELECT io.*, pe.NamaPenghuni, pe.Nim, k.NomorKamar 
+                                     FROM inoutpenghuni io 
+                                     JOIN penghuni pe ON io.PenghuniID = pe.PenghuniID 
+                                     JOIN kamar k ON pe.KamarID = k.KamarID 
+                                     WHERE io.Status = 'Pending' 
+                                     ORDER BY io.InOutID ASC");
+                                     
+    $outsideQuery = mysqli_query($db, "SELECT io.*, pe.NamaPenghuni, pe.Nim, k.NomorKamar 
+                                     FROM inoutpenghuni io 
+                                     JOIN penghuni pe ON io.PenghuniID = pe.PenghuniID 
+                                     JOIN kamar k ON pe.KamarID = k.KamarID 
+                                     WHERE io.Status = 'Keluar' 
+                                     ORDER BY io.WaktuKeluar ASC");
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<?php require '../../head.php'; ?>
+
+<body class="tw:p-0 tw:m-0 relative tw:flex tw:bg-[#f8fafc] tw:min-h-screen">
+    <?php require '../components/sidebar.php'; ?>
+    <main class="tw:ml-75 tw:grow">
+        <div class="tw:pt-8 tw:px-8 tw:flex-1 tw:w-full">
+            <h1 class="tw:font-bold tw:mb-6 tw:text-4xl tw:text-black">
+                <?= $role === 'SIGAP' ? 'Konfirmasi In/Out' : 'Izin Keluar' ?>
+            </h1>
+
+            <?php if ($role === 'PENGHUNI'): ?>
+                <div class="tw:grid tw:grid-cols-1 lg:tw:grid-cols-3 tw:gap-8">
+                    <div class="tw:lg:col-span-1">
+                        <div class="tw:bg-white tw:p-6 tw:rounded-[24px] tw:shadow-sm tw:border tw:border-gray-100">
+                            <h5 class="tw:font-bold tw:mb-4">Buat Izin Keluar</h5>
+                            <?php if ($hasActiveRequest): ?>
+                                <div class="alert alert-warning tw:rounded-xl">
+                                    Anda masih memiliki izin keluar yang aktif (Pending/Di Luar). Silakan selesaikan terlebih dahulu sebelum membuat yang baru.
+                                </div>
+                            <?php else: ?>
+                                <form action="process.php" method="POST">
+                                    <input type="hidden" name="action" value="create_request">
+                                    <?php $currentTime = date('H:i'); ?>
+                                    <div class="mb-3">
+                                        <label class="form-label">Rencana Keluar (Waktu)</label>
+                                        <input type="time" name="waktuKeluar" class="form-control" min="<?= $currentTime ?>" max="22:00" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Rencana Masuk (Waktu)</label>
+                                        <input type="time" name="waktuMasuk" class="form-control" min="<?= $currentTime ?>" max="22:00" required>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="form-label">Keperluan</label>
+                                        <textarea name="keperluan" class="form-control" rows="3" placeholder="Contoh: Beli makan, Fotocopy, dll" required></textarea>
+                                    </div>
+                                    <button type="submit" class="tw:bg-secondary tw:w-full tw:text-white tw:py-3 tw:rounded-xl tw:hover:bg-accent tw:transition-all tw:font-semibold">
+                                        Kirim Permintaan
+                                    </button>
+                                </form>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+
+                    <!-- History Section -->
+                    <div class="tw:lg:col-span-2">
+                        <div class="tw:bg-white tw:p-6 tw:rounded-[24px] tw:shadow-sm tw:border tw:border-gray-100">
+                            <h5 class="tw:font-bold tw:mb-4">Riwayat Izin Keluar</h5>
+                            <div class="tw:overflow-hidden tw:rounded-lg tw:border tw:border-gray-300">
+                                <table id="historyTable" class="table text-center align-middle tw:mb-0 tw:w-full">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col" class="text-center align-middle" style="width: 20%;">Status</th>
+                                            <th scope="col" class="text-center align-middle" style="width: 40%;">Keperluan</th>
+                                            <th scope="col" class="text-center align-middle" style="width: 20%;">Waktu Keluar</th>
+                                            <th scope="col" class="text-center align-middle" style="width: 20%;">Waktu Masuk</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php while ($row = mysqli_fetch_assoc($historyQuery)): ?>
+                                            <tr>
+                                                <td>
+                                                    <?php if ($row['Status'] === 'Pending'): ?>
+                                                        <span class="badge bg-warning">Pending</span>
+                                                    <?php elseif ($row['Status'] === 'Keluar'): ?>
+                                                        <span class="badge bg-danger">Di Luar</span>
+                                                    <?php else: ?>
+                                                        <span class="badge bg-success">Selesai</span>
+                                                    <?php endif; ?>
+                                                </td>
+                                                <td><?= htmlspecialchars($row['Keperluan']) ?></td>
+                                                <td><?= $row['WaktuKeluar'] ? date('H:i, d M', strtotime($row['WaktuKeluar'])) : '-' ?></td>
+                                                <td><?= $row['WaktuMasuk'] ? date('H:i, d M', strtotime($row['WaktuMasuk'])) : '-' ?></td>
+                                            </tr>
+                                        <?php endwhile; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            <?php elseif ($role === 'SIGAP'): ?>
+                <div class="tw:flex tw:flex-col tw:gap-8">
+                    <div class="tw:bg-white tw:p-6 tw:rounded-[24px] tw:shadow-sm tw:border tw:border-gray-100">
+                        <div class="tw:flex tw:items-center tw:gap-3 tw:mb-6">
+                            <div class="tw:p-3 tw:bg-orange-50 tw:text-orange-500 tw:rounded-xl">
+                                <i class="iconsax tw:text-2xl" icon-name="export-1"></i>
+                            </div>
+                            <h5 class="tw:font-bold tw:m-0">Akan Keluar</h5>
+                        </div>
+                        <div class="tw:overflow-hidden tw:rounded-lg tw:border tw:border-gray-300">
+                            <table id="pendingTable" class="table text-center align-middle tw:mb-0 tw:w-full">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" class="text-center align-middle" style="width: 30%;">Penghuni</th>
+                                        <th scope="col" class="text-center align-middle" style="width: 20%;">Kamar</th>
+                                        <th scope="col" class="text-center align-middle" style="width: 30%;">Keperluan</th>
+                                        <th scope="col" class="text-center align-middle" style="width: 20%;">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php while ($row = mysqli_fetch_assoc($pendingQuery)): ?>
+                                        <tr>
+                                            <td>
+                                                <div class="tw:font-bold"><?= htmlspecialchars($row['NamaPenghuni']) ?></div>
+                                                <div class="tw:text-xs tw:text-gray-500"><?= $row['Nim'] ?></div>
+                                            </td>
+                                            <td><?= $row['NomorKamar'] ?></td>
+                                            <td><?= htmlspecialchars($row['Keperluan']) ?></td>
+                                            <td>
+                                                <form action="process.php" method="POST" class="tw:inline">
+                                                    <input type="hidden" name="action" value="confirm_exit">
+                                                    <input type="hidden" name="id" value="<?= $row['InOutID'] ?>">
+                                                    <button type="submit" class="btn btn-primary btn-sm tw:rounded-lg">Konfirmasi Keluar</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    <?php endwhile; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="tw:bg-white tw:p-6 tw:rounded-[24px] tw:shadow-sm tw:border tw:border-gray-100">
+                        <div class="tw:flex tw:items-center tw:gap-3 tw:mb-6">
+                            <div class="tw:p-3 tw:bg-blue-50 tw:text-blue-500 tw:rounded-xl">
+                                <i class="iconsax tw:text-2xl" icon-name="import-1"></i>
+                            </div>
+                            <h5 class="tw:font-bold tw:m-0">Di Luar</h5>
+                        </div>
+                        <div class="tw:overflow-hidden tw:rounded-lg tw:border tw:border-gray-300">
+                            <table id="outsideTable" class="table text-center align-middle tw:mb-0 tw:w-full">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" class="text-center align-middle" style="width: 30%;">Penghuni</th>
+                                        <th scope="col" class="text-center align-middle" style="width: 20%;">Kamar</th>
+                                        <th scope="col" class="text-center align-middle" style="width: 30%;">Waktu Keluar</th>
+                                        <th scope="col" class="text-center align-middle" style="width: 20%;">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php while ($row = mysqli_fetch_assoc($outsideQuery)): ?>
+                                        <tr>
+                                            <td>
+                                                <div class="tw:font-bold"><?= htmlspecialchars($row['NamaPenghuni']) ?></div>
+                                                <div class="tw:text-xs tw:text-gray-500"><?= $row['Nim'] ?></div>
+                                            </td>
+                                            <td><?= $row['NomorKamar'] ?></td>
+                                            <td><?= date('H:i, d M', strtotime($row['WaktuKeluar'])) ?></td>
+                                            <td>
+                                                <form action="process.php" method="POST" class="tw:inline">
+                                                    <input type="hidden" name="action" value="confirm_entry">
+                                                    <input type="hidden" name="id" value="<?= $row['InOutID'] ?>">
+                                                    <button type="submit" class="btn btn-success btn-sm tw:rounded-lg">Konfirmasi Masuk</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    <?php endwhile; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
+        </div>
+    </main>
+    <?php require '../../bootstrap.php'; ?>
+    <?php require '../../validation_alert.php'; ?>
+    
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/2.0.8/js/dataTables.bootstrap5.min.js"></script>
+    <link href="https://cdn.datatables.net/2.0.8/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const dtConfig = {
+                autoWidth: false,
+                ordering: true,
+                searching: true,
+                paging: true,
+                info: true,
+                columnDefs: [
+                    {
+                        targets: '_all',
+                        className: 'text-center align-middle'
+                    }
+                ],
+                layout: {
+                    topStart: 'pageLength',
+                    topEnd: 'search',
+                    bottomStart: 'info',
+                    bottomEnd: 'paging'
+                },
+                language: {
+                    search: "Cari:",
+                    lengthMenu: "Tampilkan _MENU_ data",
+                    info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                    infoEmpty: "Tidak ada data",
+                    zeroRecords: "Data tidak ditemukan",
+                    paginate: {
+                        first: "Pertama",
+                        last: "Terakhir",
+                        next: "Berikutnya",
+                        previous: "Sebelumnya"
+                    }
+                }
+            };
+
+            <?php if ($role === 'PENGHUNI'): ?>
+                if (document.getElementById('historyTable')) {
+                    new DataTable('#historyTable', {
+                        ...dtConfig,
+                        order: [[2, 'desc']] // Order by Waktu Keluar descending by default
+                    });
+                }
+            <?php elseif ($role === 'SIGAP'): ?>
+                if (document.getElementById('pendingTable')) {
+                    new DataTable('#pendingTable', {
+                        ...dtConfig,
+                        columnDefs: [
+                            { targets: 3, orderable: false }, // Disable sorting on Action column
+                            { targets: '_all', className: 'text-center align-middle' }
+                        ]
+                    });
+                }
+                if (document.getElementById('outsideTable')) {
+                    new DataTable('#outsideTable', {
+                        ...dtConfig,
+                        order: [[2, 'asc']], // Order by Waktu Keluar ascending by default
+                        columnDefs: [
+                            { targets: 3, orderable: false }, // Disable sorting on Action column
+                            { targets: '_all', className: 'text-center align-middle' }
+                        ]
+                    });
+                }
+            <?php endif; ?>
+        });
+    </script>
+</body>
+
+</html>
