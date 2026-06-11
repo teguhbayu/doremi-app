@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         v::key('no', v::digit()->length(10, 15)),
         v::key('jk', v::in(['L', 'P'])),
         v::key('kamarId', v::numericVal()),
-        v::key('alamat', v::stringType()->length(1, 255)),
+        v::key('alamat', v::stringType()->length(3, 255)),
         v::key('password', v::length(5, 100)),
         v::key('confirmPassword', v::length(5, 100))
     );
@@ -127,7 +127,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
                 <div class="mb-3">
                     <label for="alamatPenghuni" class="form-label">Alamat</label>
-                    <textarea name="alamatPenghuni" class="form-control" id="alamatPenghuni" rows="3" required></textarea>
+                    <textarea name="alamatPenghuni" class="form-control" id="alamatPenghuni" rows="3"
+                        required></textarea>
                 </div>
                 <div class="mb-3">
                     <label for="passwordPenghuni" class="form-label">Password</label>

@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $confirmPassword = trim($_POST['confirmPasswordPetugas'] ?? '');
 
     $petugasSchema = v::keySet(
-        v::key('nama', v::alpha()->length(3, 100))
+        v::key('nama', v::stringType()->length(3, 100))
         ,
         v::key('email', v::email()->length(3, 100))
         ,
@@ -41,7 +41,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'confirmPassword' => $confirmPassword,
     ];
 
-    print_r($postData);
 
     if (!$petugasSchema->validate($postData)) {
         header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Petugas Baru tidak Valid!');
@@ -55,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
 
-    $stmt = mysqli_prepare($db, "INSERT INTO Petugas (NamaPetugas, Email, Password, Jabatan, NoHP) VALUES (?, ?, ?, ?, ?)");
+    $stmt = mysqli_prepare($db, "INSERT INTO petugas (NamaPetugas, Email, Password, Jabatan, NoHP) VALUES (?, ?, ?, ?, ?)");
     mysqli_stmt_bind_param($stmt, 'sssss', $nama, $email, $hashedPassword, $jabatan, $no);
 
     if (!mysqli_stmt_execute($stmt)) {

@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $isChangingPassword = $password !== '' || $confirmPassword !== '';
 
     $baseSchema = v::keySet(
-        v::key('nama', v::alpha()->length(3, 100)),
+        v::key('nama', v::stringType()->length(3, 100)),
         v::key('email', v::email()->length(3, 100)),
         v::key('no', v::digit()->length(10, 15)),
         v::key('jabatan', v::alpha()->in(["PENGURUS", "SIGAP", "VIRTUS", "MAINTENANCE"])),
@@ -68,10 +68,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($isChangingPassword) {
         $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-        $stmt = mysqli_prepare($db, "UPDATE Petugas SET NamaPetugas = ?, Email = ?, Jabatan = ?, NoHP = ?, Password = ? WHERE PetugasID = ?");
+        $stmt = mysqli_prepare($db, "UPDATE petugas SET NamaPetugas = ?, Email = ?, Jabatan = ?, NoHP = ?, Password = ? WHERE PetugasID = ?");
         mysqli_stmt_bind_param($stmt, 'sssssi', $nama, $email, $jabatan, $no, $hashedPassword, $id);
     } else {
-        $stmt = mysqli_prepare($db, "UPDATE Petugas SET NamaPetugas = ?, Email = ?, Jabatan = ?, NoHP = ? WHERE PetugasID = ?");
+        $stmt = mysqli_prepare($db, "UPDATE petugas SET NamaPetugas = ?, Email = ?, Jabatan = ?, NoHP = ? WHERE PetugasID = ?");
         mysqli_stmt_bind_param($stmt, 'ssssi', $nama, $email, $jabatan, $no, $id);
     }
 
