@@ -26,27 +26,27 @@ session_start();
                 </div>
 
                 <div
-                    class="tw:max-w-7xl tw:mx-auto tw:px-4 tw:sm:tw:px-6 tw:lg:tw:px-8 tw:relative tw:z-10 tw:py-16 tw:sm:tw:py-24">
+                    class="tw:max-w-7xl tw:mx-auto tw:px-4 tw:sm:px-6 tw:lg:px-8 tw:relative tw:z-10 tw:py-16 tw:sm:py-24">
                     <div class="tw:text-center">
                         <h1
-                            class="tw:text-4xl tw:tracking-tight tw:font-extrabold tw:text-gray-900 tw:sm:tw:text-5xl tw:md:tw:text-6xl">
+                            class="tw:text-4xl tw:tracking-tight tw:font-extrabold tw:text-gray-900 tw:sm:text-5xl tw:md:text-6xl">
                             <span class="tw:block tw:text-primary">DOREMI</span>
                             <span class="tw:block tw:text-secondary tw:mt-2">Kenyamanan & Keamanan Terpadu</span>
                         </h1>
                         <p
-                            class="tw:mt-3 tw:max-w-md tw:mx-auto tw:text-base tw:text-gray-500 tw:sm:tw:text-lg tw:md:tw:mt-5 tw:md:tw:text-xl tw:md:tw:max-w-3xl">
+                            class="tw:mt-3 tw:max-w-md tw:mx-auto tw:text-base tw:text-gray-500 tw:sm:text-lg tw:md:mt-5 tw:md:text-xl tw:md:max-w-3xl">
                             Sistem manajemen asrama modern yang menghubungkan penghuni,
                             pengurus, keamanan (Sigap), kebersihan (Virtus), dan teknisi
                             dalam satu platform yang mudah digunakan.
                         </p>
                         <div
-                            class="tw:mt-8 tw:no-underline tw:max-w-md tw:mx-auto tw:sm:tw:flex tw:sm:tw:justify-center tw:md:tw:mt-10 tw:gap-4">
+                            class="tw:mt-8 tw:no-underline tw:max-w-md tw:mx-auto tw:sm:flex tw:sm:justify-center tw:md:mt-10 tw:gap-4">
                             <a href="login.php"
-                                class="tw:w-full tw:no-underline tw:flex tw:items-center tw:justify-center tw:px-8 tw:py-3 tw:border tw:border-transparent tw:text-base tw:font-medium tw:rounded-full tw:text-white tw:bg-primary tw:hover:bg-opacity-90 tw:md:tw:py-4 tw:md:tw:text-lg tw:md:tw:px-10 tw:shadow-lg tw:transform tw:transition tw:hover:-tw:translate-y-1">
+                                class="tw:w-full tw:no-underline tw:flex tw:items-center tw:justify-center tw:px-8 tw:py-3 tw:border tw:border-transparent tw:text-base tw:font-medium tw:rounded-full tw:text-white tw:bg-primary tw:hover:bg-opacity-90 tw:md:py-4 tw:md:text-lg tw:md:px-10 tw:shadow-lg tw:transform tw:transition tw:hover:-translate-y-1">
                                 Masuk Sistem
                             </a>
                             <a href="gallery.php"
-                                class="tw:mt-3 tw:no-underline tw:w-full tw:flex tw:items-center tw:justify-center tw:px-8 tw:py-3 tw:border-2 tw:border-secondary tw:text-base tw:font-medium tw:rounded-full tw:text-primary tw:bg-transparent tw:hover:bg-secondary tw:hover:text-white tw:md:tw:py-4 tw:md:tw:text-lg tw:md:tw:px-10 tw:mt-0 tw:sm:tw:mt-0 tw:transition-colors">
+                                class="tw:mt-3 tw:no-underline tw:w-full tw:flex tw:items-center tw:justify-center tw:px-8 tw:py-3 tw:border-2 tw:border-secondary tw:text-base tw:font-medium tw:rounded-full tw:text-primary tw:bg-transparent tw:hover:bg-secondary tw:hover:text-white tw:md:py-4 tw:md:text-lg tw:md:px-10 tw:mt-0 tw:sm:mt-0 tw:transition-colors">
                                 Lihat Galeri
                             </a>
                         </div>
@@ -56,7 +56,7 @@ session_start();
 
             <!-- Features Section -->
             <section class="tw:py-16 tw:bg-white tw:z-10 tw:relative">
-                <div class="tw:max-w-7xl tw:mx-auto tw:px-4 tw:sm:tw:px-6 tw:lg:tw:px-8">
+                <div class="tw:max-w-7xl tw:mx-auto tw:px-4 tw:sm:px-6 tw:lg:px-8">
                     <div class="tw:text-center tw:mb-12">
                         <h2 class="tw:text-3xl tw:font-extrabold tw:text-primary">
                             Fasilitas & Layanan Unggulan

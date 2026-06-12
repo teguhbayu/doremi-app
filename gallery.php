@@ -10,7 +10,7 @@ session_start();
     <?php include 'header.php'; ?>
     <div class="tw:pt-16 tw:flex-1 tw:h-full tw:w-full tw:relative tw:overflow-y-auto tw:overflow-x-hidden">
         <div id="gallery-container" class="tw:min-h-full tw:bg-background tw:pt-8 tw:pb-16">
-            <div class="tw:max-w-7xl tw:mx-auto tw:px-4 tw:sm:tw:px-6 tw:lg:tw:px-8">
+            <div class="tw:max-w-7xl tw:mx-auto tw:px-4 tw:sm:px-6 tw:lg:px-8">
                 <div class="tw:text-center tw:mb-10">
                     <h2 class="tw:text-3xl tw:font-extrabold tw:text-primary">Galeri DOREMI</h2>
                     <p class="tw:mt-4 tw:text-lg tw:text-gray-500">
