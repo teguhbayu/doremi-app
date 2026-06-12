@@ -9,23 +9,17 @@ require '../db.php';
 $role = $_SESSION['userRole'];
 $userName = $_SESSION['userName'];
 
-// Data for PENGURUS
 $stats = [];
 if ($role === 'PENGURUS') {
-    // Total Active Penghuni
     $activePenghuni = mysqli_fetch_assoc(mysqli_query($db, "SELECT COUNT(*) as total FROM penghuni WHERE IsDeleted = 0 AND IsActive = 1"))['total'];
 
-    // InOut Today
     $today = date('Y-m-d');
     $inOutToday = mysqli_fetch_assoc(mysqli_query($db, "SELECT COUNT(*) as total FROM inoutpenghuni WHERE DATE(WaktuKeluar) = '$today' OR DATE(WaktuMasuk) = '$today'"))['total'];
 
-    // Available Kamar
     $totalKamar = mysqli_fetch_assoc(mysqli_query($db, "SELECT COUNT(*) as total FROM kamar WHERE IsDeleted = 0"))['total'];
 
-    // Maintenance Pending
     $pendingMaintenance = mysqli_fetch_assoc(mysqli_query($db, "SELECT COUNT(*) as total FROM maintenance WHERE StatusMaintenance = 'Diajukan'"))['total'];
 
-    // Chart Data: Gender Distribution
     $genderStats = mysqli_query($db, "SELECT JenisKelamin, COUNT(*) as count FROM penghuni WHERE IsDeleted = 0 GROUP BY JenisKelamin");
     $chartData = ['L' => 0, 'P' => 0];
     while ($row = mysqli_fetch_assoc($genderStats)) {
@@ -59,7 +53,6 @@ if ($role === 'PENGURUS') {
 
             <?php if ($role === 'PENGURUS'): ?>
                 <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:lg:grid-cols-4 tw:gap-6 tw:mb-10">
-                    <!-- Stat Card 1 -->
                     <div
                         class="tw:group tw:relative tw:bg-white/60 tw:backdrop-blur-xl tw:p-6 tw:rounded-[24px] tw:border tw:border-white tw:shadow-[0_8px_30px_rgb(0,0,0,0.04)] tw:transition-all tw:duration-500 tw:hover:shadow-[0_20px_50px_rgba(59,130,246,0.1)] tw:hover:-translate-y-1">
                         <div class="tw:flex tw:items-center tw:gap-5">
@@ -75,7 +68,6 @@ if ($role === 'PENGURUS') {
                             </div>
                         </div>
                     </div>
-                    <!-- Stat Card 2 -->
                     <div
                         class="tw:group tw:relative tw:bg-white/60 tw:backdrop-blur-xl tw:p-6 tw:rounded-[24px] tw:border tw:border-white tw:shadow-[0_8px_30px_rgb(0,0,0,0.04)] tw:transition-all tw:duration-500 tw:hover:shadow-[0_20px_50px_rgba(34,197,94,0.1)] tw:hover:-translate-y-1">
                         <div class="tw:flex tw:items-center tw:gap-5">
@@ -91,7 +83,6 @@ if ($role === 'PENGURUS') {
                             </div>
                         </div>
                     </div>
-                    <!-- Stat Card 3 -->
                     <div
                         class="tw:group tw:relative tw:bg-white/60 tw:backdrop-blur-xl tw:p-6 tw:rounded-[24px] tw:border tw:border-white tw:shadow-[0_8px_30px_rgb(0,0,0,0.04)] tw:transition-all tw:duration-500 tw:hover:shadow-[0_20px_50px_rgba(168,85,247,0.1)] tw:hover:-translate-y-1">
                         <div class="tw:flex tw:items-center tw:gap-5">
@@ -107,7 +98,6 @@ if ($role === 'PENGURUS') {
                             </div>
                         </div>
                     </div>
-                    <!-- Stat Card 4 -->
                     <div
                         class="tw:group tw:relative tw:bg-white/60 tw:backdrop-blur-xl tw:p-6 tw:rounded-[24px] tw:border tw:border-white tw:shadow-[0_8px_30px_rgb(0,0,0,0.04)] tw:transition-all tw:duration-500 tw:hover:shadow-[0_20px_50px_rgba(249,115,22,0.1)] tw:hover:-translate-y-1">
                         <div class="tw:flex tw:items-center tw:gap-5">
@@ -161,7 +151,6 @@ if ($role === 'PENGURUS') {
                     });
                 </script>
             <?php else: ?>
-                <!-- Content for other roles (Petugas, etc) -->
                 <div class="tw:bg-white tw:p-8 tw:rounded-2xl tw:shadow-sm tw:border tw:border-gray-100">
                     <h5 class="tw:font-semibold">Quick Actions</h5>
                     <p class="tw:text-gray-500">Silahkan gunakan menu di samping untuk mengelola data dormitory.</p>

@@ -71,7 +71,6 @@ $query = mysqli_query($db, "SELECT p.*, k.NomorKamar FROM penghuni p LEFT JOIN k
         </div>
     </main>
 
-    <!-- Modal -->
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">

@@ -8,7 +8,6 @@ if (!isset($_SESSION['userId'])) {
 require '../../db.php';
 $role = $_SESSION['userRole'];
 $userId = $_SESSION['userId'];
-// Handle PENGHUNI view
 if ($role === 'PENGHUNI') {
     $historyQuery = mysqli_query($db, "SELECT io.*, p.NamaPetugas 
                                      FROM inoutpenghuni io 
@@ -82,7 +81,6 @@ if ($role === 'SIGAP') {
                         </div>
                     </div>
 
-                    <!-- History Section -->
                     <div class="tw:lg:col-span-2">
                         <div class="tw:bg-white tw:p-6 tw:rounded-[24px] tw:shadow-sm tw:border tw:border-gray-100">
                             <h5 class="tw:font-bold tw:mb-4">Riwayat Izin Keluar</h5>
@@ -252,7 +250,7 @@ if ($role === 'SIGAP') {
                 if (document.getElementById('historyTable')) {
                     new DataTable('#historyTable', {
                         ...dtConfig,
-                        order: [[2, 'desc']] // Order by Waktu Keluar descending by default
+                        order: [[2, 'desc']]
                     });
                 }
             <?php elseif ($role === 'SIGAP'): ?>
@@ -260,7 +258,7 @@ if ($role === 'SIGAP') {
                     new DataTable('#pendingTable', {
                         ...dtConfig,
                         columnDefs: [
-                            { targets: 3, orderable: false }, // Disable sorting on Action column
+                            { targets: 3, orderable: false },
                             { targets: '_all', className: 'text-center align-middle' }
                         ]
                     });
@@ -268,9 +266,9 @@ if ($role === 'SIGAP') {
                 if (document.getElementById('outsideTable')) {
                     new DataTable('#outsideTable', {
                         ...dtConfig,
-                        order: [[2, 'asc']], // Order by Waktu Keluar ascending by default
+                        order: [[2, 'asc']],
                         columnDefs: [
-                            { targets: 3, orderable: false }, // Disable sorting on Action column
+                            { targets: 3, orderable: false },
                             { targets: '_all', className: 'text-center align-middle' }
                         ]
                     });

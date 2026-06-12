@@ -76,7 +76,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (!mysqli_stmt_execute($stmt)) {
-        // TODO: Handle query execution error
         mysqli_stmt_close($stmt);
         exit;
     }

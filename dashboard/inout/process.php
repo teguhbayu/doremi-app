@@ -37,12 +37,10 @@ if ($action === 'create_request') {
         exit;
     }
 
-    // Append today's date to the time inputs
     $today = date('Y-m-d');
     $waktuKeluar = $today . ' ' . $waktuKeluarTime . ':00';
     $waktuMasuk = $today . ' ' . $waktuMasukTime . ':00';
 
-    // Check if user already has an active request
     $activeQuery = mysqli_query($db, "SELECT COUNT(*) as count FROM inoutpenghuni WHERE PenghuniID = $userId AND Status IN ('Pending', 'Keluar')");
     if (mysqli_fetch_assoc($activeQuery)['count'] > 0) {
         header("Location: index.php?status=error&message=Anda masih memiliki izin keluar yang aktif!");

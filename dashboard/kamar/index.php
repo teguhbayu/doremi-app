@@ -112,10 +112,6 @@ $query = mysqli_query($db, "SELECT * FROM kamar WHERE IsDeleted = 0 ORDER BY Nom
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            // if (typeof DataTable === 'undefined') {
-            //     console.error('DataTables gagal dimuat. Periksa akses CDN atau file asset.');
-            //     return;
-            // }
 
             new DataTable('#kamarTable', {
                 autoWidth: false,

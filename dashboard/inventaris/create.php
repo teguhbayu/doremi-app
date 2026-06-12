@@ -10,14 +10,13 @@ if (!isset($_SESSION['userId'])) {
 }
 require '../../db.php';
 
-// Fetch rooms and spaces
 $kamars = mysqli_fetch_all(mysqli_query($db, "SELECT KamarID, NomorKamar FROM kamar WHERE IsDeleted = 0"), MYSQLI_ASSOC);
 $ruangans = mysqli_fetch_all(mysqli_query($db, "SELECT RuanganID, NamaRuangan FROM ruangan WHERE IsDeleted = 0"), MYSQLI_ASSOC);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nama = trim($_POST['namaBarang'] ?? '');
     $jumlah = trim($_POST['jumlahBarang'] ?? '');
-    $lokasi = $_POST['lokasiBarang'] ?? ''; // Format: "kamar:ID" or "ruangan:ID"
+    $lokasi = $_POST['lokasiBarang'] ?? '';
     $keterangan = trim($_POST['keteranganBarang'] ?? '');
 
     $inventarisSchema = v::keySet(

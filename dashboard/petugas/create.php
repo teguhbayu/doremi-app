@@ -58,7 +58,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     mysqli_stmt_bind_param($stmt, 'sssss', $nama, $email, $hashedPassword, $jabatan, $no);
 
     if (!mysqli_stmt_execute($stmt)) {
-        // TODO: Handle query execution error
         header("Location: " . $_SERVER['PHP_SELF'] . '?status=success&message=Terjadi Kesalahan!!');
         mysqli_stmt_close($stmt);
         exit;
