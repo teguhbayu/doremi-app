@@ -16,7 +16,7 @@ if (!$id) {
     exit;
 }
 
-$stmt = mysqli_prepare($db, "SELECT PetugasID, NamaPetugas, Email, Jabatan, NoHP FROM Petugas WHERE PetugasID = ? LIMIT 1");
+$stmt = mysqli_prepare($db, "SELECT PetugasID, NamaPetugas, Email, Jabatan, NoHP FROM petugas WHERE PetugasID = ? LIMIT 1");
 mysqli_stmt_bind_param($stmt, 'i', $id);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
