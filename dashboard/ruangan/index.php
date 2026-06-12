@@ -37,8 +37,9 @@ $query = mysqli_query($db, "SELECT * FROM ruangan WHERE IsDeleted = 0;");
                 <thead>
                     <tr>
                         <th scope="col" class="text-center align-middle" style="width: 10%;">ID</th>
-                        <th scope="col" class="text-center align-middle" style="width: 30%;">Nama Ruangan</th>
-                        <th scope="col" class="text-center align-middle" style="width: 20%;">Jenis</th>
+                        <th scope="col" class="text-center align-middle" style="width: 25%;">Nama Ruangan</th>
+                        <th scope="col" class="text-center align-middle" style="width: 15%;">Jenis</th>
+                        <th scope="col" class="text-center align-middle" style="width: 10%;">Lantai</th>
                         <th scope="col" class="text-center align-middle" style="width: 20%;">Keterangan</th>
                         <th scope="col" class="text-center align-middle" style="width: 20%;">Aksi</th>
                     </tr>
@@ -49,6 +50,7 @@ $query = mysqli_query($db, "SELECT * FROM ruangan WHERE IsDeleted = 0;");
                             <th scope="row"><?php echo $ruangan["RuanganID"]; ?></th>
                             <td><?php echo $ruangan["NamaRuangan"]; ?></td>
                             <td><?php echo $ruangan["JenisRuangan"]; ?></td>
+                            <td>Lantai <?php echo $ruangan["Lantai"]; ?></td>
                             <td><?php echo $ruangan["Keterangan"]; ?></td>
                             <td>
                                 <div class="tw:inline-flex tw:justify-center tw:items-center tw:gap-1 tw:text-black">

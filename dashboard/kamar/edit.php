@@ -31,15 +31,18 @@ if (!$kamar) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nomor = trim($_POST['nomorKamar'] ?? '');
     $kapasitas = trim($_POST['kapasitasKamar'] ?? '');
+    $lantai = trim($_POST['lantaiKamar'] ?? '');
 
     $kamarSchema = v::keySet(
         v::key('nomor', v::stringType()->length(1, 20)),
-        v::key('kapasitas', v::digit())
+        v::key('kapasitas', v::digit()),
+        v::key('lantai', v::in(['1', '2', '3', '4', '5', '6', '7']))
     );
 
     $postData = [
         'nomor' => $nomor,
         'kapasitas' => $kapasitas,
+        'lantai' => $lantai,
     ];
 
     if (!$kamarSchema->validate($postData)) {
@@ -67,8 +70,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $now = date('Y-m-d H:i:s');
 
-    $stmt = mysqli_prepare($db, "UPDATE kamar SET NomorKamar = ?, KapasitasPenghuni = ?, UpdatedAt = ? WHERE KamarID = ?");
-    mysqli_stmt_bind_param($stmt, 'sisi', $nomor, $kapasitasInt, $now, $id);
+    $stmt = mysqli_prepare($db, "UPDATE kamar SET NomorKamar = ?, KapasitasPenghuni = ?, Lantai = ?, UpdatedAt = ? WHERE KamarID = ?");
+    mysqli_stmt_bind_param($stmt, 'sissi', $nomor, $kapasitasInt, $lantai, $now, $id);
 
     if (!mysqli_stmt_execute($stmt)) {
         header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&status=error&message=Terjadi Kesalahan saat mengupdate data!');
@@ -106,6 +109,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <input type="number" name="kapasitasKamar" class="form-control" id="kapasitasKamar"
                         value="<?= htmlspecialchars($kamar['KapasitasPenghuni']) ?>" min="1" max="4" required>
                     <div class="form-text">Jumlah penghuni minimal 1 dan maksimal 4 orang per kamar.</div>
+                </div>
+                <div class="mb-3">
+                    <label for="lantaiKamar" class="form-label">Lantai</label>
+                    <select class="form-select" name="lantaiKamar" id="lantaiKamar" required>
+                        <option value="" disabled <?= empty($kamar['Lantai']) ? 'selected' : '' ?>>Pilih Lantai</option>
+                        <option value="1" <?= $kamar['Lantai'] == '1' ? 'selected' : '' ?>>Lantai 1</option>
+                        <option value="2" <?= $kamar['Lantai'] == '2' ? 'selected' : '' ?>>Lantai 2</option>
+                        <option value="3" <?= $kamar['Lantai'] == '3' ? 'selected' : '' ?>>Lantai 3</option>
+                        <option value="4" <?= $kamar['Lantai'] == '4' ? 'selected' : '' ?>>Lantai 4</option>
+                        <option value="5" <?= $kamar['Lantai'] == '5' ? 'selected' : '' ?>>Lantai 5</option>
+                        <option value="6" <?= $kamar['Lantai'] == '6' ? 'selected' : '' ?>>Lantai 6</option>
+                        <option value="7" <?= $kamar['Lantai'] == '7' ? 'selected' : '' ?>>Lantai 7</option>
+                    </select>
                 </div>
                 <div class="tw:w-full tw:flex tw:justify-end tw:mt-2">
                     <button type="submit"

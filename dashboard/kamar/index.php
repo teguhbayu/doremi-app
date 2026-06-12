@@ -37,8 +37,9 @@ $query = mysqli_query($db, "SELECT * FROM kamar WHERE IsDeleted = 0 ORDER BY Nom
                     <thead>
                         <tr>
                             <th scope="col" class="text-center align-middle" style="width: 10%;">No</th>
-                            <th scope="col" class="text-center align-middle" style="width: 35%;">Nomor Kamar</th>
-                            <th scope="col" class="text-center align-middle" style="width: 35%;">Jumlah Penghuni</th>
+                            <th scope="col" class="text-center align-middle" style="width: 25%;">Nomor Kamar</th>
+                            <th scope="col" class="text-center align-middle" style="width: 25%;">Jumlah Penghuni</th>
+                            <th scope="col" class="text-center align-middle" style="width: 20%;">Lantai</th>
                             <th scope="col" class="text-center align-middle" style="width: 20%;">Aksi</th>
                         </tr>
                     </thead>
@@ -50,6 +51,7 @@ $query = mysqli_query($db, "SELECT * FROM kamar WHERE IsDeleted = 0 ORDER BY Nom
                                 <th scope="row"><?php echo $nomorUrut++; ?></th>
                                 <td><?php echo $kamar["NomorKamar"]; ?></td>
                                 <td><?php echo $kamar["KapasitasPenghuni"]; ?> Orang</td>
+                                <td>Lantai <?php echo $kamar["Lantai"]; ?></td>
                                 <td>
                                     <div class="tw:inline-flex tw:justify-center tw:items-center tw:gap-1 tw:text-black">
                                         <a href="edit.php?id=<?php echo $kamar["KamarID"]; ?>">
@@ -121,7 +123,7 @@ $query = mysqli_query($db, "SELECT * FROM kamar WHERE IsDeleted = 0 ORDER BY Nom
                 info: true,
                 columnDefs: [
                     {
-                        targets: [0, 3],
+                        targets: [0, 4],
                         orderable: false
                     },
                     {

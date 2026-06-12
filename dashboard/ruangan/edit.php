@@ -31,17 +31,20 @@ if (!$ruangan) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nama = trim($_POST['namaRuangan'] ?? '');
     $jenis = trim($_POST['jenisRuangan'] ?? '');
+    $lantai = trim($_POST['lantaiRuangan'] ?? '');
     $keterangan = trim($_POST['keteranganRuangan'] ?? '');
 
     $ruanganSchema = v::keySet(
         v::key('nama', v::stringType()->length(1, 100)),
         v::key('jenis', v::stringType()->length(1, 50)),
+        v::key('lantai', v::in(['1', '2', '3', '4', '5', '6', '7'])),
         v::key('keterangan', v::stringType()->length(0, 500))
     );
 
     $postData = [
         'nama' => $nama,
         'jenis' => $jenis,
+        'lantai' => $lantai,
         'keterangan' => $keterangan,
     ];
 
@@ -52,8 +55,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $now = date('Y-m-d H:i:s');
 
-    $stmt = mysqli_prepare($db, "UPDATE ruangan SET NamaRuangan = ?, JenisRuangan = ?, Keterangan = ?, UpdatedAt = ? WHERE RuanganID = ?");
-    mysqli_stmt_bind_param($stmt, 'ssssi', $nama, $jenis, $keterangan, $now, $id);
+    $stmt = mysqli_prepare($db, "UPDATE ruangan SET NamaRuangan = ?, JenisRuangan = ?, Lantai = ?, Keterangan = ?, UpdatedAt = ? WHERE RuanganID = ?");
+    mysqli_stmt_bind_param($stmt, 'sssssi', $nama, $jenis, $lantai, $keterangan, $now, $id);
 
     if (!mysqli_stmt_execute($stmt)) {
         header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&status=error&message=Terjadi Kesalahan saat mengupdate data!');
@@ -95,6 +98,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <label for="jenisRuangan" class="form-label">Jenis Ruangan</label>
                     <input type="text" name="jenisRuangan" class="form-control" id="jenisRuangan"
                         value="<?= htmlspecialchars($ruangan['JenisRuangan']) ?>" required>
+                </div>
+                <div class="mb-3">
+                    <label for="lantaiRuangan" class="form-label">Lantai</label>
+                    <select class="form-select" name="lantaiRuangan" id="lantaiRuangan" required>
+                        <option value="" disabled <?= empty($ruangan['Lantai']) ? 'selected' : '' ?>>Pilih Lantai</option>
+                        <option value="1" <?= $ruangan['Lantai'] == '1' ? 'selected' : '' ?>>Lantai 1</option>
+                        <option value="2" <?= $ruangan['Lantai'] == '2' ? 'selected' : '' ?>>Lantai 2</option>
+                        <option value="3" <?= $ruangan['Lantai'] == '3' ? 'selected' : '' ?>>Lantai 3</option>
+                        <option value="4" <?= $ruangan['Lantai'] == '4' ? 'selected' : '' ?>>Lantai 4</option>
+                        <option value="5" <?= $ruangan['Lantai'] == '5' ? 'selected' : '' ?>>Lantai 5</option>
+                        <option value="6" <?= $ruangan['Lantai'] == '6' ? 'selected' : '' ?>>Lantai 6</option>
+                        <option value="7" <?= $ruangan['Lantai'] == '7' ? 'selected' : '' ?>>Lantai 7</option>
+                    </select>
                 </div>
                 <div class="mb-3">
                     <label for="keteranganRuangan" class="form-label">Keterangan</label>

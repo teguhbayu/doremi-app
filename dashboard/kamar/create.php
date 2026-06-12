@@ -13,15 +13,18 @@ require '../../db.php';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nomor = trim($_POST['nomorKamar'] ?? '');
     $kapasitas = trim($_POST['kapasitasKamar'] ?? '');
+    $lantai = trim($_POST['lantaiKamar'] ?? '');
 
     $kamarSchema = v::keySet(
         v::key('nomor', v::stringType()->length(1, 20)),
-        v::key('kapasitas', v::digit())
+        v::key('kapasitas', v::digit()),
+        v::key('lantai', v::in(['1', '2', '3', '4', '5', '6', '7']))
     );
 
     $postData = [
         'nomor' => $nomor,
         'kapasitas' => $kapasitas,
+        'lantai' => $lantai,
     ];
 
     if (!$kamarSchema->validate($postData)) {
@@ -49,8 +52,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $now = date('Y-m-d H:i:s');
 
-    $stmt = mysqli_prepare($db, "INSERT INTO kamar (NomorKamar, KapasitasPenghuni, UpdatedAt, IsDeleted) VALUES (?, ?, ?, 0)");
-    mysqli_stmt_bind_param($stmt, 'sis', $nomor, $kapasitasInt, $now);
+    $stmt = mysqli_prepare($db, "INSERT INTO kamar (NomorKamar, KapasitasPenghuni, Lantai, UpdatedAt, IsDeleted) VALUES (?, ?, ?, ?, 0)");
+    mysqli_stmt_bind_param($stmt, 'siss', $nomor, $kapasitasInt, $lantai, $now);
 
     if (!mysqli_stmt_execute($stmt)) {
         header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Terjadi Kesalahan saat menyimpan data!');
@@ -89,6 +92,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <input type="number" name="kapasitasKamar" class="form-control" id="kapasitasKamar" min="1"
                         max="4" required>
                     <div class="form-text">Jumlah penghuni minimal 1 dan maksimal 4 orang per kamar.</div>
+                </div>
+                <div class="mb-3">
+                    <label for="lantaiKamar" class="form-label">Lantai</label>
+                    <select class="form-select" name="lantaiKamar" id="lantaiKamar" required>
+                        <option value="" disabled selected>Pilih Lantai</option>
+                        <option value="1">Lantai 1</option>
+                        <option value="2">Lantai 2</option>
+                        <option value="3">Lantai 3</option>
+                        <option value="4">Lantai 4</option>
+                        <option value="5">Lantai 5</option>
+                        <option value="6">Lantai 6</option>
+                        <option value="7">Lantai 7</option>
+                    </select>
                 </div>
                 <div class="tw:w-full tw:flex tw:justify-end tw:mt-2">
                     <button type="submit"

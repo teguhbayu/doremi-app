@@ -13,17 +13,20 @@ require '../../db.php';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nama = trim($_POST['namaRuangan'] ?? '');
     $jenis = trim($_POST['jenisRuangan'] ?? '');
+    $lantai = trim($_POST['lantaiRuangan'] ?? '');
     $keterangan = trim($_POST['keteranganRuangan'] ?? '');
 
     $ruanganSchema = v::keySet(
         v::key('nama', v::stringType()->length(1, 100)),
         v::key('jenis', v::stringType()->length(1, 50)),
+        v::key('lantai', v::in(['1', '2', '3', '4', '5', '6', '7'])),
         v::key('keterangan', v::stringType()->length(0, 500))
     );
 
     $postData = [
         'nama' => $nama,
         'jenis' => $jenis,
+        'lantai' => $lantai,
         'keterangan' => $keterangan,
     ];
 
@@ -34,8 +37,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $now = date('Y-m-d H:i:s');
 
-    $stmt = mysqli_prepare($db, "INSERT INTO ruangan (NamaRuangan, JenisRuangan, Keterangan, UpdatedAt, IsDeleted) VALUES (?, ?, ?, ?, 0)");
-    mysqli_stmt_bind_param($stmt, 'ssss', $nama, $jenis, $keterangan, $now);
+    $stmt = mysqli_prepare($db, "INSERT INTO ruangan (NamaRuangan, JenisRuangan, Lantai, Keterangan, UpdatedAt, IsDeleted) VALUES (?, ?, ?, ?, ?, 0)");
+    mysqli_stmt_bind_param($stmt, 'sssss', $nama, $jenis, $lantai, $keterangan, $now);
 
     if (!mysqli_stmt_execute($stmt)) {
         header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Terjadi Kesalahan saat menyimpan data!');
@@ -72,6 +75,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="mb-3">
                     <label for="jenisRuangan" class="form-label">Jenis Ruangan</label>
                     <input type="text" name="jenisRuangan" class="form-control" id="jenisRuangan" required>
+                </div>
+                <div class="mb-3">
+                    <label for="lantaiRuangan" class="form-label">Lantai</label>
+                    <select class="form-select" name="lantaiRuangan" id="lantaiRuangan" required>
+                        <option value="" disabled selected>Pilih Lantai</option>
+                        <option value="1">Lantai 1</option>
+                        <option value="2">Lantai 2</option>
+                        <option value="3">Lantai 3</option>
+                        <option value="4">Lantai 4</option>
+                        <option value="5">Lantai 5</option>
+                        <option value="6">Lantai 6</option>
+                        <option value="7">Lantai 7</option>
+                    </select>
                 </div>
                 <div class="mb-3">
                     <label for="keteranganRuangan" class="form-label">Keterangan</label>
