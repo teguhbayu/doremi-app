@@ -104,11 +104,6 @@ $query = mysqli_query($db, "SELECT * FROM ruangan WHERE IsDeleted = 0;");
         }
 
          document.addEventListener('DOMContentLoaded', () => {
-            // if (typeof DataTable === 'undefined') {
-            //     console.error('DataTables gagal dimuat. Periksa akses CDN atau file asset.');
-            //     return;
-            // }
-
             new DataTable('#ruanganTable', {
                 autoWidth: false,
                 ordering: true,

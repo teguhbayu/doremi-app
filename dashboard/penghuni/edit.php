@@ -16,7 +16,6 @@ if (!$id) {
     exit;
 }
 
-// Fetch resident data
 $stmt = mysqli_prepare($db, "SELECT * FROM penghuni WHERE PenghuniID = ? LIMIT 1");
 mysqli_stmt_bind_param($stmt, 'i', $id);
 mysqli_stmt_execute($stmt);
@@ -29,7 +28,6 @@ if (!$penghuni) {
     exit;
 }
 
-// Fetch active rooms
 $kamarQuery = mysqli_query($db, "SELECT KamarID, NomorKamar FROM kamar WHERE IsDeleted = 0 ORDER BY NomorKamar ASC");
 $kamars = mysqli_fetch_all($kamarQuery, MYSQLI_ASSOC);
 
