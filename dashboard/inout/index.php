@@ -43,14 +43,14 @@ if ($role === 'SIGAP') {
 
 <body class="tw:p-0 tw:m-0 relative tw:flex tw:bg-[#f8fafc] tw:min-h-screen">
     <?php require '../components/sidebar.php'; ?>
-    <main class="tw:ml-75 tw:grow">
-        <div class="tw:pt-8 tw:px-8 tw:flex-1 tw:w-full">
+    <main class="tw:md:ml-75 tw:grow">
+        <div class="tw:pt-20 tw:md:pt-8 tw:px-8 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
             <h1 class="tw:font-bold tw:mb-6 tw:text-4xl tw:text-black">
                 <?= $role === 'SIGAP' ? 'Konfirmasi In/Out' : 'Izin Keluar' ?>
             </h1>
 
             <?php if ($role === 'PENGHUNI'): ?>
-                <div class="tw:grid tw:grid-cols-1 lg:tw:grid-cols-3 tw:gap-8">
+                <div class="tw:grid tw:grid-cols-1 tw:lg:grid-cols-3 tw:gap-8">
                     <div class="tw:lg:col-span-1">
                         <div class="tw:bg-white tw:p-6 tw:rounded-[24px] tw:shadow-sm tw:border tw:border-gray-100">
                             <h5 class="tw:font-bold tw:mb-4">Buat Izin Keluar</h5>
@@ -86,7 +86,7 @@ if ($role === 'SIGAP') {
                     <div class="tw:lg:col-span-2">
                         <div class="tw:bg-white tw:p-6 tw:rounded-[24px] tw:shadow-sm tw:border tw:border-gray-100">
                             <h5 class="tw:font-bold tw:mb-4">Riwayat Izin Keluar</h5>
-                            <div class="tw:overflow-hidden tw:rounded-lg tw:border tw:border-gray-300">
+                            <div class="tw:overflow-x-auto tw:rounded-lg tw:border tw:border-gray-300">
                                 <table id="historyTable" class="table text-center align-middle tw:mb-0 tw:w-full">
                                     <thead>
                                         <tr>
@@ -129,7 +129,7 @@ if ($role === 'SIGAP') {
                             </div>
                             <h5 class="tw:font-bold tw:m-0">Akan Keluar</h5>
                         </div>
-                        <div class="tw:overflow-hidden tw:rounded-lg tw:border tw:border-gray-300">
+                        <div class="tw:overflow-x-auto tw:rounded-lg tw:border tw:border-gray-300">
                             <table id="pendingTable" class="table text-center align-middle tw:mb-0 tw:w-full">
                                 <thead>
                                     <tr>
@@ -169,7 +169,7 @@ if ($role === 'SIGAP') {
                             </div>
                             <h5 class="tw:font-bold tw:m-0">Di Luar</h5>
                         </div>
-                        <div class="tw:overflow-hidden tw:rounded-lg tw:border tw:border-gray-300">
+                        <div class="tw:overflow-x-auto tw:rounded-lg tw:border tw:border-gray-300">
                             <table id="outsideTable" class="table text-center align-middle tw:mb-0 tw:w-full">
                                 <thead>
                                     <tr>

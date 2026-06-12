@@ -17,8 +17,8 @@ $query = mysqli_query($db, "SELECT p.*, k.NomorKamar FROM penghuni p LEFT JOIN k
 
 <body class="tw:p-0 tw:m-0 relative tw:flex">
     <?php require '../components/sidebar.php'; ?>
-    <main class="tw:ml-75 tw:grow">
-        <div class="tw:pt-5 tw:px-5 tw:flex-1 tw:w-full">
+    <main class="tw:md:ml-75 tw:grow">
+        <div class="tw:pt-20 tw:md:pt-5 tw:px-5 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
             <h1 class="tw:font-bold tw:mb-5 tw:text-4xl tw:text-black">
                 Kelola Penghuni
             </h1>
@@ -33,7 +33,7 @@ $query = mysqli_query($db, "SELECT p.*, k.NomorKamar FROM penghuni p LEFT JOIN k
                 </a>
             </div>
 
-            <div class="tw:mt-3 tw:overflow-hidden tw:rounded-lg tw:border tw:border-gray-300">
+            <div class="tw:mt-3 tw:overflow-x-auto tw:rounded-lg tw:border tw:border-gray-300">
                 <table id="penghuniTable" class="table text-center align-middle tw:mb-0 tw:w-full">
                 <thead>
                     <tr>

@@ -1,7 +1,7 @@
 <?php
 session_start();
-require 'db.php';
-require 'vendor/autoload.php';
+require './db.php';
+require 'auth/config.php';
 
 use Respect\Validation\Validator as v;
 
@@ -69,6 +69,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Email atau Password Tidak Valid!');
     exit;
 }
+
+$login_url = $client->createAuthUrl();
 ?>
 
 <!DOCTYPE html>
@@ -80,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php include 'header.php'; ?>
     <div class="tw:pt-16 tw:flex-1 tw:h-full tw:w-full tw:relative tw:overflow-y-auto tw:overflow-x-hidden">
         <div id="login-container"
-            class="tw:min-h-full tw:flex tw:items-center tw:justify-center tw:bg-background tw:px-4 tw:sm:tw:px-6 tw:lg:tw:px-8 tw:py-12 tw:relative tw:overflow-hidden">
+            class="tw:min-h-full tw:flex tw:items-center tw:justify-center tw:bg-background tw:px-4 tw:sm:px-6 tw:lg:px-8 tw:py-12 tw:relative tw:overflow-hidden">
             <div
                 class="tw:absolute tw:top-1/4 tw:left-1/4 tw:w-72 tw:h-72 tw:bg-accent tw:rounded-full tw:mix-blend-multiply tw:filter tw:blur-2xl tw:opacity-60">
             </div>
@@ -97,28 +99,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         Silakan masuk ke akun DOREMI Anda
                     </p>
                 </div>
-                <form class="tw:mt-8 tw:w-full tw:space-y-6" method="POST">
+                <form class="tw:mt-8 tw:w-full tw:space-y-2 tw:mb-2" method="POST">
                     <div class="tw:rounded-md tw:shadow-sm tw:space-y-4">
                         <div class="tw:w-full">
                             <label for="email" class="tw:sr-only">Email</label>
                             <div class="tw:relative tw:w-full">
-                                <i class="iconsax tw:text-2xl z-[9999] tw:left-0 tw:pl-3 tw:absolute tw:pointer-events-none tw:text-gray-400"
+                                <i class="iconsax tw:size-9 tw:text-2xl z-[9999] tw:left-0 tw:top-1/2 tw:-translate-y-1/2 tw:pl-3 tw:absolute tw:pointer-events-none tw:text-gray-400"
                                     icon-name="user-1"></i>
                                 <input id="email" name="email" type="email" required
-                                    class="tw:appearance-none tw:rounded-xl tw:relative tw:block tw:w-[90%] tw:px-3 tw:py-3 tw:ps-10 tw:border tw:border-gray-300 tw:placeholder-gray-500 tw:text-gray-900 focus:tw:outline-none focus:tw:ring-secondary focus:tw:border-secondary focus:tw:z-10 tw:sm:tw:text-sm tw:transition-colors"
+                                    class="tw:appearance-none tw:w-full tw:rounded-xl tw:relative tw:block tw:px-3 tw:py-3 tw:ps-10 tw:border tw:border-gray-300 tw:placeholder-gray-500 tw:text-gray-900 tw:focus:outline-none tw:focus:ring-secondary tw:focus:border-secondary tw:focus:z-10 tw:sm:text-sm tw:transition-colors"
                                     placeholder="email" />
                             </div>
                         </div>
-                        <div>
+                        <div class="tw:w-full" x-data="{ hidden: true }">
                             <label for="password" class="tw:sr-only">Password</label>
                             <div class="tw:relative">
                                 <div
-                                    class="tw:absolute tw:inset-y-0 tw:left-0 tw:pl-3 tw:flex tw:items-center tw:pointer-events-none">
-                                    <i class="iconsax tw:text-2xl tw:text-gray-400" icon-name="lock-1"></i>
+                                    class="tw:absolute tw:inset-y-0 tw:left-0 tw:pl-3 tw:top-1/2 tw:-translate-y-1/2 tw:flex tw:items-center tw:pointer-events-none">
+                                    <i class="iconsax  tw:size-9 tw:text-2xl tw:text-gray-400" icon-name="lock-1"></i>
                                 </div>
-                                <input id="password" name="password" type="password" required
-                                    class="tw:appearance-none tw:rounded-xl tw:relative tw:block tw:w-[90%] tw:px-3 tw:py-3 tw:pl-10 tw:border tw:border-gray-300 tw:placeholder-gray-500 tw:text-gray-900 focus:tw:outline-none focus:tw:ring-secondary focus:tw:border-secondary focus:tw:z-10 tw:sm:tw:text-sm tw:transition-colors"
+                                <input id="password" name="password" :type="hidden ? 'password' : 'text'" required
+                                    class="tw:appearance-none tw:w-full tw:rounded-xl tw:pe-8 tw:relative tw:block tw:px-3 tw:py-3 tw:pl-10 tw:border tw:border-gray-300 tw:placeholder-gray-500 tw:text-gray-900 tw:focus:outline-none tw:focus:ring-secondary tw:focus:border-secondary tw:focus:z-10 tw:sm:text-sm tw:transition-colors"
                                     placeholder="Password" />
+                                <button class="tw:absolute tw:right-2 tw:top-1/2 tw:-translate-y-1/2" type="button"
+                                    @click="hidden = !hidden">
+                                    <i class="iconsax  tw:size-9 tw:text-lg tw:text-gray-400"
+                                        :icon-name="hidden ? 'eye' : 'eye-slash'"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -128,11 +135,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     <div>
                         <button type="submit"
-                            class="tw:group tw:relative tw:w-full tw:flex tw:justify-center tw:py-3 tw:px-4 tw:border tw:border-transparent tw:text-sm tw:font-medium tw:rounded-xl tw:text-white tw:bg-primary tw:hover:bg-opacity-90 focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-offset-2 focus:tw:ring-primary tw:shadow-lg tw:transition-all tw:transform tw:hover:-tw:translate-y-0.5">
+                            class="tw:group tw:relative tw:w-full tw:flex tw:justify-center tw:py-3 tw:px-4 tw:border tw:border-transparent tw:text-sm tw:font-medium tw:rounded-xl tw:text-white tw:bg-primary tw:hover:bg-opacity-90 tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-offset-2 tw:focus:ring-primary tw:shadow-lg tw:transition-all tw:transform tw:hover:-translate-y-0.5">
                             Masuk
                         </button>
                     </div>
                 </form>
+                <a href="<?php echo $login_url; ?>" type="button"
+                    class="tw:w-full tw:gap-1 tw:flex tw:justify-center tw:py-3 tw:items-center tw:px-4 tw:border tw:border-transparent tw:text-sm tw:font-medium tw:rounded-xl tw:text-white tw:bg-primary tw:hover:bg-opacity-90 tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-offset-2 tw:focus:ring-primary tw:shadow-lg tw:transition-all tw:transform tw:hover:-translate-y-0.5">
+                    <i class="fa-brands fa-google tw:text-white tw:text-2xl"></i>
+                    Masuk Dengan Google
+                </a>
             </div>
         </div>
     </div>
