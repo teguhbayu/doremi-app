@@ -43,11 +43,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
     if (!$petugasSchema->validate($postData)) {
+        $_SESSION['form_data'] = $postData;
         header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Petugas Baru tidak Valid!');
         exit;
     }
 
     if ($password !== $confirmPassword) {
+        $_SESSION['form_data'] = $postData;
         header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Password Tidak Cocok!');
         exit;
     }
@@ -58,16 +60,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     mysqli_stmt_bind_param($stmt, 'sssss', $nama, $email, $hashedPassword, $jabatan, $no);
 
     if (!mysqli_stmt_execute($stmt)) {
+        $_SESSION['form_data'] = $postData;
         header("Location: " . $_SERVER['PHP_SELF'] . '?status=success&message=Terjadi Kesalahan!!');
         mysqli_stmt_close($stmt);
         exit;
     }
 
     mysqli_stmt_close($stmt);
+    unset($_SESSION['form_data']);
 
     header("Location: " . '/doremi-app/dashboard/petugas/' . '?status=success&message=Petugas Berhasil Ditambahkan!');
     exit;
 }
+
+// Retrieve form data from session if it exists (after a failed submission)
+$formData = $_SESSION['form_data'] ?? [
+    'nama' => '',
+    'email' => '',
+    'no' => '',
+    'jabatan' => 'Pilih Salah Satu',
+    'password' => '',
+    'confirmPassword' => ''
+];
+unset($_SESSION['form_data']); // Clear the data after retrieving
 
 ?>
 
@@ -84,23 +99,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 Tambah Petugas
             </h1>
 
-            <form method="POST">
+            <form method="POST" x-data='<?= json_encode($formData, JSON_HEX_APOS | JSON_HEX_QUOT) ?>'>
                 <div class="mb-3">
                     <label for="namaPetugas" class="form-label">Nama Petugas</label>
-                    <input type="text" name="namaPetugas" class="form-control" id="namaPetugas">
+                    <input type="text" name="namaPetugas" x-model="nama" class="form-control" id="namaPetugas">
                 </div>
                 <div class="mb-3">
                     <label for="emailPetugas" class="form-label">Email Petugas</label>
-                    <input type="email" name="emailPetugas" class="form-control" id="emailPetugas">
+                    <input type="email" name="emailPetugas" x-model="email" class="form-control" id="emailPetugas">
                 </div>
                 <div class="mb-3">
                     <label for="noPetugas" class="form-label">No. HP</label>
-                    <input type="number" name="noPetugas" class="form-control" id="noPetugas">
+                    <input type="number" name="noPetugas" x-model="no" class="form-control" id="noPetugas">
                 </div>
                 <div class="mb-3">
                     <label for="jabatanPetugas" class="form-label">Jabatan</label>
-                    <select class="form-select" name="jabatanPetugas" id="jabatanPetugas">
-                        <option selected>Pilih Salah Satu</option>
+                    <select class="form-select" name="jabatanPetugas" x-model="jabatan" id="jabatanPetugas">
+                        <option value="Pilih Salah Satu" disabled>Pilih Salah Satu</option>
                         <option value="PENGURUS">PENGURUS</option>
                         <option value="SIGAP">SIGAP</option>
                         <option value="SERVANDA">SERVANDA</option>
@@ -109,11 +124,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
                 <div class="mb-3">
                     <label for="passwordPetugas" class="form-label">Password</label>
-                    <input type="password" name="passwordPetugas" class="form-control" id="passwordPetugas">
+                    <input type="password" name="passwordPetugas" x-model="password" class="form-control" id="passwordPetugas">
                 </div>
                 <div class="mb-3">
                     <label for="confirmPasswordPetugas" class="form-label">Konfirmasi Password</label>
-                    <input type="password" name="confirmPasswordPetugas" class="form-control"
+                    <input type="password" name="confirmPasswordPetugas" x-model="confirmPassword" class="form-control"
                         id="confirmPasswordPetugas">
                 </div>
                 <div class="tw:w-full tw:flex tw:justify-end tw:mt-2">
