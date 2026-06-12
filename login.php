@@ -119,10 +119,10 @@ $login_url = $client->createAuthUrl();
                                     <i class="iconsax  tw:size-9 tw:text-2xl tw:text-gray-400" icon-name="lock-1"></i>
                                 </div>
                                 <input id="password" name="password" :type="hidden ? 'password' : 'text'" required
-                                    class="tw:appearance-none tw:w-full tw:rounded-xl tw:pe-8 tw:relative tw:block tw:px-3 tw:py-3 tw:pl-10 tw:border tw:border-gray-300 tw:placeholder-gray-500 tw:text-gray-900 tw:focus:outline-none tw:focus:ring-secondary tw:focus:border-secondary tw:focus:z-10 tw:sm:text-sm tw:transition-colors"
+                                    class="tw:appearance-none tw:w-full tw:rounded-xl z-[9] tw:me-8 tw:relative tw:block tw:px-3 tw:py-3 tw:pl-10 tw:border tw:border-gray-300 tw:placeholder-gray-500 tw:text-gray-900 tw:focus:outline-none tw:focus:ring-secondary tw:focus:border-secondary tw:focus:z-10 tw:sm:text-sm tw:transition-colors"
                                     placeholder="Password" />
-                                <button class="tw:absolute tw:right-2 tw:top-1/2 tw:-translate-y-1/2" type="button"
-                                    @click="hidden = !hidden">
+                                <button class="tw:absolute tw:right-2 z-[99] tw:top-1/2 tw:-translate-y-1/2"
+                                    type="button" @click="hidden = !hidden">
                                     <i class="iconsax  tw:size-9 tw:text-lg tw:text-gray-400"
                                         :icon-name="hidden ? 'eye' : 'eye-slash'"></i>
                                 </button>
