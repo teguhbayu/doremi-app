@@ -22,6 +22,7 @@
     --tw-color-slate-900: oklch(20.8% 0.042 265.755);
     --tw-color-gray-50: oklch(98.5% 0.002 247.839);
     --tw-color-gray-100: oklch(96.7% 0.003 264.542);
+    --tw-color-gray-200: oklch(92.8% 0.006 264.531);
     --tw-color-gray-300: oklch(87.2% 0.01 258.338);
     --tw-color-gray-400: oklch(70.7% 0.022 261.325);
     --tw-color-gray-500: oklch(55.1% 0.027 264.364);
@@ -315,17 +316,14 @@
   .tw\:z-\[35\] {
     z-index: 35 !important;
   }
-  .tw\:z-\[55\] {
-    z-index: 55 !important;
-  }
-  .tw\:z-\[60\] {
-    z-index: 60 !important;
-  }
   .tw\:m-0 {
     margin: calc(var(--tw-spacing) * 0) !important;
   }
   .tw\:mx-auto {
     margin-inline: auto !important;
+  }
+  .tw\:me-8 {
+    margin-inline-end: calc(var(--tw-spacing) * 8) !important;
   }
   .tw\:mt-0 {
     margin-top: calc(var(--tw-spacing) * 0) !important;
@@ -341,9 +339,6 @@
   }
   .tw\:mt-8 {
     margin-top: calc(var(--tw-spacing) * 8) !important;
-  }
-  .tw\:mt-10 {
-    margin-top: calc(var(--tw-spacing) * 10) !important;
   }
   .tw\:mb-0 {
     margin-bottom: calc(var(--tw-spacing) * 0) !important;
@@ -390,6 +385,9 @@
   .tw\:aspect-\[1\/1\] {
     aspect-ratio: 1/1 !important;
   }
+  .tw\:aspect-square {
+    aspect-ratio: 1 / 1 !important;
+  }
   .tw\:size-9 {
     width: calc(var(--tw-spacing) * 9) !important;
     height: calc(var(--tw-spacing) * 9) !important;
@@ -397,6 +395,10 @@
   .tw\:size-10 {
     width: calc(var(--tw-spacing) * 10) !important;
     height: calc(var(--tw-spacing) * 10) !important;
+  }
+  .tw\:size-12 {
+    width: calc(var(--tw-spacing) * 12) !important;
+    height: calc(var(--tw-spacing) * 12) !important;
   }
   .tw\:h-12 {
     height: calc(var(--tw-spacing) * 12) !important;
@@ -428,14 +430,8 @@
   .tw\:h-auto {
     height: auto !important;
   }
-  .tw\:h-dvh {
-    height: 100dvh !important;
-  }
   .tw\:h-full {
     height: 100% !important;
-  }
-  .tw\:min-h-\[70\%\] {
-    min-height: 70% !important;
   }
   .tw\:min-h-full {
     min-height: 100% !important;
@@ -455,23 +451,11 @@
   .tw\:w-96 {
     width: calc(var(--tw-spacing) * 96) !important;
   }
-  .tw\:w-100 {
-    width: calc(var(--tw-spacing) * 100) !important;
-  }
-  .tw\:w-\[90\%\] {
-    width: 90% !important;
-  }
-  .tw\:w-\[300px\] {
-    width: 300px !important;
-  }
   .tw\:w-\[400px\] {
     width: 400px !important;
   }
   .tw\:w-\[500px\] {
     width: 500px !important;
-  }
-  .tw\:w-dvh {
-    width: 100dvh !important;
   }
   .tw\:w-dvw {
     width: 100dvw !important;
@@ -493,10 +477,6 @@
   }
   .tw\:grow {
     flex-grow: 1 !important;
-  }
-  .tw\:translate-x-0 {
-    --tw-translate-x: calc(var(--tw-spacing) * 0) !important;
-    translate: var(--tw-translate-x) var(--tw-translate-y) !important;
   }
   .tw\:-translate-y-1\/2 {
     --tw-translate-y: calc(calc(1 / 2 * 100%) * -1) !important;
@@ -593,13 +573,6 @@
       margin-block-end: calc(calc(var(--tw-spacing) * 4) * calc(1 - var(--tw-space-y-reverse))) !important;
     }
   }
-  .tw\:space-y-6 {
-    :where(& > :not(:last-child)) {
-      --tw-space-y-reverse: 0 !important;
-      margin-block-start: calc(calc(var(--tw-spacing) * 6) * var(--tw-space-y-reverse)) !important;
-      margin-block-end: calc(calc(var(--tw-spacing) * 6) * calc(1 - var(--tw-space-y-reverse))) !important;
-    }
-  }
   .tw\:space-y-8 {
     :where(& > :not(:last-child)) {
       --tw-space-y-reverse: 0 !important;
@@ -685,8 +658,17 @@
   .tw\:border-gray-100 {
     border-color: var(--tw-color-gray-100) !important;
   }
+  .tw\:border-gray-200 {
+    border-color: var(--tw-color-gray-200) !important;
+  }
   .tw\:border-gray-300 {
     border-color: var(--tw-color-gray-300) !important;
+  }
+  .tw\:border-primary\/20 {
+    border-color: var(--tw-color-primary) !important;
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--tw-color-primary) 20%, transparent) !important;
+    }
   }
   .tw\:border-secondary {
     border-color: var(--tw-color-secondary) !important;
@@ -838,9 +820,6 @@
   .tw\:py-3 {
     padding-block: calc(var(--tw-spacing) * 3) !important;
   }
-  .tw\:py-8\.5 {
-    padding-block: calc(var(--tw-spacing) * 8.5) !important;
-  }
   .tw\:py-12 {
     padding-block: calc(var(--tw-spacing) * 12) !important;
   }
@@ -852,18 +831,6 @@
   }
   .tw\:ps-10 {
     padding-inline-start: calc(var(--tw-spacing) * 10) !important;
-  }
-  .tw\:pe-3 {
-    padding-inline-end: calc(var(--tw-spacing) * 3) !important;
-  }
-  .tw\:pe-4 {
-    padding-inline-end: calc(var(--tw-spacing) * 4) !important;
-  }
-  .tw\:pe-6 {
-    padding-inline-end: calc(var(--tw-spacing) * 6) !important;
-  }
-  .tw\:pe-8 {
-    padding-inline-end: calc(var(--tw-spacing) * 8) !important;
   }
   .tw\:pt-8 {
     padding-top: calc(var(--tw-spacing) * 8) !important;
@@ -1235,6 +1202,16 @@
       }
     }
   }
+  .tw\:hover\:bg-primary\/5 {
+    &:hover {
+      @media (hover: hover) {
+        background-color: var(--tw-color-primary) !important;
+        @supports (color: color-mix(in lab, red, red)) {
+          background-color: color-mix(in oklab, var(--tw-color-primary) 5%, transparent) !important;
+        }
+      }
+    }
+  }
   .tw\:hover\:bg-red-400 {
     &:hover {
       @media (hover: hover) {
@@ -1401,11 +1378,6 @@
       z-index: 60 !important;
     }
   }
-  .tw\:md\:mt-0 {
-    @media (width >= 48rem) {
-      margin-top: calc(var(--tw-spacing) * 0) !important;
-    }
-  }
   .tw\:md\:mt-5 {
     @media (width >= 48rem) {
       margin-top: calc(var(--tw-spacing) * 5) !important;
@@ -1449,12 +1421,6 @@
   .tw\:md\:max-w-3xl {
     @media (width >= 48rem) {
       max-width: var(--tw-container-3xl) !important;
-    }
-  }
-  .tw\:md\:translate-x-0 {
-    @media (width >= 48rem) {
-      --tw-translate-x: calc(var(--tw-spacing) * 0) !important;
-      translate: var(--tw-translate-x) var(--tw-translate-y) !important;
     }
   }
   .tw\:md\:translate-y-0 {

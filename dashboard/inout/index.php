@@ -26,7 +26,7 @@ if ($role === 'SIGAP') {
                                      JOIN kamar k ON pe.KamarID = k.KamarID 
                                      WHERE io.Status = 'Pending' 
                                      ORDER BY io.InOutID ASC");
-                                     
+
     $outsideQuery = mysqli_query($db, "SELECT io.*, pe.NamaPenghuni, pe.Nim, k.NomorKamar 
                                      FROM inoutpenghuni io 
                                      JOIN penghuni pe ON io.PenghuniID = pe.PenghuniID 
@@ -44,9 +44,19 @@ if ($role === 'SIGAP') {
     <?php require '../components/sidebar.php'; ?>
     <main class="tw:md:ml-75 tw:grow">
         <div class="tw:pt-20 tw:md:pt-8 tw:px-8 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
-            <h1 class="tw:font-bold tw:mb-6 tw:text-4xl tw:text-black">
-                <?= $role === 'SIGAP' ? 'Konfirmasi In/Out' : 'Izin Keluar' ?>
-            </h1>
+            <div class="tw:flex tw:justify-between tw:items-center tw:mb-6">
+                <h1 class="tw:font-bold tw:text-4xl tw:text-black tw:m-0">
+                    <?= $role === 'SIGAP' ? 'Konfirmasi In/Out' : 'Izin Keluar' ?>
+                </h1>
+
+                <?php if ($role === 'SIGAP'): ?>
+                    <a href="log.php"
+                        class="tw:bg-white tw:text-primary tw:font-medium tw:px-4 tw:py-2 tw:rounded-lg tw:border tw:border-primary/20 tw:hover:bg-primary/5 tw:transition-all tw:inline-flex tw:items-center tw:gap-2 tw:no-underline">
+                        <i class="iconsax tw:text-xl" icon-name="document-text-1"></i>
+                        <span>Lihat Semua Log</span>
+                    </a>
+                <?php endif; ?>
+            </div>
 
             <?php if ($role === 'PENGHUNI'): ?>
                 <div class="tw:grid tw:grid-cols-1 tw:lg:grid-cols-3 tw:gap-8">
@@ -55,7 +65,8 @@ if ($role === 'SIGAP') {
                             <h5 class="tw:font-bold tw:mb-4">Buat Izin Keluar</h5>
                             <?php if ($hasActiveRequest): ?>
                                 <div class="alert alert-warning tw:rounded-xl">
-                                    Anda masih memiliki izin keluar yang aktif (Pending/Di Luar). Silakan selesaikan terlebih dahulu sebelum membuat yang baru.
+                                    Anda masih memiliki izin keluar yang aktif (Pending/Di Luar). Silakan selesaikan terlebih
+                                    dahulu sebelum membuat yang baru.
                                 </div>
                             <?php else: ?>
                                 <form action="process.php" method="POST">
@@ -63,17 +74,21 @@ if ($role === 'SIGAP') {
                                     <?php $currentTime = date('H:i'); ?>
                                     <div class="mb-3">
                                         <label class="form-label">Rencana Keluar (Waktu)</label>
-                                        <input type="time" name="waktuKeluar" class="form-control" min="<?= $currentTime ?>" max="22:00" required>
+                                        <input type="time" name="waktuKeluar" class="form-control" min="<?= $currentTime ?>"
+                                            max="22:00" required>
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label">Rencana Masuk (Waktu)</label>
-                                        <input type="time" name="waktuMasuk" class="form-control" min="<?= $currentTime ?>" max="22:00" required>
+                                        <input type="time" name="waktuMasuk" class="form-control" min="<?= $currentTime ?>"
+                                            max="22:00" required>
                                     </div>
                                     <div class="mb-4">
                                         <label class="form-label">Keperluan</label>
-                                        <textarea name="keperluan" class="form-control" rows="3" placeholder="Contoh: Beli makan, Fotocopy, dll" required></textarea>
+                                        <textarea name="keperluan" class="form-control" rows="3"
+                                            placeholder="Contoh: Beli makan, Fotocopy, dll" required></textarea>
                                     </div>
-                                    <button type="submit" class="tw:bg-secondary tw:w-full tw:text-white tw:py-3 tw:rounded-xl tw:hover:bg-accent tw:transition-all tw:font-semibold">
+                                    <button type="submit"
+                                        class="tw:bg-secondary tw:w-full tw:text-white tw:py-3 tw:rounded-xl tw:hover:bg-accent tw:transition-all tw:font-semibold">
                                         Kirim Permintaan
                                     </button>
                                 </form>
@@ -89,9 +104,12 @@ if ($role === 'SIGAP') {
                                     <thead>
                                         <tr>
                                             <th scope="col" class="text-center align-middle" style="width: 20%;">Status</th>
-                                            <th scope="col" class="text-center align-middle" style="width: 40%;">Keperluan</th>
-                                            <th scope="col" class="text-center align-middle" style="width: 20%;">Waktu Keluar</th>
-                                            <th scope="col" class="text-center align-middle" style="width: 20%;">Waktu Masuk</th>
+                                            <th scope="col" class="text-center align-middle" style="width: 40%;">Keperluan
+                                            </th>
+                                            <th scope="col" class="text-center align-middle" style="width: 20%;">Waktu
+                                                Keluar</th>
+                                            <th scope="col" class="text-center align-middle" style="width: 20%;">Waktu Masuk
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -107,8 +125,10 @@ if ($role === 'SIGAP') {
                                                     <?php endif; ?>
                                                 </td>
                                                 <td><?= htmlspecialchars($row['Keperluan']) ?></td>
-                                                <td><?= $row['WaktuKeluar'] ? date('H:i, d M', strtotime($row['WaktuKeluar'])) : '-' ?></td>
-                                                <td><?= $row['WaktuMasuk'] ? date('H:i, d M', strtotime($row['WaktuMasuk'])) : '-' ?></td>
+                                                <td><?= $row['WaktuKeluar'] ? date('H:i, d M', strtotime($row['WaktuKeluar'])) : '-' ?>
+                                                </td>
+                                                <td><?= $row['WaktuMasuk'] ? date('H:i, d M', strtotime($row['WaktuMasuk'])) : '-' ?>
+                                                </td>
                                             </tr>
                                         <?php endwhile; ?>
                                     </tbody>
@@ -123,7 +143,7 @@ if ($role === 'SIGAP') {
                     <div class="tw:bg-white tw:p-6 tw:rounded-[24px] tw:shadow-sm tw:border tw:border-gray-100">
                         <div class="tw:flex tw:items-center tw:gap-3 tw:mb-6">
                             <div class="tw:p-3 tw:bg-orange-50 tw:text-orange-500 tw:rounded-xl">
-                                <i class="iconsax tw:text-2xl" icon-name="export-1"></i>
+                                <i class="fa-solid fa-arrow-up text-2xl"></i>
                             </div>
                             <h5 class="tw:font-bold tw:m-0">Akan Keluar</h5>
                         </div>
@@ -150,7 +170,8 @@ if ($role === 'SIGAP') {
                                                 <form action="process.php" method="POST" class="tw:inline">
                                                     <input type="hidden" name="action" value="confirm_exit">
                                                     <input type="hidden" name="id" value="<?= $row['InOutID'] ?>">
-                                                    <button type="submit" class="btn btn-primary btn-sm tw:rounded-lg">Konfirmasi Keluar</button>
+                                                    <button type="submit"
+                                                        class="btn btn-primary btn-sm tw:rounded-lg">Konfirmasi Keluar</button>
                                                 </form>
                                             </td>
                                         </tr>
@@ -163,7 +184,7 @@ if ($role === 'SIGAP') {
                     <div class="tw:bg-white tw:p-6 tw:rounded-[24px] tw:shadow-sm tw:border tw:border-gray-100">
                         <div class="tw:flex tw:items-center tw:gap-3 tw:mb-6">
                             <div class="tw:p-3 tw:bg-blue-50 tw:text-blue-500 tw:rounded-xl">
-                                <i class="iconsax tw:text-2xl" icon-name="import-1"></i>
+                                <i class="fa-solid fa-arrow-down text-2xl"></i>
                             </div>
                             <h5 class="tw:font-bold tw:m-0">Di Luar</h5>
                         </div>
@@ -173,7 +194,8 @@ if ($role === 'SIGAP') {
                                     <tr>
                                         <th scope="col" class="text-center align-middle" style="width: 30%;">Penghuni</th>
                                         <th scope="col" class="text-center align-middle" style="width: 20%;">Kamar</th>
-                                        <th scope="col" class="text-center align-middle" style="width: 30%;">Waktu Keluar</th>
+                                        <th scope="col" class="text-center align-middle" style="width: 30%;">Waktu Keluar
+                                        </th>
                                         <th scope="col" class="text-center align-middle" style="width: 20%;">Aksi</th>
                                     </tr>
                                 </thead>
@@ -190,7 +212,8 @@ if ($role === 'SIGAP') {
                                                 <form action="process.php" method="POST" class="tw:inline">
                                                     <input type="hidden" name="action" value="confirm_entry">
                                                     <input type="hidden" name="id" value="<?= $row['InOutID'] ?>">
-                                                    <button type="submit" class="btn btn-success btn-sm tw:rounded-lg">Konfirmasi Masuk</button>
+                                                    <button type="submit"
+                                                        class="btn btn-success btn-sm tw:rounded-lg">Konfirmasi Masuk</button>
                                                 </form>
                                             </td>
                                         </tr>
@@ -205,7 +228,7 @@ if ($role === 'SIGAP') {
     </main>
     <?php require '../../bootstrap.php'; ?>
     <?php require '../../validation_alert.php'; ?>
-    
+
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/2.0.8/js/dataTables.bootstrap5.min.js"></script>
