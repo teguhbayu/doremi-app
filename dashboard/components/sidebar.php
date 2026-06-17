@@ -16,12 +16,14 @@ switch ($_SESSION["userRole"]) {
         $menus = [
             ["title" => "Home", "target" => "/doremi-app/dashboard/", "icon" => "home-2"],
             ["title" => "Izin Keluar", "target" => "/doremi-app/dashboard/inout/", "icon" => "export-1"],
+            ["title" => "Paket", "target" => "/doremi-app/dashboard/paket/", "icon" => "box-1"],
         ];
         break;
     case "SIGAP":
         $menus = [
             ["title" => "Home", "target" => "/doremi-app/dashboard/", "icon" => "home-2"],
             ["title" => "Konfirmasi In/Out", "target" => "/doremi-app/dashboard/inout/", "icon" => "shield-tick"],
+            ["title" => "Paket", "target" => "/doremi-app/dashboard/paket/", "icon" => "box-1"],
         ];
         break;
 }

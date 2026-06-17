@@ -8,7 +8,20 @@ if (!isset($_SESSION['userId'])) {
 
 require '../../db.php';
 
-$query = mysqli_query($db, "SELECT * FROM kamar WHERE IsDeleted = 0 ORDER BY NomorKamar ASC;");
+$query = mysqli_query(
+    $db,
+    "SELECT
+        k.KamarID,
+        k.NomorKamar,
+        k.KapasitasPenghuni,
+        k.Lantai,
+        COUNT(p.PenghuniID) AS JumlahPenghuniAktual
+    FROM kamar k
+    LEFT JOIN penghuni p ON p.KamarID = k.KamarID AND p.IsDeleted = 0
+    WHERE k.IsDeleted = 0
+    GROUP BY k.KamarID, k.NomorKamar, k.KapasitasPenghuni, k.Lantai
+    ORDER BY k.NomorKamar ASC"
+);
 ?>
 
 <!DOCTYPE html>
@@ -49,8 +62,20 @@ $query = mysqli_query($db, "SELECT * FROM kamar WHERE IsDeleted = 0 ORDER BY Nom
                         <?php while ($kamar = mysqli_fetch_assoc($query)) { ?>
                             <tr>
                                 <th scope="row"><?php echo $nomorUrut++; ?></th>
-                                <td><?php echo $kamar["NomorKamar"]; ?></td>
-                                <td><?php echo $kamar["KapasitasPenghuni"]; ?> Orang</td>
+                                <td>
+                                    <a href="detail.php?id=<?php echo (int) $kamar["KamarID"]; ?>"
+                                        class="tw:font-semibold tw:text-primary tw:hover:text-accent tw:hover:underline tw:no-underline">
+                                        <?php echo htmlspecialchars($kamar["NomorKamar"]); ?>
+                                    </a>
+                                </td>
+                                <td>
+                                    <div class="tw:font-semibold">
+                                        <?php echo (int) $kamar["JumlahPenghuniAktual"]; ?> Orang
+                                    </div>
+                                    <div class="tw:text-xs tw:text-gray-500">
+                                        Maks. <?php echo (int) $kamar["KapasitasPenghuni"]; ?> Orang
+                                    </div>
+                                </td>
                                 <td>Lantai <?php echo $kamar["Lantai"]; ?></td>
                                 <td>
                                     <div class="tw:inline-flex tw:justify-center tw:items-center tw:gap-1 tw:text-black">

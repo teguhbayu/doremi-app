@@ -3,3 +3,8 @@
 node_modules/
 .agents/
 doremi.sql
+assets/uploads/*
+!assets/uploads/.gitkeep
+!assets/uploads/paket/
+assets/uploads/paket/*
+!assets/uploads/paket/.gitkeep
