@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $kapasitasInt = (int) $kapasitas;
     if ($kapasitasInt < 1 || $kapasitasInt > 4) {
-        header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Jumlah penghuni minimal 1 dan maksimal 4 orang!');
+        header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Kapasitas kamar minimal 1 dan maksimal 4 penghuni!');
         exit;
     }
 
@@ -88,10 +88,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <input type="text" name="nomorKamar" class="form-control" id="nomorKamar" required>
                 </div>
                 <div class="mb-3">
-                    <label for="kapasitasKamar" class="form-label">Jumlah Penghuni</label>
+                    <label for="kapasitasKamar" class="form-label">Kapasitas Kamar</label>
                     <input type="number" name="kapasitasKamar" class="form-control" id="kapasitasKamar" min="1"
                         max="4" required>
-                    <div class="form-text">Jumlah penghuni minimal 1 dan maksimal 4 orang per kamar.</div>
+                    <div class="form-text">Kapasitas kamar minimal 1 dan maksimal 4 penghuni.</div>
                 </div>
                 <div class="mb-3">
                     <label for="lantaiKamar" class="form-label">Lantai</label>

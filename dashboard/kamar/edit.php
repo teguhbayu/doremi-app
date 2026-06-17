@@ -28,6 +28,13 @@ if (!$kamar) {
     exit;
 }
 
+$occupancyStmt = mysqli_prepare($db, "SELECT COUNT(*) AS total FROM penghuni WHERE KamarID = ? AND IsDeleted = 0");
+mysqli_stmt_bind_param($occupancyStmt, 'i', $id);
+mysqli_stmt_execute($occupancyStmt);
+$occupancyResult = mysqli_stmt_get_result($occupancyStmt);
+$currentOccupancy = (int) (mysqli_fetch_assoc($occupancyResult)['total'] ?? 0);
+mysqli_stmt_close($occupancyStmt);
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nomor = trim($_POST['nomorKamar'] ?? '');
     $kapasitas = trim($_POST['kapasitasKamar'] ?? '');
@@ -52,7 +59,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $kapasitasInt = (int) $kapasitas;
     if ($kapasitasInt < 1 || $kapasitasInt > 4) {
-        header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&status=error&message=Jumlah penghuni minimal 1 dan maksimal 4 orang!');
+        header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&status=error&message=Kapasitas kamar minimal 1 dan maksimal 4 penghuni!');
+        exit;
+    }
+
+    if ($kapasitasInt < $currentOccupancy) {
+        header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&status=error&message=Kapasitas kamar tidak boleh lebih kecil dari jumlah penghuni saat ini!');
         exit;
     }
 
@@ -105,10 +117,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         value="<?= htmlspecialchars($kamar['NomorKamar']) ?>" required>
                 </div>
                 <div class="mb-3">
-                    <label for="kapasitasKamar" class="form-label">Jumlah Penghuni</label>
+                    <label for="kapasitasKamar" class="form-label">Kapasitas Kamar</label>
                     <input type="number" name="kapasitasKamar" class="form-control" id="kapasitasKamar"
                         value="<?= htmlspecialchars($kamar['KapasitasPenghuni']) ?>" min="1" max="4" required>
-                    <div class="form-text">Jumlah penghuni minimal 1 dan maksimal 4 orang per kamar.</div>
+                    <div class="form-text">
+                        Saat ini kamar ditempati <?= $currentOccupancy ?> penghuni. Kapasitas minimal 1 dan maksimal 4
+                        penghuni.
+                    </div>
                 </div>
                 <div class="mb-3">
                     <label for="lantaiKamar" class="form-label">Lantai</label>

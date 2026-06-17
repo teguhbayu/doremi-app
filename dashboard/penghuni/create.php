@@ -10,8 +10,24 @@ if (!isset($_SESSION['userId'])) {
 }
 require '../../db.php';
 
-$kamarQuery = mysqli_query($db, "SELECT KamarID, NomorKamar FROM kamar WHERE IsDeleted = 0 ORDER BY NomorKamar ASC");
+$kamarQuery = mysqli_query(
+    $db,
+    "SELECT
+        k.KamarID,
+        k.NomorKamar,
+        k.KapasitasPenghuni,
+        COUNT(p.PenghuniID) AS JumlahPenghuniAktual
+    FROM kamar k
+    LEFT JOIN penghuni p ON p.KamarID = k.KamarID AND p.IsDeleted = 0
+    WHERE k.IsDeleted = 0
+    GROUP BY k.KamarID, k.NomorKamar, k.KapasitasPenghuni
+    ORDER BY k.NomorKamar ASC"
+);
 $kamars = mysqli_fetch_all($kamarQuery, MYSQLI_ASSOC);
+$kamarMap = [];
+foreach ($kamars as $kamar) {
+    $kamarMap[(int) $kamar['KamarID']] = $kamar;
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nama = trim($_POST['namaPenghuni'] ?? '');
@@ -55,6 +71,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($password !== $confirmPassword) {
         header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Password Tidak Cocok!');
+        exit;
+    }
+
+    $selectedKamar = $kamarMap[(int) $kamarId] ?? null;
+    if (!$selectedKamar) {
+        header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Kamar yang dipilih tidak ditemukan!');
+        exit;
+    }
+
+    if ((int) $selectedKamar['JumlahPenghuniAktual'] >= (int) $selectedKamar['KapasitasPenghuni']) {
+        header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Kamar yang dipilih sudah penuh!');
         exit;
     }
 
@@ -121,7 +148,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <select class="form-select" name="kamarPenghuni" id="kamarPenghuni" required>
                         <option selected disabled>Pilih Kamar</option>
                         <?php foreach ($kamars as $kamar): ?>
-                            <option value="<?= $kamar['KamarID'] ?>"><?= $kamar['NomorKamar'] ?></option>
+                            <option value="<?= $kamar['KamarID'] ?>">
+                                <?= $kamar['NomorKamar'] ?> (<?= $kamar['JumlahPenghuniAktual'] ?>/<?= $kamar['KapasitasPenghuni'] ?> terisi)
+                            </option>
                         <?php endforeach; ?>
                     </select>
                 </div>
