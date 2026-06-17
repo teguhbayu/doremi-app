@@ -14,8 +14,7 @@ $stmt = mysqli_prepare(
     $db,
     "SELECT pk.*, ph.NamaPenghuni, ph.Nim, k.NomorKamar,
             pt.NamaPetugas AS NamaPetugasPaket,
-            pp.PengambilanPaketID, pp.PetugasID AS PickupPetugasID, pp.FotoPengambilan, pp.WaktuPengambilan, pp.Status, pp.Keterangan,
-            sp.NamaPetugas AS NamaPetugasPengambilan
+            pp.PengambilanPaketID, pp.PetugasID AS PickupPetugasID, pp.FotoPengambilan, pp.WaktuPengambilan, pp.Status, pp.Keterangan
      FROM paket pk
      JOIN penghuni ph ON pk.PenghuniID = ph.PenghuniID
      LEFT JOIN kamar k ON ph.KamarID = k.KamarID
@@ -29,7 +28,6 @@ $stmt = mysqli_prepare(
              GROUP BY PaketID
          ) latest ON latest.LatestPengambilanPaketID = pp1.PengambilanPaketID
      ) pp ON pp.PaketID = pk.PaketID
-     LEFT JOIN petugas sp ON pp.PetugasID = sp.PetugasID
      WHERE pk.PaketID = ? AND pk.PenghuniID = ?
      LIMIT 1"
 );
@@ -43,26 +41,15 @@ if (!$paket) {
     paket_redirect('/doremi-app/dashboard/paket/', 'error', 'Data paket tidak ditemukan.');
 }
 
-$sigapQuery = mysqli_query($db, "SELECT PetugasID, NamaPetugas FROM petugas WHERE Jabatan = 'SIGAP' ORDER BY NamaPetugas");
-$sigapPetugas = mysqli_fetch_all($sigapQuery, MYSQLI_ASSOC);
-$sigapIds = array_map('intval', array_column($sigapPetugas, 'PetugasID'));
-
-if (!$sigapPetugas) {
-    paket_redirect('/doremi-app/dashboard/paket/', 'error', 'Petugas SIGAP belum tersedia.');
-}
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $petugasId = filter_input(INPUT_POST, 'petugasId', FILTER_VALIDATE_INT);
+    $petugasId = !empty($paket['PickupPetugasID']) ? (int) $paket['PickupPetugasID'] : (int) $paket['PetugasID'];
     $status = trim($_POST['status'] ?? '');
-    $waktuPengambilan = paket_normalize_datetime($_POST['waktuPengambilan'] ?? '');
+    $waktuPengambilan = date('Y-m-d H:i:s');
     $keterangan = trim($_POST['keterangan'] ?? '');
 
     if (
-        $petugasId === false
-        || $petugasId === null
-        || !in_array((int) $petugasId, $sigapIds, true)
+        $petugasId < 1
         || !in_array($status, ['Belum Diambil', 'Sudah Diambil'], true)
-        || $waktuPengambilan === null
     ) {
         paket_redirect($_SERVER['PHP_SELF'] . '?id=' . $paketId, 'error', 'Data pengambilan paket tidak valid.');
     }
@@ -70,7 +57,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $fotoPengambilan = paket_store_photo(
             $_FILES['fotoPengambilan'] ?? [],
-            $paketId,
             $paket['FotoPengambilan'] ?? null
         );
     } catch (RuntimeException $exception) {
@@ -128,13 +114,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     paket_redirect('/doremi-app/dashboard/paket/', 'success', $successMessage);
 }
 
-$selectedPetugasId = (int) ($paket['PickupPetugasID'] ?? $paket['PetugasID'] ?? $sigapPetugas[0]['PetugasID']);
-$selectedStatus = $paket['Status'] ?? 'Sudah Diambil';
-$waktuPengambilanValue = !empty($paket['WaktuPengambilan'])
-    ? paket_datetime_input_value($paket['WaktuPengambilan'])
-    : date('Y-m-d\TH:i');
+$selectedStatus = in_array($paket['Status'] ?? '', ['Belum Diambil', 'Sudah Diambil'], true)
+    ? $paket['Status']
+    : 'Sudah Diambil';
 $keteranganValue = ($paket['Keterangan'] ?? '-') === '-' ? '' : $paket['Keterangan'];
 $fotoWajib = empty($paket['FotoPengambilan']);
+$statusMeta = paket_status_meta($paket['Status'] ?? 'Belum Diambil');
 ?>
 
 <!DOCTYPE html>
@@ -200,11 +185,15 @@ $fotoWajib = empty($paket['FotoPengambilan']);
                             </div>
                             <div>
                                 <p class="tw:text-sm tw:text-slate-500 tw:mb-1">Status Saat Ini</p>
-                                <?php if (($paket['Status'] ?? 'Belum Diambil') === 'Sudah Diambil'): ?>
-                                    <span class="badge bg-success">Sudah Diambil</span>
-                                <?php else: ?>
-                                    <span class="badge bg-warning text-dark">Belum Diambil</span>
-                                <?php endif; ?>
+                                <span class="badge <?= htmlspecialchars($statusMeta['class']) ?>">
+                                    <?= htmlspecialchars($statusMeta['label']) ?>
+                                </span>
+                            </div>
+                            <div>
+                                <p class="tw:text-sm tw:text-slate-500 tw:mb-1">Waktu Pengambilan</p>
+                                <p class="tw:font-semibold tw:text-slate-900 tw:mb-0">
+                                    <?= !empty($paket['WaktuPengambilan']) ? date('d M Y H:i', strtotime($paket['WaktuPengambilan'])) : 'Belum tercatat' ?>
+                                </p>
                             </div>
                             <?php if (!empty($paket['FotoPengambilan'])): ?>
                                 <div>
@@ -224,30 +213,18 @@ $fotoWajib = empty($paket['FotoPengambilan']);
                 <div class="tw:lg:col-span-2">
                     <div class="tw:bg-white tw:p-6 tw:rounded-[24px] tw:shadow-sm tw:border tw:border-gray-100">
                         <form method="POST" enctype="multipart/form-data">
-                            <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4">
-                                <div class="mb-3">
-                                    <label for="petugasId" class="form-label">Petugas SIGAP</label>
-                                    <select class="form-select" name="petugasId" id="petugasId" required>
-                                        <?php foreach ($sigapPetugas as $petugas): ?>
-                                            <option value="<?= (int) $petugas['PetugasID'] ?>" <?= $selectedPetugasId === (int) $petugas['PetugasID'] ? 'selected' : '' ?>>
-                                                <?= htmlspecialchars($petugas['NamaPetugas']) ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="status" class="form-label">Status Paket</label>
-                                    <select class="form-select" name="status" id="status" required>
-                                        <option value="Belum Diambil" <?= $selectedStatus === 'Belum Diambil' ? 'selected' : '' ?>>Belum Diambil</option>
-                                        <option value="Sudah Diambil" <?= $selectedStatus === 'Sudah Diambil' ? 'selected' : '' ?>>Sudah Diambil</option>
-                                    </select>
-                                </div>
+                            <div class="mb-3">
+                                <label for="status" class="form-label">Status Paket</label>
+                                <select class="form-select" name="status" id="status" required>
+                                    <option value="Belum Diambil" <?= $selectedStatus === 'Belum Diambil' ? 'selected' : '' ?>>Belum Diambil</option>
+                                    <option value="Sudah Diambil" <?= $selectedStatus === 'Sudah Diambil' ? 'selected' : '' ?>>Sudah Diambil</option>
+                                </select>
                             </div>
 
                             <div class="mb-3">
-                                <label for="waktuPengambilan" class="form-label">Waktu Pengambilan</label>
-                                <input type="datetime-local" name="waktuPengambilan" class="form-control"
-                                    id="waktuPengambilan" value="<?= htmlspecialchars($waktuPengambilanValue) ?>" required>
+                                <label class="form-label">Waktu Pengambilan</label>
+                                <input type="text" class="form-control"
+                                    value="Akan diisi otomatis saat data disimpan" disabled>
                             </div>
 
                             <div class="mb-3">
@@ -255,7 +232,7 @@ $fotoWajib = empty($paket['FotoPengambilan']);
                                 <input type="file" name="fotoPengambilan" class="form-control" id="fotoPengambilan"
                                     accept="image/png,image/jpeg,image/webp" <?= $fotoWajib ? 'required' : '' ?>>
                                 <div class="form-text">
-                                    Upload JPG, PNG, atau WEBP maksimal 2MB.
+                                    Upload JPG, PNG, atau WEBP maksimal 2MB. Foto akan disimpan langsung ke database dalam format base64.
                                     <?= $fotoWajib ? 'Foto wajib diunggah untuk pencatatan pertama.' : 'Kosongkan jika tidak ingin mengganti foto.' ?>
                                 </div>
                             </div>

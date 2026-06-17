@@ -36,15 +36,13 @@ if ($role === 'SIGAP') {
         $db,
         "SELECT pk.*, ph.NamaPenghuni, ph.Nim, k.NomorKamar,
                 pt.NamaPetugas AS NamaPetugasPaket,
-                pp.PengambilanPaketID, pp.PetugasID AS PickupPetugasID, pp.Status, pp.WaktuPengambilan,
-                pp.Keterangan, pp.FotoPengambilan,
-                sp.NamaPetugas AS NamaPetugasPengambilan
+                pp.PengambilanPaketID, pp.Status, pp.WaktuPengambilan,
+                pp.Keterangan, pp.FotoPengambilan
          FROM paket pk
          JOIN penghuni ph ON pk.PenghuniID = ph.PenghuniID
          LEFT JOIN kamar k ON ph.KamarID = k.KamarID
          JOIN petugas pt ON pk.PetugasID = pt.PetugasID
          $latestPickupSubquery
-         LEFT JOIN petugas sp ON pp.PetugasID = sp.PetugasID
          WHERE pk.PenghuniID = ?
          ORDER BY pk.PaketID DESC"
     );
@@ -56,8 +54,9 @@ if ($role === 'SIGAP') {
 }
 
 $totalPaket = count($pakets);
+$tertukar = count(array_filter($pakets, fn($paket) => ($paket['Status'] ?? 'Belum Diambil') === 'TERTUKAR'));
 $sudahDiambil = count(array_filter($pakets, fn($paket) => ($paket['Status'] ?? 'Belum Diambil') === 'Sudah Diambil'));
-$belumDiambil = $totalPaket - $sudahDiambil;
+$belumDiambil = count(array_filter($pakets, fn($paket) => ($paket['Status'] ?? 'Belum Diambil') === 'Belum Diambil'));
 ?>
 
 <!DOCTYPE html>
@@ -89,7 +88,7 @@ $belumDiambil = $totalPaket - $sudahDiambil;
                 <?php endif; ?>
             </div>
 
-            <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-3 tw:gap-6 tw:mb-8">
+            <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:xl:grid-cols-4 tw:gap-6 tw:mb-8">
                 <div class="tw:bg-white tw:p-6 tw:rounded-[24px] tw:shadow-sm tw:border tw:border-gray-100">
                     <div class="tw:flex tw:items-center tw:gap-4">
                         <div class="tw:p-4 tw:bg-blue-50 tw:text-blue-600 tw:rounded-[18px]">
@@ -129,6 +128,19 @@ $belumDiambil = $totalPaket - $sudahDiambil;
                         </div>
                     </div>
                 </div>
+                <div class="tw:bg-white tw:p-6 tw:rounded-[24px] tw:shadow-sm tw:border tw:border-gray-100">
+                    <div class="tw:flex tw:items-center tw:gap-4">
+                        <div class="tw:p-4 tw:bg-rose-50 tw:text-rose-600 tw:rounded-[18px]">
+                            <i class="iconsax tw:text-3xl" icon-name="danger"></i>
+                        </div>
+                        <div>
+                            <p class="tw:text-sm tw:font-medium tw:text-slate-500 tw:uppercase tw:tracking-wider tw:m-0">
+                                Tertukar
+                            </p>
+                            <h3 class="tw:text-3xl tw:font-bold tw:text-slate-900 tw:m-0"><?= $tertukar ?></h3>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="tw:bg-white tw:p-6 tw:rounded-[24px] tw:shadow-sm tw:border tw:border-gray-100">
@@ -148,6 +160,7 @@ $belumDiambil = $totalPaket - $sudahDiambil;
                         <tbody>
                             <?php foreach ($pakets as $paket): ?>
                                 <?php $status = $paket['Status'] ?? 'Belum Diambil'; ?>
+                                <?php $statusMeta = paket_status_meta($status); ?>
                                 <tr>
                                     <th scope="row"><?= (int) $paket['PaketID'] ?></th>
                                     <td class="tw:text-start">
@@ -176,11 +189,9 @@ $belumDiambil = $totalPaket - $sudahDiambil;
                                         <?= $paket['WaktuSampai'] ? date('d M Y H:i', strtotime($paket['WaktuSampai'])) : '-' ?>
                                     </td>
                                     <td>
-                                        <?php if ($status === 'Sudah Diambil'): ?>
-                                            <span class="badge bg-success">Sudah Diambil</span>
-                                        <?php else: ?>
-                                            <span class="badge bg-warning text-dark">Belum Diambil</span>
-                                        <?php endif; ?>
+                                        <span class="badge <?= htmlspecialchars($statusMeta['class']) ?>">
+                                            <?= htmlspecialchars($statusMeta['label']) ?>
+                                        </span>
 
                                         <?php if (!empty($paket['WaktuPengambilan'])): ?>
                                             <div class="tw:text-xs tw:text-slate-500 tw:mt-1">
@@ -191,6 +202,10 @@ $belumDiambil = $totalPaket - $sudahDiambil;
                                     <td>
                                         <div class="tw:inline-flex tw:flex-wrap tw:justify-center tw:items-center tw:gap-2 tw:text-black">
                                             <?php if ($role === 'SIGAP'): ?>
+                                                <a href="review.php?id=<?= (int) $paket['PaketID'] ?>"
+                                                    class="tw:text-rose-600 tw:no-underline" title="Review Status Pengambilan">
+                                                    <i class="iconsax tw:text-lg" icon-name="eye"></i>
+                                                </a>
                                                 <?php if (!empty($paket['FotoPengambilan'])): ?>
                                                     <a href="<?= htmlspecialchars(paket_photo_url($paket['FotoPengambilan'])) ?>"
                                                         target="_blank" rel="noopener noreferrer"

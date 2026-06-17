@@ -54,14 +54,90 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
+    $activeCheckStmt = mysqli_prepare(
+        $db,
+        "SELECT PetugasID, Email, NoHP
+         FROM petugas
+         WHERE IsDeleted = 0 AND (Email = ? OR NoHP = ?)
+         LIMIT 1"
+    );
+    mysqli_stmt_bind_param($activeCheckStmt, 'ss', $email, $no);
+    mysqli_stmt_execute($activeCheckStmt);
+    $activeCheckResult = mysqli_stmt_get_result($activeCheckStmt);
+    $activePetugas = mysqli_fetch_assoc($activeCheckResult);
+    mysqli_stmt_close($activeCheckStmt);
+
+    if ($activePetugas) {
+        $_SESSION['form_data'] = $postData;
+
+        if (($activePetugas['Email'] ?? '') === $email) {
+            header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Email petugas sudah terdaftar!');
+            exit;
+        }
+
+        header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=No. HP petugas sudah terdaftar!');
+        exit;
+    }
+
     $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+    $deletedCheckStmt = mysqli_prepare(
+        $db,
+        "SELECT PetugasID, Email, NoHP
+         FROM petugas
+         WHERE IsDeleted = 1 AND (Email = ? OR NoHP = ?)
+         ORDER BY PetugasID ASC"
+    );
+    mysqli_stmt_bind_param($deletedCheckStmt, 'ss', $email, $no);
+    mysqli_stmt_execute($deletedCheckStmt);
+    $deletedCheckResult = mysqli_stmt_get_result($deletedCheckStmt);
+    $deletedPetugasRows = mysqli_fetch_all($deletedCheckResult, MYSQLI_ASSOC);
+    mysqli_stmt_close($deletedCheckStmt);
+
+    $restoredDeletedPetugasId = null;
+    if ($deletedPetugasRows) {
+        $candidateIds = array_values(array_unique(array_map(
+            static fn(array $row): int => (int) $row['PetugasID'],
+            $deletedPetugasRows
+        )));
+
+        if (count($candidateIds) > 1) {
+            $_SESSION['form_data'] = $postData;
+            header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Email atau No. HP terkait dengan data petugas terhapus yang berbeda. Gunakan data lain atau edit data lama.');
+            exit;
+        }
+
+        $restoredDeletedPetugasId = $candidateIds[0];
+    }
+
+    if ($restoredDeletedPetugasId !== null) {
+        $restoreStmt = mysqli_prepare(
+            $db,
+            "UPDATE petugas
+             SET NamaPetugas = ?, Email = ?, Password = ?, Jabatan = ?, NoHP = ?, IsDeleted = 0, UpdatedAt = NOW()
+             WHERE PetugasID = ?"
+        );
+        mysqli_stmt_bind_param($restoreStmt, 'sssssi', $nama, $email, $hashedPassword, $jabatan, $no, $restoredDeletedPetugasId);
+
+        if (!mysqli_stmt_execute($restoreStmt)) {
+            $_SESSION['form_data'] = $postData;
+            mysqli_stmt_close($restoreStmt);
+            header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Gagal memulihkan data petugas yang pernah dihapus!');
+            exit;
+        }
+
+        mysqli_stmt_close($restoreStmt);
+        unset($_SESSION['form_data']);
+
+        header("Location: " . '/doremi-app/dashboard/petugas/' . '?status=success&message=Petugas berhasil ditambahkan kembali dari data yang pernah dihapus!');
+        exit;
+    }
 
     $stmt = mysqli_prepare($db, "INSERT INTO petugas (NamaPetugas, Email, Password, Jabatan, NoHP) VALUES (?, ?, ?, ?, ?)");
     mysqli_stmt_bind_param($stmt, 'sssss', $nama, $email, $hashedPassword, $jabatan, $no);
 
     if (!mysqli_stmt_execute($stmt)) {
         $_SESSION['form_data'] = $postData;
-        header("Location: " . $_SERVER['PHP_SELF'] . '?status=success&message=Terjadi Kesalahan!!');
+        header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Terjadi Kesalahan saat menambahkan petugas!');
         mysqli_stmt_close($stmt);
         exit;
     }
