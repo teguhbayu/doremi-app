@@ -9,6 +9,7 @@ if (!isset($_SESSION['userId'])) {
     exit;
 }
 require '../../db.php';
+require 'helpers.php';
 
 $id = $_GET['id'] ?? null;
 if (!$id) {
@@ -16,7 +17,7 @@ if (!$id) {
     exit;
 }
 
-$stmt = mysqli_prepare($db, "SELECT * FROM penghuni WHERE PenghuniID = ? LIMIT 1");
+$stmt = mysqli_prepare($db, "SELECT * FROM penghuni WHERE PenghuniID = ? AND IsDeleted = 0 LIMIT 1");
 mysqli_stmt_bind_param($stmt, 'i', $id);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
@@ -33,12 +34,13 @@ $kamarQuery = mysqli_query(
     "SELECT
         k.KamarID,
         k.NomorKamar,
+        k.Lantai,
         k.KapasitasPenghuni,
         COUNT(p.PenghuniID) AS JumlahPenghuniAktual
     FROM kamar k
     LEFT JOIN penghuni p ON p.KamarID = k.KamarID AND p.IsDeleted = 0
     WHERE k.IsDeleted = 0
-    GROUP BY k.KamarID, k.NomorKamar, k.KapasitasPenghuni
+    GROUP BY k.KamarID, k.NomorKamar, k.Lantai, k.KapasitasPenghuni
     ORDER BY k.NomorKamar ASC"
 );
 $kamars = mysqli_fetch_all($kamarQuery, MYSQLI_ASSOC);
@@ -100,9 +102,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    $isChangingKamar = (int) $penghuni['KamarID'] !== (int) $kamarId;
-    if ($isChangingKamar && (int) $selectedKamar['JumlahPenghuniAktual'] >= (int) $selectedKamar['KapasitasPenghuni']) {
-        header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&status=error&message=Kamar yang dipilih sudah penuh!');
+    $duplicateCheckStmt = mysqli_prepare(
+        $db,
+        "SELECT PenghuniID, Nim, Email, NoHP
+         FROM penghuni
+         WHERE IsDeleted = 0 AND PenghuniID != ? AND (Nim = ? OR Email = ? OR NoHP = ?)
+         LIMIT 1"
+    );
+    mysqli_stmt_bind_param($duplicateCheckStmt, 'isss', $id, $nim, $email, $no);
+    mysqli_stmt_execute($duplicateCheckStmt);
+    $duplicateCheckResult = mysqli_stmt_get_result($duplicateCheckStmt);
+    $duplicatePenghuni = mysqli_fetch_assoc($duplicateCheckResult);
+    mysqli_stmt_close($duplicateCheckStmt);
+
+    if ($duplicatePenghuni) {
+        header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&status=error&message=' . urlencode(penghuni_duplicate_identity_message($duplicatePenghuni, $nim, $email, $no)));
+        exit;
+    }
+
+    $roomValidationMessage = penghuni_validate_room_assignment($db, (int) $kamarId, $jk, (int) $id);
+    if ($roomValidationMessage !== null) {
+        header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&status=error&message=' . urlencode($roomValidationMessage));
         exit;
     }
 
@@ -180,7 +200,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <select class="form-select" name="kamarPenghuni" id="kamarPenghuni" required>
                         <?php foreach ($kamars as $kamar): ?>
                             <option value="<?= $kamar['KamarID'] ?>" <?= $penghuni['KamarID'] == $kamar['KamarID'] ? 'selected' : '' ?>>
-                                <?= $kamar['NomorKamar'] ?> (<?= $kamar['JumlahPenghuniAktual'] ?>/<?= $kamar['KapasitasPenghuni'] ?> terisi)
+                                <?= $kamar['NomorKamar'] ?> - Lantai <?= $kamar['Lantai'] ?>
+                                (<?= $kamar['JumlahPenghuniAktual'] ?>/<?= $kamar['KapasitasPenghuni'] ?> terisi)
                             </option>
                         <?php endforeach; ?>
                     </select>

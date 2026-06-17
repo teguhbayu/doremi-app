@@ -14,7 +14,7 @@ if (isset($_GET['code'])) {
 
         $email = $google_account_info->email;
 
-        $stmt = mysqli_prepare($db, "SELECT PetugasID, NamaPetugas, Password, Jabatan FROM petugas WHERE Email = ? LIMIT 1");
+        $stmt = mysqli_prepare($db, "SELECT PetugasID, NamaPetugas, Password, Jabatan FROM petugas WHERE Email = ? AND IsDeleted = 0 LIMIT 1");
         mysqli_stmt_bind_param($stmt, 's', $email);
         mysqli_stmt_execute($stmt);
         $result = mysqli_stmt_get_result($stmt);
@@ -30,7 +30,7 @@ if (isset($_GET['code'])) {
             exit;
         }
 
-        $stmt = mysqli_prepare($db, "SELECT PenghuniID, NamaPenghuni, Password FROM penghuni WHERE Email = ? LIMIT 1");
+        $stmt = mysqli_prepare($db, "SELECT PenghuniID, NamaPenghuni, Password FROM penghuni WHERE Email = ? AND IsDeleted = 0 LIMIT 1");
         mysqli_stmt_bind_param($stmt, 's', $email);
         mysqli_stmt_execute($stmt);
         $result = mysqli_stmt_get_result($stmt);

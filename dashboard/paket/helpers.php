@@ -70,6 +70,13 @@ function paket_photo_url(?string $path): string
     }
 
     if (
+        str_starts_with($path, 'data:image/')
+        || str_starts_with($path, 'data:application/octet-stream;base64,')
+    ) {
+        return $path;
+    }
+
+    if (
         str_starts_with($path, 'http://')
         || str_starts_with($path, 'https://')
         || str_starts_with($path, '/')
@@ -80,7 +87,46 @@ function paket_photo_url(?string $path): string
     return '/doremi-app/' . ltrim($path, '/');
 }
 
-function paket_store_photo(array $file, int $paketId, ?string $currentPath = null): string
+function paket_status_meta(?string $status): array
+{
+    return match ($status ?? 'Belum Diambil') {
+        'Sudah Diambil' => [
+            'label' => 'Sudah Diambil',
+            'class' => 'bg-success',
+        ],
+        'TERTUKAR' => [
+            'label' => 'PAKET TERTUKAR',
+            'class' => 'bg-danger',
+        ],
+        default => [
+            'label' => 'Belum Diambil',
+            'class' => 'bg-warning text-dark',
+        ],
+    };
+}
+
+function paket_cleanup_legacy_photo(?string $currentPath): void
+{
+    if (empty($currentPath) || !str_starts_with($currentPath, 'assets/uploads/paket/')) {
+        return;
+    }
+
+    $baseDir = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . 'paket';
+    $baseRealPath = realpath($baseDir);
+    $oldFilePath = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . str_replace(['/', '\\'], DIRECTORY_SEPARATOR, ltrim($currentPath, '/\\'));
+    $oldRealPath = realpath($oldFilePath);
+
+    if (
+        $baseRealPath !== false
+        && $oldRealPath !== false
+        && str_starts_with($oldRealPath, $baseRealPath)
+        && is_file($oldRealPath)
+    ) {
+        @unlink($oldRealPath);
+    }
+}
+
+function paket_store_photo(array $file, ?string $currentPath = null): string
 {
     $uploadError = $file['error'] ?? UPLOAD_ERR_NO_FILE;
 
@@ -116,44 +162,12 @@ function paket_store_photo(array $file, int $paketId, ?string $currentPath = nul
         throw new RuntimeException('Format foto harus JPG, PNG, atau WEBP.');
     }
 
-    $baseDir = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . 'paket';
-    if (!is_dir($baseDir) && !mkdir($baseDir, 0775, true) && !is_dir($baseDir)) {
-        throw new RuntimeException('Folder upload foto paket tidak tersedia.');
+    $rawBinary = file_get_contents($file['tmp_name']);
+    if ($rawBinary === false) {
+        throw new RuntimeException('Foto pengambilan gagal diproses.');
     }
 
-    try {
-        $randomToken = bin2hex(random_bytes(4));
-    } catch (Throwable $exception) {
-        $randomToken = uniqid();
-    }
+    paket_cleanup_legacy_photo($currentPath);
 
-    $filename = sprintf(
-        'paket-%d-%s-%s.%s',
-        $paketId,
-        date('YmdHis'),
-        $randomToken,
-        $allowedMimeTypes[$mimeType]
-    );
-    $targetPath = $baseDir . DIRECTORY_SEPARATOR . $filename;
-
-    if (!move_uploaded_file($file['tmp_name'], $targetPath)) {
-        throw new RuntimeException('Foto pengambilan gagal disimpan.');
-    }
-
-    if (!empty($currentPath) && str_starts_with($currentPath, 'assets/uploads/paket/')) {
-        $baseRealPath = realpath($baseDir);
-        $oldFilePath = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . str_replace(['/', '\\'], DIRECTORY_SEPARATOR, ltrim($currentPath, '/\\'));
-        $oldRealPath = realpath($oldFilePath);
-
-        if (
-            $baseRealPath !== false
-            && $oldRealPath !== false
-            && str_starts_with($oldRealPath, $baseRealPath)
-            && is_file($oldRealPath)
-        ) {
-            @unlink($oldRealPath);
-        }
-    }
-
-    return 'assets/uploads/paket/' . $filename;
+    return 'data:' . $mimeType . ';base64,' . base64_encode($rawBinary);
 }

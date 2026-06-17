@@ -16,7 +16,7 @@ if (!$id) {
     exit;
 }
 
-$stmt = mysqli_prepare($db, "SELECT PetugasID, NamaPetugas, Email, Jabatan, NoHP FROM petugas WHERE PetugasID = ? LIMIT 1");
+$stmt = mysqli_prepare($db, "SELECT PetugasID, NamaPetugas, Email, Jabatan, NoHP FROM petugas WHERE PetugasID = ? AND IsDeleted = 0 LIMIT 1");
 mysqli_stmt_bind_param($stmt, 'i', $id);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         v::key('nama', v::stringType()->length(3, 100)),
         v::key('email', v::email()->length(3, 100)),
         v::key('no', v::digit()->length(10, 15)),
-        v::key('jabatan', v::alpha()->in(["PENGURUS", "SIGAP", "VIRTUS", "MAINTENANCE"])),
+        v::key('jabatan', v::alpha()->in(["PENGURUS", "SIGAP", "SERVANDA", "MAINTENANCE"])),
         v::key('password', v::optional(v::length(5, 100))),
         v::key('confirmPassword', v::optional(v::length(5, 100)))
     );
@@ -63,6 +63,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($isChangingPassword && $password !== $confirmPassword) {
         header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&status=error&message=Password Tidak Cocok!');
+        exit;
+    }
+
+    $duplicateCheckStmt = mysqli_prepare(
+        $db,
+        "SELECT PetugasID, Email, NoHP
+         FROM petugas
+         WHERE IsDeleted = 0 AND PetugasID != ? AND (Email = ? OR NoHP = ?)
+         LIMIT 1"
+    );
+    mysqli_stmt_bind_param($duplicateCheckStmt, 'iss', $id, $email, $no);
+    mysqli_stmt_execute($duplicateCheckStmt);
+    $duplicateCheckResult = mysqli_stmt_get_result($duplicateCheckStmt);
+    $duplicatePetugas = mysqli_fetch_assoc($duplicateCheckResult);
+    mysqli_stmt_close($duplicateCheckStmt);
+
+    if ($duplicatePetugas) {
+        if (($duplicatePetugas['Email'] ?? '') === $email) {
+            header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&status=error&message=Email petugas sudah terdaftar!');
+            exit;
+        }
+
+        header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&status=error&message=No. HP petugas sudah terdaftar!');
         exit;
     }
 
@@ -124,7 +147,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <label for="jabatanPetugas" class="form-label">Jabatan</label>
                     <select class="form-select" name="jabatanPetugas" id="jabatanPetugas">
                         <option disabled>Pilih Salah Satu</option>
-                        <?php foreach (["PENGURUS", "SIGAP", "VIRTUS", "MAINTENANCE"] as $role): ?>
+                        <?php foreach (["PENGURUS", "SIGAP", "SERVANDA", "MAINTENANCE"] as $role): ?>
                             <option value="<?= $role ?>" <?= $petugas['Jabatan'] === $role ? 'selected' : '' ?>>
                                 <?= $role ?>
                             </option>
