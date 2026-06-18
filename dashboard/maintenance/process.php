@@ -13,13 +13,12 @@ if (!$id) {
 }
 
 if ($action === 'claim') {
-    // Claiming status transition: 'Diajukan' -> 'Diproses' and logs the claimed technicians' ID
     $stmt = mysqli_prepare($db, "UPDATE maintenance SET StatusMaintenance = 'Diproses', PetugasID = ? WHERE MaintenanceID = ?");
     mysqli_stmt_bind_param($stmt, 'ii', $userId, $id);
 
     if (mysqli_stmt_execute($stmt)) {
         mysqli_stmt_close($stmt);
-        maintenance_redirect('index.php', 'success', 'Laporan berhasil di-claim! Pekerjaan telah masuk status Diproses.');
+        maintenance_redirect('index.php', 'success', 'Laporan berhasil di-claim! Silahkan mulai perbaikan.');
     } else {
         mysqli_stmt_close($stmt);
         maintenance_redirect('index.php', 'error', 'Gagal memproses klaim pekerjaan.');
@@ -41,10 +40,9 @@ elseif ($action === 'complete') {
     }
 
     if (empty($fotoMaintenance)) {
-        maintenance_redirect('index.php', 'error', 'Foto bukti hasil perbaikan wajib diunggah.');
+        maintenance_redirect('index.php', 'error', 'Foto hasil perbaikan wajib diunggah.');
     }
 
-    // Resolving status transition: 'Diproses' -> 'Selesai' with final reporting metrics
     $stmt = mysqli_prepare(
         $db,
         "UPDATE maintenance SET StatusMaintenance = 'Selesai', TanggalSelesai = ?, Keterangan = ?, FotoMaintenance = ? WHERE MaintenanceID = ?"
@@ -53,7 +51,7 @@ elseif ($action === 'complete') {
 
     if (mysqli_stmt_execute($stmt)) {
         mysqli_stmt_close($stmt);
-        maintenance_redirect('index.php', 'success', 'Perbaikan selesai! Pelapor sekarang dapat melihat laporan hasil kerja.');
+        maintenance_redirect('index.php', 'success', 'Perbaikan selesai! Laporan berhasil diperbarui.');
     } else {
         mysqli_stmt_close($stmt);
         maintenance_redirect('index.php', 'error', 'Terjadi kesalahan sistem saat memperbarui status selesai.');

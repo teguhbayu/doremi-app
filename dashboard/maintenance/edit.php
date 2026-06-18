@@ -1,7 +1,8 @@
 <?php
 session_start();
 require 'helpers.php';
-maintenance_require_roles(['PENGURUS', 'PENGHUNI', 'SIGAP', 'SERVANDA']);
+// Allowed the MAINTENANCE role to edit their submitted tickets
+maintenance_require_roles(['PENGURUS', 'PENGHUNI', 'SIGAP', 'SERVANDA', 'MAINTENANCE']);
 require '../../db.php';
 
 use Respect\Validation\Validator as v;
@@ -35,6 +36,7 @@ if ($role === 'PENGHUNI') {
         $isOwner = true;
     }
 } else {
+    // Correctly identifies ownership for staff creators (including the MAINTENANCE technician)
     if ((int)$report['PetugasID'] === $userId && $report['PenghuniID'] === null) {
         $isOwner = true;
     }
@@ -187,7 +189,6 @@ $currentTargetValue = !empty($report['RuanganID']) ? $report['RuanganID'] : $rep
                                     </label>
                                 </div>
 
-                                <!-- Ruangan Dropdown -->
                                 <div x-show="targetType === 'ruangan'">
                                     <select name="targetValue" class="form-select" :required="targetType === 'ruangan'">
                                         <option value="" disabled>Pilih Ruangan</option>
@@ -199,7 +200,6 @@ $currentTargetValue = !empty($report['RuanganID']) ? $report['RuanganID'] : $rep
                                     </select>
                                 </div>
 
-                                <!-- Inventaris Dropdown -->
                                 <div x-show="targetType === 'inventaris'">
                                     <select name="targetValue" class="form-select" :required="targetType === 'inventaris'">
                                         <option value="" disabled>Pilih Inventaris</option>
