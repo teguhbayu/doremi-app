@@ -55,13 +55,12 @@ $reports = mysqli_fetch_all($query, MYSQLI_ASSOC);
                     </p>
                 </div>
 
-                <?php if ($role !== 'MAINTENANCE'): ?>
-                    <a href="create.php"
-                        class="tw:bg-secondary tw:text-white tw:px-4 tw:py-3 tw:rounded-xl tw:hover:bg-accent tw:duration-300 tw:transition-all tw:inline-flex tw:items-center tw:gap-2 tw:no-underline tw:font-medium">
-                        <i class="iconsax tw:text-2xl" icon-name="add-square"></i>
-                        <span>Buat Laporan</span>
-                    </a>
-                <?php endif; ?>
+                <!-- Everybody, including the MAINTENANCE role, can file reports -->
+                <a href="create.php"
+                    class="tw:bg-secondary tw:text-white tw:px-4 tw:py-3 tw:rounded-xl tw:hover:bg-accent tw:duration-300 tw:transition-all tw:inline-flex tw:items-center tw:gap-2 tw:no-underline tw:font-medium">
+                    <i class="iconsax tw:text-2xl" icon-name="add-square"></i>
+                    <span>Buat Laporan</span>
+                </a>
             </div>
 
             <div class="tw:bg-white tw:p-6 tw:rounded-[24px] tw:shadow-sm tw:border tw:border-gray-100">
@@ -142,7 +141,8 @@ $reports = mysqli_fetch_all($query, MYSQLI_ASSOC);
                                                 <?php endif; ?>
                                             <?php endif; ?>
 
-                                            <?php if ($r['StatusMaintenance'] === 'Diajukan' && $role !== 'MAINTENANCE'): ?>
+                                            <!-- Dynamic Edit/Delete display for ticket owners (even if they are MAINTENANCE role) -->
+                                            <?php if ($r['StatusMaintenance'] === 'Diajukan'): ?>
                                                 <?php 
                                                     $isOwner = false;
                                                     if ($role === 'PENGHUNI' && (int)$r['PenghuniID'] === $userId) {

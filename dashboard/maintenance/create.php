@@ -128,7 +128,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
 
             <div class="tw:grid tw:grid-cols-1 tw:lg:grid-cols-3 tw:gap-8">
-                <!-- Instruction Legend / Panduan prioritas -->
                 <div class="tw:lg:col-span-1">
                     <div class="tw:bg-white tw:p-6 tw:rounded-[24px] tw:shadow-sm tw:border tw:border-gray-100 tw:h-full">
                         <h5 class="tw:font-bold tw:text-slate-900 tw:mb-4">Panduan Tingkat Urgensi</h5>
@@ -153,11 +152,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                 </div>
 
-                <!-- Form report -->
                 <div class="tw:lg:col-span-2">
                     <div class="tw:bg-white tw:p-6 tw:rounded-[24px] tw:shadow-sm tw:border tw:border-gray-100" x-data="{ targetType: 'ruangan' }">
                         <form method="POST" enctype="multipart/form-data">
-                            
                             <div class="mb-4">
                                 <label class="form-label tw:font-semibold">Skala Prioritas / Tingkat Kerusakan</label>
                                 <select name="jenisLaporan" class="form-select" required>
@@ -181,7 +178,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     </label>
                                 </div>
 
-                                <!-- Ruangan -->
                                 <div x-show="targetType === 'ruangan'">
                                     <select name="targetValue" class="form-select" :required="targetType === 'ruangan'">
                                         <option value="" selected disabled>Pilih Ruangan</option>
@@ -191,7 +187,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     </select>
                                 </div>
 
-                                <!-- Inventaris -->
                                 <div x-show="targetType === 'inventaris'">
                                     <select name="targetValue" class="form-select" :required="targetType === 'inventaris'">
                                         <option value="" selected disabled>Pilih Inventaris</option>
