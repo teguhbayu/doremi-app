@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         v::key('nama', v::stringType()->length(1, 100)),
         v::key('jumlah', v::numericVal()->min(0)),
         v::key('lokasi', v::stringType()->length(1, 50)),
-        v::key('keterangan', v::stringType())
+        v::key('keterangan', v::stringType()->length(0, 500))
     );
 
     if (!$inventarisSchema->validate(['nama' => $nama, 'jumlah' => $jumlah, 'lokasi' => $lokasi, 'keterangan' => $keterangan])) {
