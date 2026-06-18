@@ -10,6 +10,7 @@ switch ($_SESSION["userRole"]) {
             ["title" => "Kamar", "target" => "/doremi-app/dashboard/kamar/", "icon" => "house-1"],
             ["title" => "Ruangan", "target" => "/doremi-app/dashboard/ruangan/", "icon" => "buildings-1"],
             ["title" => "Inventaris", "target" => "/doremi-app/dashboard/inventaris/", "icon" => "archive-book"],
+            ["title" => "Maintenance", "target" => "/doremi-app/dashboard/maintenance/", "icon" => "setting-2"],
         ];
         break;
     case "PENGHUNI":
@@ -17,6 +18,7 @@ switch ($_SESSION["userRole"]) {
             ["title" => "Home", "target" => "/doremi-app/dashboard/", "icon" => "home-2"],
             ["title" => "Izin Keluar", "target" => "/doremi-app/dashboard/inout/", "icon" => "export-1"],
             ["title" => "Paket", "target" => "/doremi-app/dashboard/paket/", "icon" => "box"],
+            ["title" => "Lapor Kerusakan", "target" => "/doremi-app/dashboard/maintenance/", "icon" => "setting-2"],
         ];
         break;
     case "SIGAP":
@@ -24,16 +26,27 @@ switch ($_SESSION["userRole"]) {
             ["title" => "Home", "target" => "/doremi-app/dashboard/", "icon" => "home-2"],
             ["title" => "Konfirmasi In/Out", "target" => "/doremi-app/dashboard/inout/", "icon" => "shield-tick"],
             ["title" => "Paket", "target" => "/doremi-app/dashboard/paket/", "icon" => "box"],
+            ["title" => "Lapor Kerusakan", "target" => "/doremi-app/dashboard/maintenance/", "icon" => "setting-2"],
+        ];
+        break;
+    case "SERVANDA":
+        $menus = [
+            ["title" => "Home", "target" => "/doremi-app/dashboard/", "icon" => "home-2"],
+            ["title" => "Lapor Kerusakan", "target" => "/doremi-app/dashboard/maintenance/", "icon" => "setting-2"],
+        ];
+        break;
+    case "MAINTENANCE":
+        $menus = [
+            ["title" => "Home", "target" => "/doremi-app/dashboard/", "icon" => "home-2"],
+            ["title" => "Pekerjaan Maintenance", "target" => "/doremi-app/dashboard/maintenance/", "icon" => "setting-2"],
         ];
         break;
 }
-
 ?>
 
 <div x-data="{ sidebarOpen: false }">
     <!-- Mobile Top Navbar -->
-    <div
-        class="tw:md:hidden tw:fixed tw:top-0 tw:left-0 tw:w-dvw tw:h-16 tw:bg-primary tw:flex tw:items-center tw:justify-between tw:px-6 tw:z-50 tw:shadow-md">
+    <div class="tw:md:hidden tw:fixed tw:top-0 tw:left-0 tw:w-dvw tw:h-16 tw:bg-primary tw:flex tw:items-center tw:justify-between tw:px-6 tw:z-50 tw:shadow-md">
         <div class="tw:flex tw:flex-col tw:leading-none">
             <h2 class="tw:font-bold tw:text-xl tw:text-white tw:m-0">DOREMI</h2>
             <p class="tw:text-[10px] tw:text-accent tw:m-0">ASTRATech Dormitory</p>
@@ -49,9 +62,7 @@ switch ($_SESSION["userRole"]) {
             <a class="tw:w-fit tw:no-underline tw:m-0 tw:p-0 tw:leading-none tw:flex tw:flex-col tw:gap-[5px]"
                 href="/doremi-app/dashboard/">
                 <h2 class="tw:font-bold tw:w-fit tw:text-[30px] tw:text-white tw:m-0 tw:leading-none">DOREMI</h2>
-                <p class="tw:font-medium tw:w-fit tw:text-[13px] tw:text-accent tw:m-0 tw:leading-none">ASTRATech
-                    Dormitory
-                </p>
+                <p class="tw:font-medium tw:w-fit tw:text-[13px] tw:text-accent tw:m-0 tw:leading-none">ASTRATech Dormitory</p>
             </a>
 
             <div class="tw:flex tw:flex-col tw:gap-2">
@@ -66,12 +77,10 @@ switch ($_SESSION["userRole"]) {
                     }
                     ?>
                     <a @click="sidebarOpen = false"
-                        class="tw:no-underline tw:p-2 tw:rounded-lg tw:inline-flex tw:items-center tw:gap-2 <?php echo $isActive ? "tw:bg-white tw:text-primary" : "tw:bg-primary tw:hover:bg-tertiary tw:text-white"; ?>  tw:transition-all tw:duration-500"
+                        class="tw:no-underline tw:p-2 tw:rounded-lg tw:inline-flex tw:items-center tw:gap-2 <?php echo $isActive ? "tw:bg-white tw:text-primary" : "tw:bg-primary tw:hover:bg-tertiary tw:text-white"; ?> tw:transition-all tw:duration-500"
                         href="<?php echo $menu["target"]; ?>">
                         <i class="iconsax tw:text-2xl" icon-name="<?php echo $menu["icon"]; ?>"></i>
-                        <span>
-                            <?php echo $menu["title"]; ?>
-                        </span>
+                        <span><?php echo $menu["title"]; ?></span>
                     </a>
                 <?php } ?>
             </div>
@@ -84,8 +93,7 @@ switch ($_SESSION["userRole"]) {
                     <?php echo $_SESSION["userRole"]; ?>
                 </h3>
                 <form method="post" action="/doremi-app/logout.php" class="tw:mt-2">
-                    <button
-                        class="tw:p-2 tw:w-full tw:bg-red-500 tw:rounded-[16px] tw:text-white tw:hover:bg-red-400 tw:transition-all tw:duration-500 tw:border-none">Logout</button>
+                    <button class="tw:p-2 tw:w-full tw:bg-red-500 tw:rounded-[16px] tw:text-white tw:hover:bg-red-400 tw:transition-all tw:duration-500 tw:border-none">Logout</button>
                 </form>
             </div>
         </div>
