@@ -205,7 +205,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <div class="mb-4">
                                 <label class="form-label tw:font-semibold">Foto Bukti Kerusakan</label>
                                 <input type="file" name="fotoLaporan" class="form-control" accept="image/png,image/jpeg,image/webp">
-                                <div class="form-text">File foto akan otomatis dikonversi ke format string Base64 sebelum disimpan. Maksimal ukuran 2MB.</div>
+                                <div class="form-text">Maksimal ukuran 2MB.</div>
                             </div>
 
                             <div class="tw:w-full tw:flex tw:justify-end tw:mt-4">
