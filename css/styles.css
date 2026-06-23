@@ -1316,10 +1316,8 @@ a {
 }
 
 .table-panel :is(
-  thead th,
   tbody td,
   tbody th,
-  table.dataTable thead th,
   table.dataTable tbody td,
   table.dataTable tbody th
 ) {
@@ -1666,14 +1664,33 @@ a {
   font-size: 0.95rem;
 }
 
+.table-panel :is(.table, table.dataTable, .doremi-table) thead th,
 .dashboard-body .table thead th,
 .doremi-table thead th {
   padding: 1rem 1.05rem !important;
-  background: transparent !important;
-  color: var(--ink-strong) !important;
+  background: linear-gradient(135deg, rgba(220, 233, 255, 0.98), rgba(203, 223, 255, 0.96)) !important;
+  color: var(--tw-color-primary) !important;
   font-weight: 800;
   border-bottom: none !important;
   vertical-align: middle !important;
+}
+
+.table-panel :is(.table, table.dataTable, .doremi-table) thead th + th,
+.dashboard-body .table thead th + th,
+.doremi-table thead th + th {
+  border-left: 1px solid rgba(47, 127, 240, 0.08) !important;
+}
+
+.table-panel :is(.table, table.dataTable, .doremi-table) thead th:first-child,
+.dashboard-body .table thead th:first-child,
+.doremi-table thead th:first-child {
+  border-top-left-radius: 18px;
+}
+
+.table-panel :is(.table, table.dataTable, .doremi-table) thead th:last-child,
+.dashboard-body .table thead th:last-child,
+.doremi-table thead th:last-child {
+  border-top-right-radius: 18px;
 }
 
 .dashboard-body .table tbody td,
@@ -1696,6 +1713,32 @@ a {
 .doremi-table tbody tr:last-child td,
 .doremi-table tbody tr:last-child th {
   border-bottom: none !important;
+}
+
+.dashboard-body .table tbody,
+.doremi-table tbody {
+  counter-reset: doremi-row-number;
+}
+
+.dashboard-body .table tbody tr,
+.doremi-table tbody tr {
+  counter-increment: doremi-row-number;
+}
+
+.dashboard-body .table thead th.row-number-col,
+.doremi-table thead th.row-number-col,
+.dashboard-body .table tbody td.row-number-cell,
+.doremi-table tbody td.row-number-cell {
+  width: 4.25rem !important;
+  min-width: 4.25rem !important;
+  text-align: center !important;
+}
+
+.dashboard-body .table tbody td.row-number-cell::before,
+.doremi-table tbody td.row-number-cell::before {
+  content: counter(doremi-row-number);
+  font-weight: 800;
+  color: var(--tw-color-primary);
 }
 
 .dt-container .dt-length,

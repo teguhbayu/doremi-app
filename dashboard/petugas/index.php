@@ -114,7 +114,7 @@ $totalPetugas = mysqli_num_rows($query);
                 info: true,
                 columnDefs: [
                     {
-                        targets: 2,
+                        targets: 3,
                         orderable: false
                     },
                     {

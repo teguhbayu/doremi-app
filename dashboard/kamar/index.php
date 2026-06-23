@@ -152,7 +152,7 @@ $totalKamar = mysqli_num_rows($query);
                 info: true,
                 columnDefs: [
                     {
-                        targets: 3,
+                        targets: 4,
                         orderable: false
                     },
                     {

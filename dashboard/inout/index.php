@@ -281,7 +281,7 @@ if ($role === 'SIGAP') {
                 if (document.getElementById('historyTable')) {
                     new DataTable('#historyTable', {
                         ...dtConfig,
-                        order: [[2, 'desc']]
+                        order: [[3, 'desc']]
                     });
                 }
             <?php elseif ($role === 'SIGAP'): ?>
@@ -289,7 +289,7 @@ if ($role === 'SIGAP') {
                     new DataTable('#pendingTable', {
                         ...dtConfig,
                         columnDefs: [
-                            { targets: 3, orderable: false },
+                            { targets: 4, orderable: false },
                             { targets: '_all', className: 'text-center align-middle' }
                         ]
                     });
@@ -297,9 +297,9 @@ if ($role === 'SIGAP') {
                 if (document.getElementById('outsideTable')) {
                     new DataTable('#outsideTable', {
                         ...dtConfig,
-                        order: [[2, 'asc']],
+                        order: [[3, 'asc']],
                         columnDefs: [
-                            { targets: 3, orderable: false },
+                            { targets: 4, orderable: false },
                             { targets: '_all', className: 'text-center align-middle' }
                         ]
                     });

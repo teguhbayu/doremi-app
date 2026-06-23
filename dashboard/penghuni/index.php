@@ -113,7 +113,7 @@ $totalPenghuni = mysqli_num_rows($query);
                 info: true,
                 columnDefs: [
                     {
-                        targets: [2, 3],
+                        targets: [3, 4],
                         orderable: false
                     },
                     {
