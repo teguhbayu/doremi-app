@@ -35,12 +35,31 @@ function penghuni_normalize_phone(string $phone): string
     return (string) preg_replace('/\D+/', '', $phone);
 }
 
+function penghuni_nim_min_length(): int
+{
+    return 5;
+}
+
+function penghuni_nim_max_length(): int
+{
+    return 10;
+}
+
+function penghuni_nim_validation_message(): string
+{
+    return sprintf(
+        'NIM harus %d-%d karakter dan hanya boleh berisi huruf, angka, titik, underscore, atau strip!',
+        penghuni_nim_min_length(),
+        penghuni_nim_max_length()
+    );
+}
+
 function penghuni_is_valid_nim(string $nim): bool
 {
     $normalizedNim = penghuni_normalize_nim($nim);
     $length = function_exists('mb_strlen') ? mb_strlen($normalizedNim) : strlen($normalizedNim);
 
-    if ($length < 5 || $length > 25) {
+    if ($length < penghuni_nim_min_length() || $length > penghuni_nim_max_length()) {
         return false;
     }
 

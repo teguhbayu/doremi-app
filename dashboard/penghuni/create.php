@@ -83,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (!penghuni_is_valid_nim($nim)) {
         $_SESSION['form_data'] = $formData;
-        header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=NIM harus 5-25 karakter dan hanya boleh berisi huruf, angka, titik, underscore, atau strip!');
+        header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=' . urlencode(penghuni_nim_validation_message()));
         exit;
     }
 
@@ -219,9 +219,10 @@ unset($_SESSION['form_data']);
             <form method="POST" class="form-shell">
                 <div class="mb-3">
                     <label for="nimPenghuni" class="form-label">NIM</label>
-                    <input type="text" name="nimPenghuni" class="form-control" id="nimPenghuni" maxlength="25"
+                    <input type="text" name="nimPenghuni" class="form-control" id="nimPenghuni"
+                        minlength="<?= penghuni_nim_min_length() ?>" maxlength="<?= penghuni_nim_max_length() ?>"
                         value="<?= htmlspecialchars($formData['nim']) ?>" required>
-                    <span class="form-hint">Gunakan 5-25 karakter tanpa spasi. Contoh: `231011400123`.</span>
+                    <span class="form-hint">Gunakan <?= penghuni_nim_min_length() ?>-<?= penghuni_nim_max_length() ?> karakter tanpa spasi. Contoh: 0920250045.</span>
                 </div>
                 <div class="mb-3">
                     <label for="namaPenghuni" class="form-label">Nama Penghuni</label>
@@ -286,6 +287,22 @@ unset($_SESSION['form_data']);
     </main>
     <?php require '../../bootstrap.php'; ?>
     <?php require '../../validation_alert.php'; ?>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const nimInput = document.getElementById('nimPenghuni');
+
+            if (!nimInput) {
+                return;
+            }
+
+            const syncNimField = () => {
+                nimInput.value = nimInput.value.replace(/\s+/g, '').toUpperCase();
+            };
+
+            nimInput.addEventListener('input', syncNimField);
+            syncNimField();
+        });
+    </script>
 </body>
 
 </html>
