@@ -654,6 +654,11 @@ a {
   color: var(--ink-strong);
 }
 
+.auth-field:has(:is(input, select, textarea)[required]:not([disabled])) > label::after {
+  content: " *";
+  color: #dc2626;
+}
+
 .auth-input-wrap {
   position: relative;
 }
@@ -1544,6 +1549,11 @@ a {
   margin-bottom: 0.55rem;
   font-weight: 800;
   color: var(--ink-strong);
+}
+
+.dashboard-body form div:has(:is(input, select, textarea)[required]:not([disabled])) > .form-label::after {
+  content: " *";
+  color: #dc2626;
 }
 
 .dashboard-body .form-control,

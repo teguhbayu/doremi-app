@@ -86,7 +86,8 @@ $login_url = $client->createAuthUrl();
             <div class="auth-layout">
                 <section class="auth-preview">
                     <span class="eyebrow">Portal Akses DOREMI</span>
-                    <h1>Egg Sando</h1>
+                    <h1>DOREMI</h1>
+                    <h4><i>Dormitory Resident Management Information</i></h4>
                     <p>
                         Penghuni dan petugas menggunakan satu pintu masuk yang rapi
                         untuk paket, maintenance, inventaris, kamar, dan izin keluar.

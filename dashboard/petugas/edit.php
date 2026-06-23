@@ -135,22 +135,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="mb-3">
                     <label for="namaPetugas" class="form-label">Nama Petugas</label>
                     <input type="text" name="namaPetugas" class="form-control" id="namaPetugas"
-                        value="<?= htmlspecialchars($petugas['NamaPetugas']) ?>">
+                        value="<?= htmlspecialchars($petugas['NamaPetugas']) ?>" required>
                 </div>
                 <div class="mb-3">
                     <label for="emailPetugas" class="form-label">Email Petugas</label>
                     <input type="email" name="emailPetugas" class="form-control" id="emailPetugas"
-                        value="<?= htmlspecialchars($petugas['Email']) ?>">
+                        value="<?= htmlspecialchars($petugas['Email']) ?>" required>
                 </div>
                 <div class="mb-3">
                     <label for="noPetugas" class="form-label">No. HP</label>
                     <input type="text" name="noPetugas" class="form-control" id="noPetugas" inputmode="numeric"
                         pattern="[0-9]{10,16}" maxlength="16"
-                        value="<?= htmlspecialchars($petugas['NoHP']) ?>">
+                        value="<?= htmlspecialchars($petugas['NoHP']) ?>" required>
                 </div>
                 <div class="mb-3">
                     <label for="jabatanPetugas" class="form-label">Jabatan</label>
-                    <select class="form-select" name="jabatanPetugas" id="jabatanPetugas" <?= $isSelfEdit ? 'disabled' : '' ?>>
+                    <select class="form-select" name="jabatanPetugas" id="jabatanPetugas" <?= $isSelfEdit ? 'disabled' : 'required' ?>>
                         <option disabled>Pilih Salah Satu</option>
                         <?php foreach (["PENGURUS", "SIGAP", "SERVANDA", "MAINTENANCE"] as $role): ?>
                             <option value="<?= $role ?>" <?= $petugas['Jabatan'] === $role ? 'selected' : '' ?>>

@@ -185,20 +185,20 @@ unset($_SESSION['form_data']); // Clear the data after retrieving
             <form method="POST" class="form-shell" x-data='<?= json_encode($formData, JSON_HEX_APOS | JSON_HEX_QUOT) ?>'>
                 <div class="mb-3">
                     <label for="namaPetugas" class="form-label">Nama Petugas</label>
-                    <input type="text" name="namaPetugas" x-model="nama" class="form-control" id="namaPetugas">
+                    <input type="text" name="namaPetugas" x-model="nama" class="form-control" id="namaPetugas" required>
                 </div>
                 <div class="mb-3">
                     <label for="emailPetugas" class="form-label">Email Petugas</label>
-                    <input type="email" name="emailPetugas" x-model="email" class="form-control" id="emailPetugas">
+                    <input type="email" name="emailPetugas" x-model="email" class="form-control" id="emailPetugas" required>
                 </div>
                 <div class="mb-3">
                     <label for="noPetugas" class="form-label">No. HP</label>
                     <input type="text" name="noPetugas" x-model="no" class="form-control" id="noPetugas"
-                        inputmode="numeric" pattern="[0-9]{10,16}" maxlength="16">
+                        inputmode="numeric" pattern="[0-9]{10,16}" maxlength="16" required>
                 </div>
                 <div class="mb-3">
                     <label for="jabatanPetugas" class="form-label">Jabatan</label>
-                    <select class="form-select" name="jabatanPetugas" x-model="jabatan" id="jabatanPetugas">
+                    <select class="form-select" name="jabatanPetugas" x-model="jabatan" id="jabatanPetugas" required>
                         <option value="Pilih Salah Satu" disabled>Pilih Salah Satu</option>
                         <option value="PENGURUS">PENGURUS</option>
                         <option value="SIGAP">SIGAP</option>
@@ -208,13 +208,13 @@ unset($_SESSION['form_data']); // Clear the data after retrieving
                 </div>
                 <div class="mb-3">
                     <label for="passwordPetugas" class="form-label">Password</label>
-                    <input type="password" name="passwordPetugas" x-model="password" class="form-control" id="passwordPetugas" minlength="8" autocomplete="new-password">
+                    <input type="password" name="passwordPetugas" x-model="password" class="form-control" id="passwordPetugas" minlength="8" autocomplete="new-password" required>
                     <span class="form-hint">Saran: pakai minimal 8 karakter dengan kombinasi huruf besar, huruf kecil, dan angka.</span>
                 </div>
                 <div class="mb-3">
                     <label for="confirmPasswordPetugas" class="form-label">Konfirmasi Password</label>
                     <input type="password" name="confirmPasswordPetugas" x-model="confirmPassword" class="form-control" minlength="8" autocomplete="new-password"
-                        id="confirmPasswordPetugas">
+                        id="confirmPasswordPetugas" required>
                 </div>
                 <div class="tw:w-full tw:flex tw:justify-end tw:mt-2">
                     <button type="submit"

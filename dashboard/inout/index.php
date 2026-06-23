@@ -90,7 +90,7 @@ if ($role === 'SIGAP') {
                                             max="22:00" required>
                                     </div>
                                     <div>
-                                        <label class="form-label">Keperluan *</label>
+                                        <label class="form-label">Keperluan</label>
                                         <textarea name="keperluan" class="form-control" rows="3"
                                             placeholder="Contoh: Belanja, Fotokopi" maxlength="20" required></textarea>
                                         <span class="form-hint">Keperluan wajib diisi dan dibatasi maksimal 20 karakter.</span>
