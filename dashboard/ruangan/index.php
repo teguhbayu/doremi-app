@@ -116,7 +116,7 @@ $totalRuangan = mysqli_num_rows($query);
                 info: true,
                 columnDefs: [
                     {
-                        targets: [2, 4],
+                        targets: [3, 5],
                         orderable: false
                     },
                     {

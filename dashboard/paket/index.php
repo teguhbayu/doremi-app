@@ -280,7 +280,7 @@ $belumDiambil = count(array_filter($pakets, fn($paket) => ($paket['Status'] ?? '
                     order: [],
                     columnDefs: [
                         {
-                            targets: 6,
+                            targets: 7,
                             orderable: false
                         },
                         {

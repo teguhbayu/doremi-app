@@ -185,7 +185,7 @@ $sisaKapasitas = max(0, (int) $kamar['KapasitasPenghuni'] - (int) $kamar['Jumlah
                     info: true,
                     columnDefs: [
                         {
-                            targets: 4,
+                            targets: 5,
                             orderable: false
                         },
                         {

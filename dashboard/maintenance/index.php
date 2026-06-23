@@ -185,7 +185,7 @@ $totalReports = count($reports);
                                                     </div>
                                                     <?php if (!empty($r['FotoLaporan'])): ?>
                                                         <div>
-                                                            <label class="tw:text-xs tw:text-slate-500 tw:mb-1 tw:block">Foto Masalah (Base64 String)</label>
+                                                            <label class="tw:text-xs tw:text-slate-500 tw:mb-1 tw:block">Foto Masalah</label>
                                                             <img src="<?= $r['FotoLaporan'] ?>" alt="Foto Laporan" class="tw:max-h-60 tw:rounded-lg tw:object-cover tw:border tw:w-full">
                                                         </div>
                                                     <?php endif; ?>

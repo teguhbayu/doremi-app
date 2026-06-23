@@ -170,11 +170,6 @@ if ($role === 'PENGHUNI') {
                                 <p>Prioritaskan laporan yang masih berstatus diajukan.</p>
                             </div>
                         </div>
-                        <div class="page-summary-actions">
-                            <a href="/doremi-app/dashboard/inout/" class="page-secondary-btn">Buka In/Out</a>
-                            <a href="/doremi-app/dashboard/paket/" class="page-secondary-btn">Buka Paket</a>
-                            <a href="/doremi-app/dashboard/maintenance/" class="page-secondary-btn">Buka Maintenance</a>
-                        </div>
                     </div>
 
                     <div class="dashboard-side-panel">
