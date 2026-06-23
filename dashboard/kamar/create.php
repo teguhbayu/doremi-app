@@ -9,20 +9,22 @@ if (!isset($_SESSION['userId'])) {
     exit;
 }
 require '../../db.php';
+require 'helpers.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nomor = strtoupper((string) preg_replace('/\s+/', '', trim($_POST['nomorKamar'] ?? '')));
+    $bagianKamar = strtoupper(substr((string) preg_replace('/[^A-Za-z]/', '', (string) ($_POST['bagianKamar'] ?? '')), 0, 1));
     $kapasitas = trim($_POST['kapasitasKamar'] ?? '');
     $lantai = trim($_POST['lantaiKamar'] ?? '');
+    $nomor = kamar_build_nomor($lantai, $bagianKamar);
 
     $kamarSchema = v::keySet(
-        v::key('nomor', v::regex('/^[A-Z0-9-]{1,20}$/')),
+        v::key('bagian', v::regex('/^[A-Z]$/')),
         v::key('kapasitas', v::digit()),
-        v::key('lantai', v::in(['1', '2', '3', '4', '5', '6', '7']))
+        v::key('lantai', v::in(kamar_allowed_floors()))
     );
 
     $postData = [
-        'nomor' => $nomor,
+        'bagian' => $bagianKamar,
         'kapasitas' => $kapasitas,
         'lantai' => $lantai,
     ];
@@ -91,17 +93,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <form method="POST" class="form-shell">
                 <div class="mb-3">
-                    <label for="nomorKamar" class="form-label">Nomor Kamar</label>
-                    <input type="text" name="nomorKamar" class="form-control" id="nomorKamar" maxlength="20" required>
-                    <span class="form-hint">Nomor kamar otomatis dinormalisasi tanpa spasi. Contoh: `A101`.</span>
-                </div>
-                <div class="mb-3">
-                    <label for="kapasitasKamar" class="form-label">Kapasitas Kamar</label>
-                    <input type="number" name="kapasitasKamar" class="form-control" id="kapasitasKamar" min="1"
-                        max="4" required>
-                    <div class="form-text">Kapasitas kamar minimal 1 dan maksimal 4 penghuni.</div>
-                </div>
-                <div class="mb-3">
                     <label for="lantaiKamar" class="form-label">Lantai</label>
                     <select class="form-select" name="lantaiKamar" id="lantaiKamar" required>
                         <option value="" disabled selected>Pilih Lantai</option>
@@ -113,6 +104,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <option value="6">Lantai 6</option>
                         <option value="7">Lantai 7</option>
                     </select>
+                </div>
+                <div class="mb-3">
+                    <label for="bagianKamar" class="form-label">Kamar</label>
+                    <input type="text" name="bagianKamar" class="form-control" id="bagianKamar" maxlength="1"
+                        pattern="[A-Za-z]" title="Kolom kamar hanya boleh diisi 1 huruf." required>
+                </div>
+                <div class="mb-3">
+                    <label for="nomorKamarPreview" class="form-label">Nomor Kamar</label>
+                    <input type="text" class="form-control" id="nomorKamarPreview" placeholder="Nomor kamar otomatis" readonly>
+                </div>
+                <div class="mb-3">
+                    <label for="kapasitasKamar" class="form-label">Kapasitas Kamar</label>
+                    <input type="number" name="kapasitasKamar" class="form-control" id="kapasitasKamar" min="1"
+                        max="4" required>
+                    <div class="form-text">Kapasitas kamar minimal 1 dan maksimal 4 penghuni.</div>
                 </div>
                 <div class="tw:w-full tw:flex tw:justify-end tw:mt-2">
                     <button type="submit"
@@ -128,6 +134,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </main>
     <?php require '../../bootstrap.php'; ?>
     <?php require '../../validation_alert.php'; ?>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const lantaiInput = document.getElementById('lantaiKamar');
+            const bagianInput = document.getElementById('bagianKamar');
+            const nomorPreviewInput = document.getElementById('nomorKamarPreview');
+
+            const syncNomorKamar = () => {
+                const lantai = (lantaiInput?.value || '').trim();
+                const bagian = ((bagianInput?.value || '').match(/[A-Za-z]/)?.[0] || '').toUpperCase();
+
+                if (bagianInput) {
+                    bagianInput.value = bagian;
+                }
+
+                if (nomorPreviewInput) {
+                    nomorPreviewInput.value = lantai && bagian ? `${lantai}${bagian}` : '';
+                }
+            };
+
+            lantaiInput?.addEventListener('change', syncNomorKamar);
+            bagianInput?.addEventListener('input', syncNomorKamar);
+            syncNomorKamar();
+        });
+    </script>
 </body>
 
 </html>
