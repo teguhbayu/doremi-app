@@ -9,6 +9,7 @@ if (!isset($_SESSION['userId'])) {
     exit;
 }
 require '../../db.php';
+require 'helpers.php';
 
 $id = $_GET['id'] ?? null;
 if (!$id) {
@@ -35,19 +36,29 @@ $occupancyResult = mysqli_stmt_get_result($occupancyStmt);
 $currentOccupancy = (int) (mysqli_fetch_assoc($occupancyResult)['total'] ?? 0);
 mysqli_stmt_close($occupancyStmt);
 
+$normalizedCurrentNomor = kamar_normalize_segment((string) ($kamar['NomorKamar'] ?? ''));
+$currentLantai = trim((string) ($kamar['Lantai'] ?? ''));
+$usesGeneratedNomor = kamar_has_lantai_prefix($normalizedCurrentNomor, $currentLantai);
+$bagianKamarValue = kamar_extract_bagian($normalizedCurrentNomor, $currentLantai);
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nomor = strtoupper((string) preg_replace('/\s+/', '', trim($_POST['nomorKamar'] ?? '')));
+    $bagianKamar = kamar_normalize_segment((string) ($_POST['bagianKamar'] ?? ''));
     $kapasitas = trim($_POST['kapasitasKamar'] ?? '');
     $lantai = trim($_POST['lantaiKamar'] ?? '');
+    $nomor = kamar_build_nomor($lantai, $bagianKamar);
+
+    if (!$usesGeneratedNomor && $bagianKamar === $normalizedCurrentNomor && $lantai === $currentLantai) {
+        $nomor = $normalizedCurrentNomor;
+    }
 
     $kamarSchema = v::keySet(
-        v::key('nomor', v::regex('/^[A-Z0-9-]{1,20}$/')),
+        v::key('bagian', v::regex('/^[A-Z0-9-]{1,19}$/')),
         v::key('kapasitas', v::digit()),
-        v::key('lantai', v::in(['1', '2', '3', '4', '5', '6', '7']))
+        v::key('lantai', v::in(kamar_allowed_floors()))
     );
 
     $postData = [
-        'nomor' => $nomor,
+        'bagian' => $bagianKamar,
         'kapasitas' => $kapasitas,
         'lantai' => $lantai,
     ];
@@ -119,21 +130,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <form method="POST" class="form-shell">
                 <div class="mb-3">
-                    <label for="nomorKamar" class="form-label">Nomor Kamar</label>
-                    <input type="text" name="nomorKamar" class="form-control" id="nomorKamar" maxlength="20"
-                        value="<?= htmlspecialchars($kamar['NomorKamar']) ?>" required>
-                    <span class="form-hint">Nomor kamar disimpan tanpa spasi agar validasi duplikasi tetap konsisten.</span>
-                </div>
-                <div class="mb-3">
-                    <label for="kapasitasKamar" class="form-label">Kapasitas Kamar</label>
-                    <input type="number" name="kapasitasKamar" class="form-control" id="kapasitasKamar"
-                        value="<?= htmlspecialchars($kamar['KapasitasPenghuni']) ?>" min="1" max="4" required>
-                    <div class="form-text">
-                        Saat ini kamar ditempati <?= $currentOccupancy ?> penghuni. Kapasitas minimal 1 dan maksimal 4
-                        penghuni.
-                    </div>
-                </div>
-                <div class="mb-3">
                     <label for="lantaiKamar" class="form-label">Lantai</label>
                     <select class="form-select" name="lantaiKamar" id="lantaiKamar" required>
                         <option value="" disabled <?= empty($kamar['Lantai']) ? 'selected' : '' ?>>Pilih Lantai</option>
@@ -146,6 +142,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <option value="7" <?= $kamar['Lantai'] == '7' ? 'selected' : '' ?>>Lantai 7</option>
                     </select>
                 </div>
+                <div class="mb-3">
+                    <label for="bagianKamar" class="form-label">Bagian Kamar</label>
+                    <input type="text" name="bagianKamar" class="form-control" id="bagianKamar" maxlength="19"
+                        value="<?= htmlspecialchars($bagianKamarValue) ?>" required>
+                </div>
+                <div class="mb-3">
+                    <label for="nomorKamarPreview" class="form-label">Nomor Kamar</label>
+                    <input type="text" class="form-control" id="nomorKamarPreview"
+                        value="<?= htmlspecialchars($kamar['NomorKamar']) ?>"
+                        data-initial-nomor="<?= htmlspecialchars($normalizedCurrentNomor) ?>"
+                        data-initial-bagian="<?= htmlspecialchars($bagianKamarValue) ?>"
+                        data-initial-lantai="<?= htmlspecialchars($currentLantai) ?>"
+                        data-preserve-legacy="<?= $usesGeneratedNomor ? '0' : '1' ?>"
+                        readonly>
+                </div>
+                <div class="mb-3">
+                    <label for="kapasitasKamar" class="form-label">Kapasitas Kamar</label>
+                    <input type="number" name="kapasitasKamar" class="form-control" id="kapasitasKamar"
+                        value="<?= htmlspecialchars($kamar['KapasitasPenghuni']) ?>" min="1" max="4" required>
+                    <div class="form-text">
+                        Saat ini kamar ditempati <?= $currentOccupancy ?> penghuni. Kapasitas minimal 1 dan maksimal 4
+                        penghuni.
+                    </div>
+                </div>
                 <div class="tw:w-full tw:flex tw:justify-end tw:mt-2">
                     <button type="submit"
                         class="tw:bg-secondary tw:w-full tw:text-white tw:px-3 tw:py-2 tw:rounded-xl tw:justify-center tw:hover:bg-accent tw:duration-300 tw:transition-all tw:inline-flex tw:items-center tw:gap-2">
@@ -157,6 +177,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </main>
     <?php require '../../bootstrap.php'; ?>
     <?php require '../../validation_alert.php'; ?>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const lantaiInput = document.getElementById('lantaiKamar');
+            const bagianInput = document.getElementById('bagianKamar');
+            const nomorPreviewInput = document.getElementById('nomorKamarPreview');
+
+            const syncNomorKamar = () => {
+                const lantai = (lantaiInput?.value || '').trim();
+                const bagian = (bagianInput?.value || '').replace(/\s+/g, '').toUpperCase();
+                const initialNomor = nomorPreviewInput?.dataset.initialNomor || '';
+                const initialBagian = nomorPreviewInput?.dataset.initialBagian || '';
+                const initialLantai = nomorPreviewInput?.dataset.initialLantai || '';
+                const preserveLegacy = nomorPreviewInput?.dataset.preserveLegacy === '1';
+
+                if (bagianInput) {
+                    bagianInput.value = bagian;
+                }
+
+                if (!nomorPreviewInput) {
+                    return;
+                }
+
+                if (preserveLegacy && bagian === initialBagian && lantai === initialLantai) {
+                    nomorPreviewInput.value = initialNomor;
+                    return;
+                }
+
+                nomorPreviewInput.value = lantai && bagian ? `${lantai}${bagian}` : '';
+            };
+
+            lantaiInput?.addEventListener('change', syncNomorKamar);
+            bagianInput?.addEventListener('input', syncNomorKamar);
+            syncNomorKamar();
+        });
+    </script>
 </body>
 
 </html>

@@ -151,6 +151,10 @@ $statusMeta = paket_status_meta($paket['Status'] ?? 'Belum Diambil');
                         <h5 class="dashboard-side-panel__title">Informasi Paket</h5>
                         <div class="dashboard-info-list">
                             <div class="dashboard-info-item">
+                                <span class="dashboard-info-item__label">Tipe Kiriman</span>
+                                <strong><?= htmlspecialchars(paket_type_label($paket['JenisPaket'] ?? null)) ?></strong>
+                            </div>
+                            <div class="dashboard-info-item">
                                 <span class="dashboard-info-item__label">Pengirim</span>
                                 <strong><?= htmlspecialchars($paket['NamaPengirim']) ?></strong>
                                 <p><?= htmlspecialchars($paket['Kurir']) ?></p>

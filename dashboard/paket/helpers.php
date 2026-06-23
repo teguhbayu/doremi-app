@@ -35,6 +35,29 @@ function paket_is_valid_length(string $value, int $min, int $max): bool
     return $length >= $min && $length <= $max;
 }
 
+function paket_allowed_types(): array
+{
+    return ['Paket', 'Dokumen'];
+}
+
+function paket_normalize_type(?string $value): ?string
+{
+    $normalizedValue = ucfirst(strtolower(trim((string) $value)));
+    return in_array($normalizedValue, paket_allowed_types(), true) ? $normalizedValue : null;
+}
+
+function paket_type_label(?string $value): string
+{
+    return paket_normalize_type($value) ?? 'Paket';
+}
+
+function paket_type_badge_class(?string $value): string
+{
+    return paket_type_label($value) === 'Dokumen'
+        ? 'bg-primary-subtle text-primary-emphasis'
+        : 'bg-secondary-subtle text-secondary-emphasis';
+}
+
 function paket_normalize_datetime(?string $value): ?string
 {
     if (empty($value)) {

@@ -147,7 +147,7 @@ $totalKamar = mysqli_num_rows($query);
             new DataTable('#kamarTable', {
                 autoWidth: false,
                 ordering: true,
-                searching: false,
+                searching: true,
                 paging: true,
                 info: true,
                 columnDefs: [

@@ -123,7 +123,7 @@ $belumDiambil = count(array_filter($pakets, fn($paket) => ($paket['Status'] ?? '
             </div>
 
             <?php if ($role === 'SIGAP'): ?>
-                <div class="page-summary-actions">
+                <div class="page-summary-actions tw:mb-6">
                     <a href="create.php" class="page-primary-btn">
                         <i class="iconsax tw:text-xl" icon-name="add-square"></i>
                         <span>Tambah Paket</span>
@@ -137,6 +137,7 @@ $belumDiambil = count(array_filter($pakets, fn($paket) => ($paket['Status'] ?? '
                         <thead>
                             <tr>
                                 <th scope="col" class="text-center align-middle"><?= $role === 'SIGAP' ? 'Penghuni' : 'Paket' ?></th>
+                                <th scope="col" class="text-center align-middle">Tipe</th>
                                 <th scope="col" class="text-center align-middle">Pengirim</th>
                                 <th scope="col" class="text-center align-middle">Kurir</th>
                                 <th scope="col" class="text-center align-middle">Waktu Sampai</th>
@@ -170,6 +171,11 @@ $belumDiambil = count(array_filter($pakets, fn($paket) => ($paket['Status'] ?? '
                                             </div>
                                         <?php endif; ?>
                                     </td>
+                                    <td>
+                                        <span class="badge <?= htmlspecialchars(paket_type_badge_class($paket['JenisPaket'] ?? null)) ?>">
+                                            <?= htmlspecialchars(paket_type_label($paket['JenisPaket'] ?? null)) ?>
+                                        </span>
+                                    </td>
                                     <td><?= htmlspecialchars($paket['NamaPengirim']) ?></td>
                                     <td><?= htmlspecialchars($paket['Kurir']) ?></td>
                                     <td>
@@ -194,13 +200,6 @@ $belumDiambil = count(array_filter($pakets, fn($paket) => ($paket['Status'] ?? '
                                                     <i class="iconsax tw:text-lg" icon-name="document-text-1"></i>
                                                     <span>Review</span>
                                                 </a>
-                                                <?php if (!empty($paket['FotoPengambilan'])): ?>
-                                                    <a href="<?= htmlspecialchars(paket_photo_url($paket['FotoPengambilan'])) ?>"
-                                                        target="_blank" rel="noopener noreferrer"
-                                                        class="icon-action" title="Lihat Foto Pengambilan">
-                                                        <i class="iconsax tw:text-lg" icon-name="gallery"></i>
-                                                    </a>
-                                                <?php endif; ?>
                                                 <a href="edit.php?id=<?= (int) $paket['PaketID'] ?>"
                                                     class="icon-action" title="Edit Paket">
                                                     <i class="iconsax tw:text-lg" icon-name="edit-2"></i>
@@ -281,7 +280,7 @@ $belumDiambil = count(array_filter($pakets, fn($paket) => ($paket['Status'] ?? '
                     order: [],
                     columnDefs: [
                         {
-                            targets: 5,
+                            targets: 6,
                             orderable: false
                         },
                         {

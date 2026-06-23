@@ -180,7 +180,7 @@ $sisaKapasitas = max(0, (int) $kamar['KapasitasPenghuni'] - (int) $kamar['Jumlah
                 new DataTable('#penghuniKamarTable', {
                     autoWidth: false,
                     ordering: true,
-                    searching: true,
+                    searching: false,
                     paging: true,
                     info: true,
                     columnDefs: [
@@ -195,7 +195,7 @@ $sisaKapasitas = max(0, (int) $kamar['KapasitasPenghuni'] - (int) $kamar['Jumlah
                     ],
                     layout: {
                         topStart: 'pageLength',
-                        topEnd: 'search',
+                        topEnd: null,
                         bottomStart: 'info',
                         bottomEnd: 'paging'
                     },

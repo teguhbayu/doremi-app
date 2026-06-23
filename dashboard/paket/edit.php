@@ -45,13 +45,15 @@ foreach ($penghuniList as $penghuniOption) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $jenisPaket = paket_normalize_type($_POST['jenisPaket'] ?? null);
     $namaPengirim = trim($_POST['namaPengirim'] ?? '');
     $kurir = trim($_POST['kurir'] ?? '');
     $penghuniId = filter_input(INPUT_POST, 'penghuniId', FILTER_VALIDATE_INT);
     $waktuSampai = paket_normalize_datetime($_POST['waktuSampai'] ?? '');
 
     if (
-        !paket_is_valid_length($namaPengirim, 1, 100)
+        $jenisPaket === null
+        || !paket_is_valid_length($namaPengirim, 1, 100)
         || !paket_is_valid_length($kurir, 1, 50)
         || $penghuniId === false
         || $penghuniId === null
@@ -71,8 +73,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         paket_redirect($_SERVER['PHP_SELF'] . '?id=' . $paketId, 'error', 'Penghuni tujuan tidak ditemukan.');
     }
 
-    $stmt = mysqli_prepare($db, "UPDATE paket SET NamaPengirim = ?, Kurir = ?, WaktuSampai = ?, PenghuniID = ? WHERE PaketID = ?");
-    mysqli_stmt_bind_param($stmt, 'sssii', $namaPengirim, $kurir, $waktuSampai, $penghuniId, $paketId);
+    $stmt = mysqli_prepare($db, "UPDATE paket SET NamaPengirim = ?, Kurir = ?, JenisPaket = ?, WaktuSampai = ?, PenghuniID = ? WHERE PaketID = ?");
+    mysqli_stmt_bind_param($stmt, 'ssssii', $namaPengirim, $kurir, $jenisPaket, $waktuSampai, $penghuniId, $paketId);
 
     if (!mysqli_stmt_execute($stmt)) {
         mysqli_stmt_close($stmt);
@@ -129,6 +131,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <span class="form-hint">Ketik untuk mencari penghuni lebih cepat tanpa harus scroll daftar panjang.</span>
                 </div>
 
+                <div class="mb-3">
+                    <label for="jenisPaket" class="form-label">Tipe Kiriman</label>
+                    <select name="jenisPaket" class="form-select" id="jenisPaket" required>
+                        <?php $selectedJenisPaket = paket_type_label($paket['JenisPaket'] ?? null); ?>
+                        <?php foreach (paket_allowed_types() as $type): ?>
+                            <option value="<?= htmlspecialchars($type) ?>" <?= $type === $selectedJenisPaket ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($type) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <span class="form-hint">Pilih apakah kiriman ini berupa paket biasa atau dokumen.</span>
+                </div>
                 <div class="mb-3">
                     <label for="namaPengirim" class="form-label">Nama Pengirim</label>
                     <input type="text" name="namaPengirim" class="form-control" id="namaPengirim" maxlength="100"
