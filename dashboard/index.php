@@ -120,7 +120,7 @@ if ($role === 'PENGHUNI') {
                                 <i class="iconsax tw:text-3xl" icon-name="clock-1"></i>
                             </div>
                             <div>
-                                <span class="dashboard-stat-card__eyebrow">Izin Pending</span>
+                                <span class="dashboard-stat-card__eyebrow">Antrean Izin</span>
                                 <strong class="dashboard-stat-card__value"><?= $pendingInOut ?></strong>
                             </div>
                         </div>
@@ -142,7 +142,7 @@ if ($role === 'PENGHUNI') {
                                 <i class="iconsax tw:text-3xl" icon-name="setting-2"></i>
                             </div>
                             <div>
-                                <span class="dashboard-stat-card__eyebrow">Antrian Perbaikan</span>
+                                <span class="dashboard-stat-card__eyebrow">Antrean Perbaikan</span>
                                 <strong class="dashboard-stat-card__value"><?= $pendingMaintenance ?></strong>
                             </div>
                         </div>

@@ -92,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (!penghuni_is_valid_nim($nim)) {
-        header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&status=error&message=NIM harus 5-25 karakter dan hanya boleh berisi huruf, angka, titik, underscore, atau strip!');
+        header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&status=error&message=' . urlencode(penghuni_nim_validation_message()));
         exit;
     }
 
@@ -172,9 +172,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <form method="POST" class="form-shell">
                 <div class="mb-3">
                     <label for="nimPenghuni" class="form-label">NIM</label>
-                    <input type="text" name="nimPenghuni" class="form-control" id="nimPenghuni" maxlength="25"
+                    <input type="text" name="nimPenghuni" class="form-control" id="nimPenghuni"
+                        minlength="<?= penghuni_nim_min_length() ?>" maxlength="<?= penghuni_nim_max_length() ?>"
                         value="<?= htmlspecialchars($penghuni['Nim']) ?>" required>
-                    <span class="form-hint">Gunakan 5-25 karakter tanpa spasi agar validasi NIM tetap konsisten.</span>
+                    <span class="form-hint">Gunakan <?= penghuni_nim_min_length() ?>-<?= penghuni_nim_max_length() ?> karakter tanpa spasi agar validasi NIM sesuai batas database.</span>
                 </div>
                 <div class="mb-3">
                     <label for="namaPenghuni" class="form-label">Nama Penghuni</label>
