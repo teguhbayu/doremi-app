@@ -63,92 +63,79 @@ $belumDiambil = count(array_filter($pakets, fn($paket) => ($paket['Status'] ?? '
 <html lang="en">
 <?php require '../../head.php'; ?>
 
-<body class="tw:p-0 tw:m-0 relative tw:flex tw:bg-[#f8fafc] tw:min-h-screen">
+<body class="dashboard-body tw:p-0 tw:m-0 relative tw:flex tw:bg-[#f8fafc] tw:min-h-screen">
     <?php require '../components/sidebar.php'; ?>
-    <main class="tw:md:ml-75 tw:grow">
-        <div class="tw:pt-20 tw:md:pt-8 tw:px-8 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
-            <div class="tw:flex tw:flex-col tw:gap-4 tw:md:flex-row tw:md:items-center tw:md:justify-between tw:mb-8">
-                <div>
-                    <h1 class="tw:font-bold tw:text-4xl tw:text-slate-900 tw:m-0">
-                        <?= $role === 'SIGAP' ? 'Kelola Paket' : 'Paket Saya' ?>
-                    </h1>
-                    <p class="tw:text-slate-500 tw:mt-2 tw:mb-0">
-                        <?= $role === 'SIGAP'
-                            ? 'Catat data paket masuk dan pantau status pengambilannya.'
-                            : 'Lihat paket yang ditujukan kepada Anda dan catat pengambilannya.' ?>
-                    </p>
-                </div>
+    <main class="dashboard-main tw:md:ml-75 tw:grow">
+        <div class="dashboard-page tw:pt-20 tw:md:pt-8 tw:px-8 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
+            <?php require dirname(__DIR__) . '/components/breadcrumb.php'; ?>
+            <h1 class="page-title" data-kicker="Distribusi Paket"
+                data-subtitle="<?= htmlspecialchars($role === 'SIGAP' ? 'Catat data paket masuk, pantau bukti pengambilan, dan review kasus paket tertukar dalam satu alur kerja yang konsisten.' : 'Lihat seluruh paket yang ditujukan kepada Anda berikut status pengambilan dan bukti pencatatannya.') ?>">
+                <?= $role === 'SIGAP' ? 'Kelola Paket' : 'Paket Saya' ?>
+            </h1>
 
-                <?php if ($role === 'SIGAP'): ?>
-                    <a href="create.php"
-                        class="tw:bg-secondary tw:text-white tw:px-4 tw:py-3 tw:rounded-xl tw:hover:bg-accent tw:duration-300 tw:transition-all tw:inline-flex tw:items-center tw:gap-2 tw:no-underline tw:font-medium">
-                        <i class="iconsax tw:text-2xl" icon-name="add-square"></i>
-                        <span>Tambah Paket</span>
-                    </a>
-                <?php endif; ?>
-            </div>
+            <div class="page-toolbar" data-note="<?= $totalPaket ?> paket tercatat"></div>
 
             <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:xl:grid-cols-4 tw:gap-6 tw:mb-8">
-                <div class="tw:bg-white tw:p-6 tw:rounded-[24px] tw:shadow-sm tw:border tw:border-gray-100">
+                <div class="dashboard-stat-card">
                     <div class="tw:flex tw:items-center tw:gap-4">
-                        <div class="tw:p-4 tw:bg-blue-50 tw:text-blue-600 tw:rounded-[18px]">
+                        <div class="dashboard-stat-card__icon dashboard-stat-card__icon--primary">
                             <i class="iconsax tw:text-3xl" icon-name="box-1"></i>
                         </div>
                         <div>
-                            <p class="tw:text-sm tw:font-medium tw:text-slate-500 tw:uppercase tw:tracking-wider tw:m-0">
-                                Total Paket
-                            </p>
-                            <h3 class="tw:text-3xl tw:font-bold tw:text-slate-900 tw:m-0"><?= $totalPaket ?></h3>
+                            <span class="dashboard-stat-card__eyebrow">Total Paket</span>
+                            <strong class="dashboard-stat-card__value"><?= $totalPaket ?></strong>
                         </div>
                     </div>
                 </div>
-                <div class="tw:bg-white tw:p-6 tw:rounded-[24px] tw:shadow-sm tw:border tw:border-gray-100">
+                <div class="dashboard-stat-card">
                     <div class="tw:flex tw:items-center tw:gap-4">
-                        <div class="tw:p-4 tw:bg-amber-50 tw:text-amber-600 tw:rounded-[18px]">
+                        <div class="dashboard-stat-card__icon dashboard-stat-card__icon--warning">
                             <i class="iconsax tw:text-3xl" icon-name="box-time"></i>
                         </div>
                         <div>
-                            <p class="tw:text-sm tw:font-medium tw:text-slate-500 tw:uppercase tw:tracking-wider tw:m-0">
-                                Belum Diambil
-                            </p>
-                            <h3 class="tw:text-3xl tw:font-bold tw:text-slate-900 tw:m-0"><?= $belumDiambil ?></h3>
+                            <span class="dashboard-stat-card__eyebrow">Belum Diambil</span>
+                            <strong class="dashboard-stat-card__value"><?= $belumDiambil ?></strong>
                         </div>
                     </div>
                 </div>
-                <div class="tw:bg-white tw:p-6 tw:rounded-[24px] tw:shadow-sm tw:border tw:border-gray-100">
+                <div class="dashboard-stat-card">
                     <div class="tw:flex tw:items-center tw:gap-4">
-                        <div class="tw:p-4 tw:bg-emerald-50 tw:text-emerald-600 tw:rounded-[18px]">
+                        <div class="dashboard-stat-card__icon dashboard-stat-card__icon--success">
                             <i class="iconsax tw:text-3xl" icon-name="box-tick"></i>
                         </div>
                         <div>
-                            <p class="tw:text-sm tw:font-medium tw:text-slate-500 tw:uppercase tw:tracking-wider tw:m-0">
-                                Sudah Diambil
-                            </p>
-                            <h3 class="tw:text-3xl tw:font-bold tw:text-slate-900 tw:m-0"><?= $sudahDiambil ?></h3>
+                            <span class="dashboard-stat-card__eyebrow">Sudah Diambil</span>
+                            <strong class="dashboard-stat-card__value"><?= $sudahDiambil ?></strong>
                         </div>
                     </div>
                 </div>
-                <div class="tw:bg-white tw:p-6 tw:rounded-[24px] tw:shadow-sm tw:border tw:border-gray-100">
+                <div class="dashboard-stat-card">
                     <div class="tw:flex tw:items-center tw:gap-4">
-                        <div class="tw:p-4 tw:bg-rose-50 tw:text-rose-600 tw:rounded-[18px]">
+                        <div class="dashboard-stat-card__icon dashboard-stat-card__icon--danger">
                             <i class="iconsax tw:text-3xl" icon-name="danger"></i>
                         </div>
                         <div>
-                            <p class="tw:text-sm tw:font-medium tw:text-slate-500 tw:uppercase tw:tracking-wider tw:m-0">
-                                Tertukar
-                            </p>
-                            <h3 class="tw:text-3xl tw:font-bold tw:text-slate-900 tw:m-0"><?= $tertukar ?></h3>
+                            <span class="dashboard-stat-card__eyebrow">Tertukar</span>
+                            <strong class="dashboard-stat-card__value"><?= $tertukar ?></strong>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="tw:bg-white tw:p-6 tw:rounded-[24px] tw:shadow-sm tw:border tw:border-gray-100">
+            <?php if ($role === 'SIGAP'): ?>
+                <div class="page-summary-actions">
+                    <a href="create.php" class="page-primary-btn">
+                        <i class="iconsax tw:text-xl" icon-name="add-square"></i>
+                        <span>Tambah Paket</span>
+                    </a>
+                </div>
+            <?php endif; ?>
+
+            <div class="table-panel">
                 <div class="doremi-table-wrapper">
                     <table id="paketTable" class="table doremi-table text-center align-middle tw:mb-0 tw:w-full">
                         <thead>
                             <tr>
-                                <th scope="col" class="text-center align-middle">ID</th>
                                 <th scope="col" class="text-center align-middle"><?= $role === 'SIGAP' ? 'Penghuni' : 'Paket' ?></th>
                                 <th scope="col" class="text-center align-middle">Pengirim</th>
                                 <th scope="col" class="text-center align-middle">Kurir</th>
@@ -161,8 +148,8 @@ $belumDiambil = count(array_filter($pakets, fn($paket) => ($paket['Status'] ?? '
                             <?php foreach ($pakets as $paket): ?>
                                 <?php $status = $paket['Status'] ?? 'Belum Diambil'; ?>
                                 <?php $statusMeta = paket_status_meta($status); ?>
+                                <?php $isPickupLocked = !empty($paket['PengambilanPaketID']) && paket_is_final_status($status); ?>
                                 <tr>
-                                    <th scope="row"><?= (int) $paket['PaketID'] ?></th>
                                     <td class="tw:text-start">
                                         <?php if ($role === 'SIGAP'): ?>
                                             <div class="tw:font-semibold tw:text-slate-900">
@@ -203,21 +190,22 @@ $belumDiambil = count(array_filter($pakets, fn($paket) => ($paket['Status'] ?? '
                                         <div class="tw:inline-flex tw:flex-wrap tw:justify-center tw:items-center tw:gap-2 tw:text-black">
                                             <?php if ($role === 'SIGAP'): ?>
                                                 <a href="review.php?id=<?= (int) $paket['PaketID'] ?>"
-                                                    class="tw:text-rose-600 tw:no-underline" title="Review Status Pengambilan">
-                                                    <i class="iconsax tw:text-lg" icon-name="eye"></i>
+                                                    class="detail-action-btn" title="Review Status Pengambilan">
+                                                    <i class="iconsax tw:text-lg" icon-name="document-text-1"></i>
+                                                    <span>Review</span>
                                                 </a>
                                                 <?php if (!empty($paket['FotoPengambilan'])): ?>
                                                     <a href="<?= htmlspecialchars(paket_photo_url($paket['FotoPengambilan'])) ?>"
                                                         target="_blank" rel="noopener noreferrer"
-                                                        class="tw:text-slate-700 tw:no-underline" title="Lihat Foto Pengambilan">
+                                                        class="icon-action" title="Lihat Foto Pengambilan">
                                                         <i class="iconsax tw:text-lg" icon-name="gallery"></i>
                                                     </a>
                                                 <?php endif; ?>
                                                 <a href="edit.php?id=<?= (int) $paket['PaketID'] ?>"
-                                                    class="tw:text-slate-700 tw:no-underline" title="Edit Paket">
+                                                    class="icon-action" title="Edit Paket">
                                                     <i class="iconsax tw:text-lg" icon-name="edit-2"></i>
                                                 </a>
-                                                <button type="button" class="tw:bg-transparent tw:border-0 tw:p-0 tw:text-slate-700"
+                                                <button type="button" class="icon-action icon-action--danger"
                                                     data-bs-toggle="modal" data-bs-target="#deleteModal"
                                                     data-bs-id="<?= (int) $paket['PaketID'] ?>" title="Hapus Paket">
                                                     <i class="iconsax tw:text-lg" icon-name="trash"></i>
@@ -225,7 +213,7 @@ $belumDiambil = count(array_filter($pakets, fn($paket) => ($paket['Status'] ?? '
                                             <?php else: ?>
                                                 <a href="pickup.php?id=<?= (int) $paket['PaketID'] ?>"
                                                     class="tw:bg-secondary tw:text-white tw:px-3 tw:py-2 tw:rounded-lg tw:no-underline tw:hover:bg-accent tw:transition-all tw:text-sm">
-                                                    <?= empty($paket['PengambilanPaketID']) ? 'Catat Pengambilan' : 'Ubah Status' ?>
+                                                    <?= empty($paket['PengambilanPaketID']) ? 'Catat Pengambilan' : ($isPickupLocked ? 'Lihat Catatan' : 'Lengkapi Pengambilan') ?>
                                                 </a>
                                                 <?php if (!empty($paket['FotoPengambilan'])): ?>
                                                     <a href="<?= htmlspecialchars(paket_photo_url($paket['FotoPengambilan'])) ?>"
@@ -290,10 +278,10 @@ $belumDiambil = count(array_filter($pakets, fn($paket) => ($paket['Status'] ?? '
                     searching: true,
                     paging: true,
                     info: true,
-                    order: [[0, 'desc']],
+                    order: [],
                     columnDefs: [
                         {
-                            targets: 6,
+                            targets: 5,
                             orderable: false
                         },
                         {

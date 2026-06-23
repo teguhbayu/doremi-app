@@ -79,76 +79,81 @@ $login_url = $client->createAuthUrl();
 
 <?php include 'head.php'; ?>
 
-<body>
+<body class="public-body">
     <?php include 'header.php'; ?>
-    <div class="tw:pt-16 tw:flex-1 tw:h-full tw:w-full tw:relative tw:overflow-y-auto tw:overflow-x-hidden">
-        <div id="login-container"
-            class="tw:min-h-full tw:flex tw:items-center tw:justify-center tw:bg-background tw:px-4 tw:sm:px-6 tw:lg:px-8 tw:py-12 tw:relative tw:overflow-hidden">
-            <div
-                class="tw:absolute tw:top-1/4 tw:left-1/4 tw:w-72 tw:h-72 tw:bg-accent tw:rounded-full tw:mix-blend-multiply tw:filter tw:blur-2xl tw:opacity-60">
-            </div>
-            <div
-                class="tw:absolute tw:bottom-1/4 tw:right-1/4 tw:w-80 tw:h-80 tw:bg-secondary tw:rounded-full tw:mix-blend-multiply tw:filter tw:blur-2xl tw:opacity-40">
-            </div>
-
-            <div class="tw:max-w-md tw:w-full tw:space-y-8 glass-panel tw:p-10 tw:rounded-3xl tw:z-10 tw:relative">
-                <div>
-                    <h2 class="tw:mt-2 tw:text-center tw:text-3xl tw:font-extrabold tw:text-primary">
-                        Selamat Datang Kembali
-                    </h2>
-                    <p class="tw:mt-2 tw:text-center tw:text-sm tw:text-gray-600">
-                        Silakan masuk ke akun DOREMI Anda
+    <main class="site-main auth-shell">
+        <div class="site-container">
+            <div class="auth-layout">
+                <section class="auth-preview">
+                    <span class="eyebrow">Portal Akses DOREMI</span>
+                    <h1>Egg Sando</h1>
+                    <p>
+                        Penghuni dan petugas menggunakan satu pintu masuk yang rapi
+                        untuk paket, maintenance, inventaris, kamar, dan izin keluar.
                     </p>
-                </div>
-                <form class="tw:mt-8 tw:w-full tw:space-y-2 tw:mb-2" method="POST">
-                    <div class="tw:rounded-md tw:shadow-sm tw:space-y-4">
-                        <div class="tw:w-full">
-                            <label for="email" class="tw:sr-only">Email</label>
-                            <div class="tw:relative tw:w-full">
-                                <i class="iconsax tw:size-9 tw:text-2xl z-[9999] tw:left-0 tw:top-1/2 tw:-translate-y-1/2 tw:pl-3 tw:absolute tw:pointer-events-none tw:text-gray-400"
-                                    icon-name="user-1"></i>
-                                <input id="email" name="email" type="email" required
-                                    class="tw:appearance-none tw:w-full tw:rounded-xl tw:relative tw:block tw:px-3 tw:py-3 tw:ps-10 tw:border tw:border-gray-300 tw:placeholder-gray-500 tw:text-gray-900 tw:focus:outline-none tw:focus:ring-secondary tw:focus:border-secondary tw:focus:z-10 tw:sm:text-sm tw:transition-colors"
+
+                    <div class="auth-preview__list">
+                        <article>
+                            <strong>Laporan lebih cepat</strong>
+                            <span>Kelola maintenance, paket, dan aktivitas harian dari dashboard yang sama.</span>
+                        </article>
+                        <article>
+                            <strong>Alur petugas jelas</strong>
+                            <span>Setiap peran kerja punya akses operasional yang tersusun dan mudah dipantau.</span>
+                        </article>
+                        <article>
+                            <strong>Riwayat tetap tercatat</strong>
+                            <span>Semua tindakan penting tersimpan agar koordinasi asrama tetap rapi.</span>
+                        </article>
+                    </div>
+                </section>
+
+                <section class="auth-card">
+                    <div class="auth-card__header">
+                        <span class="eyebrow">Login</span>
+                        <h2>Selamat Datang Kembali</h2>
+                        <p>Silakan masuk ke akun DOREMI Anda.</p>
+                    </div>
+
+                    <form class="auth-form" method="POST">
+                        <div class="auth-field">
+                            <label for="email">Email</label>
+                            <div class="auth-input-wrap">
+                                <i class="iconsax auth-input-icon tw:text-xl" icon-name="user-1"></i>
+                                <input id="email" name="email" type="email" required class="auth-input"
                                     placeholder="email" />
                             </div>
                         </div>
-                        <div class="tw:w-full" x-data="{ hidden: true }">
-                            <label for="password" class="tw:sr-only">Password</label>
-                            <div class="tw:relative">
-                                <div
-                                    class="tw:absolute tw:inset-y-0 tw:left-0 tw:pl-3 tw:top-1/2 tw:-translate-y-1/2 tw:flex tw:items-center tw:pointer-events-none">
-                                    <i class="iconsax  tw:size-9 tw:text-2xl tw:text-gray-400" icon-name="lock-1"></i>
-                                </div>
+
+                        <div class="auth-field" x-data="{ hidden: true }">
+                            <label for="password">Password</label>
+                            <div class="auth-input-wrap">
+                                <i class="iconsax auth-input-icon tw:text-xl" icon-name="lock-1"></i>
                                 <input id="password" name="password" :type="hidden ? 'password' : 'text'" required
-                                    class="tw:appearance-none tw:w-full tw:rounded-xl z-[9] tw:me-8 tw:relative tw:block tw:px-3 tw:py-3 tw:pl-10 tw:border tw:border-gray-300 tw:placeholder-gray-500 tw:text-gray-900 tw:focus:outline-none tw:focus:ring-secondary tw:focus:border-secondary tw:focus:z-10 tw:sm:text-sm tw:transition-colors"
-                                    placeholder="Password" />
-                                <button class="tw:absolute tw:right-2 z-[99] tw:top-1/2 tw:-translate-y-1/2"
-                                    type="button" @click="hidden = !hidden">
-                                    <i class="iconsax  tw:size-9 tw:text-lg tw:text-gray-400"
-                                        :icon-name="hidden ? 'eye' : 'eye-slash'"></i>
+                                    class="auth-input auth-input--with-action" placeholder="Password" />
+                                <button class="auth-toggle" type="button" @click="hidden = !hidden">
+                                    <i class="iconsax tw:text-lg" :icon-name="hidden ? 'eye' : 'eye-slash'"></i>
                                 </button>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="tw:flex tw:items-center tw:justify-between">
-                    </div>
-
-                    <div>
-                        <button type="submit"
-                            class="tw:group tw:relative tw:w-full tw:flex tw:justify-center tw:py-3 tw:px-4 tw:border tw:border-transparent tw:text-sm tw:font-medium tw:rounded-xl tw:text-white tw:bg-primary tw:hover:bg-opacity-90 tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-offset-2 tw:focus:ring-primary tw:shadow-lg tw:transition-all tw:transform tw:hover:-translate-y-0.5">
+                        <button type="submit" class="auth-submit site-cta--full">
                             Masuk
                         </button>
+                    </form>
+
+                    <div class="auth-divider">
+                        <span>atau</span>
                     </div>
-                </form>
-                <a href="<?php echo $login_url; ?>" type="button"
-                    class="tw:w-full tw:gap-1 tw:flex tw:justify-center tw:py-3 tw:items-center tw:px-4 tw:border tw:border-transparent tw:text-sm tw:font-medium tw:rounded-xl tw:text-white tw:bg-primary tw:hover:bg-opacity-90 tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-offset-2 tw:focus:ring-primary tw:shadow-lg tw:transition-all tw:transform tw:hover:-translate-y-0.5">
-                    <i class="fa-brands fa-google tw:text-white tw:text-2xl"></i>
-                    Masuk Dengan Google
-                </a>
+
+                    <a href="<?php echo $login_url; ?>" class="auth-google site-cta--full">
+                        <i class="fa-brands fa-google tw:text-2xl"></i>
+                        Masuk Dengan Google
+                    </a>
+                </section>
             </div>
         </div>
-    </div>
+    </main>
     <?php require 'validation_alert.php' ?>
 </body>
 

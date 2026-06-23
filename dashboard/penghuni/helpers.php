@@ -5,19 +5,89 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
 
 function penghuni_duplicate_identity_message(array $existingPenghuni, string $nim, string $email, string $noHp): string
 {
-    if (($existingPenghuni['Nim'] ?? '') === $nim) {
+    if (penghuni_normalize_nim((string) ($existingPenghuni['Nim'] ?? '')) === penghuni_normalize_nim($nim)) {
         return 'NIM penghuni sudah terdaftar!';
     }
 
-    if (($existingPenghuni['Email'] ?? '') === $email) {
+    if (penghuni_normalize_email((string) ($existingPenghuni['Email'] ?? '')) === penghuni_normalize_email($email)) {
         return 'Email penghuni sudah terdaftar!';
     }
 
-    if (($existingPenghuni['NoHP'] ?? '') === $noHp) {
+    if (penghuni_normalize_phone((string) ($existingPenghuni['NoHP'] ?? '')) === penghuni_normalize_phone($noHp)) {
         return 'No. HP penghuni sudah terdaftar!';
     }
 
     return 'Data penghuni sudah terdaftar!';
+}
+
+function penghuni_normalize_nim(string $nim): string
+{
+    return strtoupper((string) preg_replace('/\s+/', '', trim($nim)));
+}
+
+function penghuni_normalize_email(string $email): string
+{
+    return strtolower(trim($email));
+}
+
+function penghuni_normalize_phone(string $phone): string
+{
+    return (string) preg_replace('/\D+/', '', $phone);
+}
+
+function penghuni_is_valid_nim(string $nim): bool
+{
+    $normalizedNim = penghuni_normalize_nim($nim);
+    $length = function_exists('mb_strlen') ? mb_strlen($normalizedNim) : strlen($normalizedNim);
+
+    if ($length < 5 || $length > 25) {
+        return false;
+    }
+
+    return preg_match('/^[A-Z0-9._-]+$/', $normalizedNim) === 1;
+}
+
+function penghuni_is_valid_phone(string $phone): bool
+{
+    $normalizedPhone = penghuni_normalize_phone($phone);
+    return preg_match('/^\d{10,16}$/', $normalizedPhone) === 1;
+}
+
+function penghuni_find_identity_matches(
+    mysqli $db,
+    string $nim,
+    string $email,
+    string $noHp,
+    int $isDeleted,
+    ?int $excludePenghuniId = null
+): array {
+    $sql = "SELECT PenghuniID, Nim, Email, NoHP FROM penghuni WHERE IsDeleted = ?";
+
+    if ($excludePenghuniId !== null) {
+        $sql .= " AND PenghuniID != ?";
+    }
+
+    $stmt = mysqli_prepare($db, $sql);
+    if ($excludePenghuniId !== null) {
+        mysqli_stmt_bind_param($stmt, 'ii', $isDeleted, $excludePenghuniId);
+    } else {
+        mysqli_stmt_bind_param($stmt, 'i', $isDeleted);
+    }
+
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    $rows = mysqli_fetch_all($result, MYSQLI_ASSOC);
+    mysqli_stmt_close($stmt);
+
+    $normalizedNim = penghuni_normalize_nim($nim);
+    $normalizedEmail = penghuni_normalize_email($email);
+    $normalizedPhone = penghuni_normalize_phone($noHp);
+
+    return array_values(array_filter($rows, static function (array $row) use ($normalizedNim, $normalizedEmail, $normalizedPhone): bool {
+        return penghuni_normalize_nim((string) ($row['Nim'] ?? '')) === $normalizedNim
+            || penghuni_normalize_email((string) ($row['Email'] ?? '')) === $normalizedEmail
+            || penghuni_normalize_phone((string) ($row['NoHP'] ?? '')) === $normalizedPhone;
+    }));
 }
 
 function penghuni_gender_label(string $gender): string

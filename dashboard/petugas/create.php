@@ -13,7 +13,7 @@ require '../../db.php';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nama = trim($_POST['namaPetugas'] ?? '');
     $email = trim($_POST['emailPetugas'] ?? '');
-    $no = trim($_POST['noPetugas'] ?? '');
+    $no = (string) preg_replace('/\D+/', '', trim($_POST['noPetugas'] ?? ''));
     $jabatan = trim($_POST['jabatanPetugas'] ?? '');
     $password = trim($_POST['passwordPetugas'] ?? '');
     $confirmPassword = trim($_POST['confirmPasswordPetugas'] ?? '');
@@ -23,13 +23,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ,
         v::key('email', v::email()->length(3, 100))
         ,
-        v::key('no', v::digit()->length(10, 15))
+        v::key('no', v::digit()->length(10, 16))
         ,
         v::key('jabatan', v::alpha()->in(["PENGURUS", "SIGAP", "SERVANDA", "MAINTENANCE"]))
         ,
-        v::key('password', v::length(5, 100))
+        v::key('password', v::length(8, 100))
         ,
-        v::key('confirmPassword', v::length(5, 100))
+        v::key('confirmPassword', v::length(8, 100))
     );
 
     $postData = [
@@ -167,15 +167,22 @@ unset($_SESSION['form_data']); // Clear the data after retrieving
 <html lang="en">
 <?php require '../../head.php'; ?>
 
-<body class="tw:p-0 tw:m-0 relative tw:flex">
+<body class="dashboard-body tw:p-0 tw:m-0 relative tw:flex">
     <?php require '../components/sidebar.php'; ?>
-    <main class="tw:md:ml-75 tw:grow">
-        <div class="tw:pt-20 tw:md:pt-5 tw:px-5 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
-            <h1 class="tw:font-bold tw:mb-5 tw:text-4xl tw:text-black">
+    <main class="dashboard-main tw:md:ml-75 tw:grow">
+        <div class="dashboard-page tw:pt-20 tw:md:pt-5 tw:px-5 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
+            <?php require dirname(__DIR__) . '/components/breadcrumb.php'; ?>
+            <h1 class="page-title" data-kicker="Tambah Data" data-subtitle="Buat akun petugas baru lengkap dengan peran, kontak, dan kredensial masuk sistem.">
                 Tambah Petugas
             </h1>
+            <div class="page-toolbar" data-note="Form akun petugas baru">
+                <a href="index.php" class="page-secondary-btn">
+                    <i class="iconsax" icon-name="arrow-left-2"></i>
+                    <span>Kembali ke daftar</span>
+                </a>
+            </div>
 
-            <form method="POST" x-data='<?= json_encode($formData, JSON_HEX_APOS | JSON_HEX_QUOT) ?>'>
+            <form method="POST" class="form-shell" x-data='<?= json_encode($formData, JSON_HEX_APOS | JSON_HEX_QUOT) ?>'>
                 <div class="mb-3">
                     <label for="namaPetugas" class="form-label">Nama Petugas</label>
                     <input type="text" name="namaPetugas" x-model="nama" class="form-control" id="namaPetugas">
@@ -186,7 +193,8 @@ unset($_SESSION['form_data']); // Clear the data after retrieving
                 </div>
                 <div class="mb-3">
                     <label for="noPetugas" class="form-label">No. HP</label>
-                    <input type="number" name="noPetugas" x-model="no" class="form-control" id="noPetugas">
+                    <input type="text" name="noPetugas" x-model="no" class="form-control" id="noPetugas"
+                        inputmode="numeric" pattern="[0-9]{10,16}" maxlength="16">
                 </div>
                 <div class="mb-3">
                     <label for="jabatanPetugas" class="form-label">Jabatan</label>
@@ -200,11 +208,12 @@ unset($_SESSION['form_data']); // Clear the data after retrieving
                 </div>
                 <div class="mb-3">
                     <label for="passwordPetugas" class="form-label">Password</label>
-                    <input type="password" name="passwordPetugas" x-model="password" class="form-control" id="passwordPetugas">
+                    <input type="password" name="passwordPetugas" x-model="password" class="form-control" id="passwordPetugas" minlength="8" autocomplete="new-password">
+                    <span class="form-hint">Saran: pakai minimal 8 karakter dengan kombinasi huruf besar, huruf kecil, dan angka.</span>
                 </div>
                 <div class="mb-3">
                     <label for="confirmPasswordPetugas" class="form-label">Konfirmasi Password</label>
-                    <input type="password" name="confirmPasswordPetugas" x-model="confirmPassword" class="form-control"
+                    <input type="password" name="confirmPasswordPetugas" x-model="confirmPassword" class="form-control" minlength="8" autocomplete="new-password"
                         id="confirmPasswordPetugas">
                 </div>
                 <div class="tw:w-full tw:flex tw:justify-end tw:mt-2">

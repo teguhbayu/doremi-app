@@ -37,38 +37,35 @@ $queryStr = "
 
 $query = mysqli_query($db, $queryStr);
 $reports = mysqli_fetch_all($query, MYSQLI_ASSOC);
+$totalReports = count($reports);
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <?php require '../../head.php'; ?>
 
-<body class="tw:p-0 tw:m-0 relative tw:flex tw:bg-[#f8fafc] tw:min-h-screen">
+<body class="dashboard-body tw:p-0 tw:m-0 relative tw:flex tw:bg-[#f8fafc] tw:min-h-screen">
     <?php require '../components/sidebar.php'; ?>
-    <main class="tw:md:ml-75 tw:grow">
-        <div class="tw:pt-20 tw:md:pt-8 tw:px-8 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
-            <div class="tw:flex tw:flex-col tw:gap-4 tw:md:flex-row tw:md:items-center tw:md:justify-between tw:mb-8">
-                <div>
-                    <h1 class="tw:font-bold tw:text-4xl tw:text-slate-900 tw:m-0">Laporan Maintenance</h1>
-                    <p class="tw:text-slate-500 tw:mt-2 tw:mb-0">
-                        <?= $role === 'MAINTENANCE' ? 'Daftar semua laporan asrama yang diurutkan berdasarkan skala prioritas.' : 'Daftar laporan kerusakan fasilitas yang Anda ajukan.' ?>
-                    </p>
-                </div>
+    <main class="dashboard-main tw:md:ml-75 tw:grow">
+        <div class="dashboard-page tw:pt-20 tw:md:pt-8 tw:px-8 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
+            <?php require dirname(__DIR__) . '/components/breadcrumb.php'; ?>
+            <h1 class="page-title" data-kicker="Kelola Fasilitas"
+                data-subtitle="<?= htmlspecialchars($role === 'MAINTENANCE' ? 'Daftar semua laporan asrama yang diurutkan berdasarkan skala prioritas agar teknisi fokus pada kerusakan yang paling mendesak.' : 'Pantau seluruh laporan kerusakan fasilitas yang Anda ajukan beserta progres penanganannya.') ?>">
+                Laporan Maintenance
+            </h1>
 
-                <!-- Everybody, including the MAINTENANCE role, can file reports -->
-                <a href="create.php"
-                    class="tw:bg-secondary tw:text-white tw:px-4 tw:py-3 tw:rounded-xl tw:hover:bg-accent tw:duration-300 tw:transition-all tw:inline-flex tw:items-center tw:gap-2 tw:no-underline tw:font-medium">
-                    <i class="iconsax tw:text-2xl" icon-name="add-square"></i>
+            <div class="page-toolbar" data-note="<?= $totalReports ?> laporan tercatat">
+                <a href="create.php" class="page-primary-btn">
+                    <i class="iconsax tw:text-xl" icon-name="add-square"></i>
                     <span>Buat Laporan</span>
                 </a>
             </div>
 
-            <div class="tw:bg-white tw:p-6 tw:rounded-[24px] tw:shadow-sm tw:border tw:border-gray-100">
-                <div class="tw:overflow-x-auto tw:rounded-lg tw:border tw:border-gray-300">
-                    <table id="maintenanceTable" class="table text-center align-middle tw:mb-0 tw:w-full">
+            <div class="table-panel">
+                <div class="doremi-table-wrapper">
+                    <table id="maintenanceTable" class="table doremi-table text-center align-middle tw:mb-0 tw:w-full">
                         <thead>
                             <tr>
-                                <th scope="col">ID</th>
                                 <th scope="col">Pelapor</th>
                                 <th scope="col">Lokasi / Target</th>
                                 <th scope="col">Tingkat Urgensi</th>
@@ -85,7 +82,6 @@ $reports = mysqli_fetch_all($query, MYSQLI_ASSOC);
                                     $severityMeta = maintenance_severity_meta($r['JenisLaporan']);
                                 ?>
                                 <tr class="<?= $severityMeta['borderClass'] ?>">
-                                    <td><?= $r['MaintenanceID'] ?></td>
                                     <td>
                                         <?php if (!empty($r['NamaPenghuni'])): ?>
                                             <div class="tw:font-semibold text-primary"><?= htmlspecialchars($r['NamaPenghuni']) ?></div>
@@ -121,9 +117,10 @@ $reports = mysqli_fetch_all($query, MYSQLI_ASSOC);
                                     </td>
                                     <td>
                                         <div class="tw:inline-flex tw:gap-2">
-                                            <button type="button" class="btn btn-sm btn-outline-primary tw:rounded-lg"
+                                            <button type="button" class="detail-action-btn"
                                                     data-bs-toggle="modal" data-bs-target="#detailModal<?= $r['MaintenanceID'] ?>">
-                                                Detail
+                                                <i class="iconsax tw:text-lg" icon-name="document-text-1"></i>
+                                                <span>Detail</span>
                                             </button>
 
                                             <?php if ($role === 'MAINTENANCE' || $role === 'PENGURUS'): ?>
@@ -152,13 +149,13 @@ $reports = mysqli_fetch_all($query, MYSQLI_ASSOC);
                                                     }
                                                 ?>
                                                 <?php if ($isOwner): ?>
-                                                    <a href="edit.php?id=<?= $r['MaintenanceID'] ?>" class="btn btn-sm btn-outline-secondary tw:rounded-lg">
-                                                        Edit
+                                                    <a href="edit.php?id=<?= $r['MaintenanceID'] ?>" class="icon-action">
+                                                        <i class="iconsax tw:text-lg" icon-name="edit-2"></i>
                                                     </a>
-                                                    <button type="button" class="btn btn-sm btn-outline-danger tw:rounded-lg"
+                                                    <button type="button" class="icon-action icon-action--danger"
                                                             data-bs-toggle="modal" data-bs-target="#deleteModal"
                                                             data-bs-id="<?= $r['MaintenanceID'] ?>">
-                                                        Hapus
+                                                        <i class="iconsax tw:text-lg" icon-name="trash"></i>
                                                     </button>
                                                 <?php endif; ?>
                                             <?php endif; ?>
@@ -171,7 +168,7 @@ $reports = mysqli_fetch_all($query, MYSQLI_ASSOC);
                                     <div class="modal-dialog modal-dialog-centered">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h5 class="modal-title">Detail Laporan #<?= $r['MaintenanceID'] ?></h5>
+                                                <h5 class="modal-title">Detail Laporan</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
                                             <div class="modal-body">
@@ -232,7 +229,7 @@ $reports = mysqli_fetch_all($query, MYSQLI_ASSOC);
                                         <div class="modal-dialog modal-dialog-centered">
                                             <div class="modal-content">
                                                 <div class="modal-header">
-                                                    <h5 class="modal-title">Konfirmasi Penyelesaian Masalah #<?= $r['MaintenanceID'] ?></h5>
+                                                    <h5 class="modal-title">Konfirmasi Penyelesaian Masalah</h5>
                                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                 </div>
                                                 <form action="process.php" method="POST" enctype="multipart/form-data">
@@ -303,7 +300,7 @@ $reports = mysqli_fetch_all($query, MYSQLI_ASSOC);
                 searching: true,
                 paging: true,
                 info: true,
-                order: [[0, 'desc']],
+                order: [],
                 language: {
                     search: "Cari:",
                     lengthMenu: "Tampilkan _MENU_ data",

@@ -16,7 +16,8 @@ if ($role === 'PENGHUNI') {
                                      ORDER BY io.InOutID DESC");
 
     $activeQuery = mysqli_query($db, "SELECT COUNT(*) as count FROM inoutpenghuni WHERE PenghuniID = $userId AND Status IN ('Pending', 'Keluar')");
-    $hasActiveRequest = mysqli_fetch_assoc($activeQuery)['count'] > 0;
+    $activeRequestCount = (int) mysqli_fetch_assoc($activeQuery)['count'];
+    $hasActiveRequest = $activeRequestCount > 0;
 }
 
 if ($role === 'SIGAP') {
@@ -33,6 +34,9 @@ if ($role === 'SIGAP') {
                                      JOIN kamar k ON pe.KamarID = k.KamarID 
                                      WHERE io.Status = 'Keluar' 
                                      ORDER BY io.WaktuKeluar ASC");
+
+    $pendingCount = mysqli_num_rows($pendingQuery);
+    $outsideCount = mysqli_num_rows($outsideQuery);
 }
 ?>
 
@@ -40,18 +44,20 @@ if ($role === 'SIGAP') {
 <html lang="en">
 <?php require '../../head.php'; ?>
 
-<body class="tw:p-0 tw:m-0 relative tw:flex tw:bg-[#f8fafc] tw:min-h-screen">
+<body class="dashboard-body tw:p-0 tw:m-0 relative tw:flex tw:bg-[#f8fafc] tw:min-h-screen">
     <?php require '../components/sidebar.php'; ?>
-    <main class="tw:md:ml-75 tw:grow">
-        <div class="tw:pt-20 tw:md:pt-8 tw:px-8 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
-            <div class="tw:flex tw:justify-between tw:items-center tw:mb-6">
-                <h1 class="tw:font-bold tw:text-4xl tw:text-black tw:m-0">
-                    <?= $role === 'SIGAP' ? 'Konfirmasi In/Out' : 'Izin Keluar' ?>
-                </h1>
+    <main class="dashboard-main tw:md:ml-75 tw:grow">
+        <div class="dashboard-page tw:pt-20 tw:md:pt-8 tw:px-8 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
+            <?php require dirname(__DIR__) . '/components/breadcrumb.php'; ?>
+            <h1 class="page-title" data-kicker="Perizinan Penghuni"
+                data-subtitle="<?= htmlspecialchars($role === 'SIGAP' ? 'Konfirmasi permintaan keluar, pantau penghuni yang masih berada di luar area asrama, dan akses log aktivitas dari satu menu yang sama.' : 'Ajukan izin keluar, cek statusnya, dan lihat riwayat aktivitas keluar masuk Anda dalam satu halaman.') ?>">
+                <?= $role === 'SIGAP' ? 'Konfirmasi In/Out' : 'Izin Keluar' ?>
+            </h1>
 
+            <div class="page-toolbar"
+                data-note="<?= htmlspecialchars($role === 'SIGAP' ? $pendingCount . ' permintaan menunggu, ' . $outsideCount . ' penghuni di luar' : ($hasActiveRequest ? $activeRequestCount . ' izin aktif masih berjalan' : 'Belum ada izin aktif')) ?>">
                 <?php if ($role === 'SIGAP'): ?>
-                    <a href="log.php"
-                        class="tw:bg-white tw:text-primary tw:font-medium tw:px-4 tw:py-2 tw:rounded-lg tw:border tw:border-primary/20 tw:hover:bg-primary/5 tw:transition-all tw:inline-flex tw:items-center tw:gap-2 tw:no-underline">
+                    <a href="log.php" class="page-secondary-btn">
                         <i class="iconsax tw:text-xl" icon-name="document-text-1"></i>
                         <span>Lihat Semua Log</span>
                     </a>
@@ -61,31 +67,33 @@ if ($role === 'SIGAP') {
             <?php if ($role === 'PENGHUNI'): ?>
                 <div class="tw:grid tw:grid-cols-1 tw:lg:grid-cols-3 tw:gap-8">
                     <div class="tw:lg:col-span-1">
-                        <div class="tw:bg-white tw:p-6 tw:rounded-[24px] tw:shadow-sm tw:border tw:border-gray-100">
-                            <h5 class="tw:font-bold tw:mb-4">Buat Izin Keluar</h5>
+                        <div class="dashboard-side-panel">
+                            <h5 class="dashboard-side-panel__title">Buat Izin Keluar</h5>
+                            <p class="dashboard-side-panel__copy">Tentukan jadwal keluar dan masuk beserta keperluan agar permintaan bisa dikonfirmasi oleh petugas SIGAP.</p>
                             <?php if ($hasActiveRequest): ?>
                                 <div class="alert alert-warning tw:rounded-xl">
                                     Anda masih memiliki izin keluar yang aktif (Pending/Di Luar). Silakan selesaikan terlebih
                                     dahulu sebelum membuat yang baru.
                                 </div>
                             <?php else: ?>
-                                <form action="process.php" method="POST">
+                                <form action="process.php" method="POST" class="tw:grid tw:gap-4">
                                     <input type="hidden" name="action" value="create_request">
                                     <?php $currentTime = date('H:i'); ?>
-                                    <div class="mb-3">
+                                    <div>
                                         <label class="form-label">Rencana Keluar (Waktu)</label>
                                         <input type="time" name="waktuKeluar" class="form-control" min="<?= $currentTime ?>"
                                             max="22:00" required>
                                     </div>
-                                    <div class="mb-3">
+                                    <div>
                                         <label class="form-label">Rencana Masuk (Waktu)</label>
                                         <input type="time" name="waktuMasuk" class="form-control" min="<?= $currentTime ?>"
                                             max="22:00" required>
                                     </div>
-                                    <div class="mb-4">
-                                        <label class="form-label">Keperluan</label>
+                                    <div>
+                                        <label class="form-label">Keperluan *</label>
                                         <textarea name="keperluan" class="form-control" rows="3"
-                                            placeholder="Contoh: Beli makan, Fotocopy, dll" required></textarea>
+                                            placeholder="Contoh: Belanja, Fotokopi" maxlength="20" required></textarea>
+                                        <span class="form-hint">Keperluan wajib diisi dan dibatasi maksimal 20 karakter.</span>
                                     </div>
                                     <button type="submit"
                                         class="tw:bg-secondary tw:w-full tw:text-white tw:py-3 tw:rounded-xl tw:hover:bg-accent tw:transition-all tw:font-semibold">
@@ -97,10 +105,10 @@ if ($role === 'SIGAP') {
                     </div>
 
                     <div class="tw:lg:col-span-2">
-                        <div class="tw:bg-white tw:p-6 tw:rounded-[24px] tw:shadow-sm tw:border tw:border-gray-100">
+                        <div class="table-panel">
                             <h5 class="tw:font-bold tw:mb-4">Riwayat Izin Keluar</h5>
-                            <div class="tw:overflow-x-auto tw:rounded-lg tw:border tw:border-gray-300">
-                                <table id="historyTable" class="table text-center align-middle tw:mb-0 tw:w-full">
+                            <div class="doremi-table-wrapper">
+                                <table id="historyTable" class="table doremi-table text-center align-middle tw:mb-0 tw:w-full">
                                     <thead>
                                         <tr>
                                             <th scope="col" class="text-center align-middle" style="width: 20%;">Status</th>
@@ -140,15 +148,15 @@ if ($role === 'SIGAP') {
 
             <?php elseif ($role === 'SIGAP'): ?>
                 <div class="tw:flex tw:flex-col tw:gap-8">
-                    <div class="tw:bg-white tw:p-6 tw:rounded-[24px] tw:shadow-sm tw:border tw:border-gray-100">
+                    <div class="table-panel">
                         <div class="tw:flex tw:items-center tw:gap-3 tw:mb-6">
-                            <div class="tw:p-3 tw:bg-orange-50 tw:text-orange-500 tw:rounded-xl">
+                            <div class="dashboard-stat-card__icon dashboard-stat-card__icon--warning">
                                 <i class="fa-solid fa-arrow-up text-2xl"></i>
                             </div>
                             <h5 class="tw:font-bold tw:m-0">Akan Keluar</h5>
                         </div>
-                        <div class="tw:overflow-x-auto tw:rounded-lg tw:border tw:border-gray-300">
-                            <table id="pendingTable" class="table text-center align-middle tw:mb-0 tw:w-full">
+                        <div class="doremi-table-wrapper">
+                            <table id="pendingTable" class="table doremi-table text-center align-middle tw:mb-0 tw:w-full">
                                 <thead>
                                     <tr>
                                         <th scope="col" class="text-center align-middle" style="width: 30%;">Penghuni</th>
@@ -181,15 +189,15 @@ if ($role === 'SIGAP') {
                         </div>
                     </div>
 
-                    <div class="tw:bg-white tw:p-6 tw:rounded-[24px] tw:shadow-sm tw:border tw:border-gray-100">
+                    <div class="table-panel">
                         <div class="tw:flex tw:items-center tw:gap-3 tw:mb-6">
-                            <div class="tw:p-3 tw:bg-blue-50 tw:text-blue-500 tw:rounded-xl">
+                            <div class="dashboard-stat-card__icon dashboard-stat-card__icon--primary">
                                 <i class="fa-solid fa-arrow-down text-2xl"></i>
                             </div>
                             <h5 class="tw:font-bold tw:m-0">Di Luar</h5>
                         </div>
-                        <div class="tw:overflow-x-auto tw:rounded-lg tw:border tw:border-gray-300">
-                            <table id="outsideTable" class="table text-center align-middle tw:mb-0 tw:w-full">
+                        <div class="doremi-table-wrapper">
+                            <table id="outsideTable" class="table doremi-table text-center align-middle tw:mb-0 tw:w-full">
                                 <thead>
                                     <tr>
                                         <th scope="col" class="text-center align-middle" style="width: 30%;">Penghuni</th>

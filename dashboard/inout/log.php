@@ -13,32 +13,34 @@ $logQuery = mysqli_query($db, "SELECT io.*, pe.NamaPenghuni, pe.Nim, k.NomorKama
                                JOIN kamar k ON pe.KamarID = k.KamarID 
                                LEFT JOIN petugas pt ON io.PetugasID = pt.PetugasID 
                                ORDER BY io.InOutID DESC");
+$totalLogs = mysqli_num_rows($logQuery);
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <?php require '../../head.php'; ?>
 
-<body class="tw:p-0 tw:m-0 relative tw:flex tw:bg-[#f8fafc] tw:min-h-screen">
+<body class="dashboard-body tw:p-0 tw:m-0 relative tw:flex tw:bg-[#f8fafc] tw:min-h-screen">
     <?php require '../components/sidebar.php'; ?>
-    <main class="tw:md:ml-75 tw:grow">
-        <div class="tw:pt-20 tw:md:pt-8 tw:px-8 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
-            <div class="tw:flex tw:justify-between tw:items-center tw:mb-6">
-                <h1 class="tw:font-bold tw:text-4xl tw:text-black">
-                    Log Transaksi In/Out
-                </h1>
-                <a href="index.php" class="tw:bg-white tw:text-gray-600 tw:px-4 tw:py-2 tw:rounded-lg tw:border tw:border-gray-200 tw:hover:bg-gray-50 tw:transition-all tw:inline-flex tw:items-center tw:gap-2 tw:no-underline">
-                    <i class="fa-solid fa-arrow-left text-2xl"></i>
-                    <span>Kembali</span>
+    <main class="dashboard-main tw:md:ml-75 tw:grow">
+        <div class="dashboard-page tw:pt-20 tw:md:pt-8 tw:px-8 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
+            <?php require dirname(__DIR__) . '/components/breadcrumb.php'; ?>
+            <h1 class="page-title" data-kicker="Log Aktivitas" data-subtitle="Lihat seluruh histori izin keluar dan masuk penghuni yang telah melalui proses konfirmasi SIGAP.">
+                Log Transaksi In/Out
+            </h1>
+            <div class="page-toolbar" data-note="<?= $totalLogs ?> transaksi tercatat">
+                <a href="index.php" class="page-secondary-btn">
+                    <i class="iconsax" icon-name="arrow-left-2"></i>
+                    <span>Kembali ke konfirmasi</span>
                 </a>
             </div>
 
-            <div class="tw:bg-white tw:p-6 tw:rounded-[24px] tw:shadow-sm tw:border tw:border-gray-100">
-                <div class="tw:overflow-x-auto tw:rounded-lg tw:border tw:border-gray-300">
-                    <table id="logTable" class="table text-center align-middle tw:mb-0 tw:w-full">
+            <div class="table-panel">
+                <div class="doremi-table-wrapper">
+                    <table id="logTable" class="table doremi-table text-center align-middle tw:mb-0 tw:w-full">
                         <thead>
                             <tr>
-                                <th scope="col" class="text-center align-middle">ID</th>
+                                <th scope="col" class="text-center align-middle">No</th>
                                 <th scope="col" class="text-center align-middle">Penghuni</th>
                                 <th scope="col" class="text-center align-middle">Kamar</th>
                                 <th scope="col" class="text-center align-middle">Status</th>
@@ -51,7 +53,7 @@ $logQuery = mysqli_query($db, "SELECT io.*, pe.NamaPenghuni, pe.Nim, k.NomorKama
                         <tbody>
                             <?php while ($row = mysqli_fetch_assoc($logQuery)): ?>
                                 <tr>
-                                    <td><?= $row['InOutID'] ?></td>
+                                    <td></td>
                                     <td>
                                         <div class="tw:font-bold"><?= htmlspecialchars($row['NamaPenghuni']) ?></div>
                                         <div class="tw:text-xs tw:text-gray-500"><?= $row['Nim'] ?></div>
@@ -87,14 +89,18 @@ $logQuery = mysqli_query($db, "SELECT io.*, pe.NamaPenghuni, pe.Nim, k.NomorKama
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            new DataTable('#logTable', {
+            const logTable = new DataTable('#logTable', {
                 autoWidth: false,
                 ordering: true,
                 searching: true,
                 paging: true,
                 info: true,
-                order: [[0, 'desc']], // Sort by ID descending (newest first)
+                order: [[5, 'desc']],
                 columnDefs: [
+                    {
+                        targets: 0,
+                        orderable: false
+                    },
                     {
                         targets: '_all',
                         className: 'text-center align-middle'
@@ -120,6 +126,13 @@ $logQuery = mysqli_query($db, "SELECT io.*, pe.NamaPenghuni, pe.Nim, k.NomorKama
                     }
                 }
             });
+
+            logTable.on('order.dt search.dt', () => {
+                let rowNumber = 1;
+                logTable.column(0, { search: 'applied', order: 'applied' }).nodes().each(cell => {
+                    cell.textContent = rowNumber++;
+                });
+            }).draw();
         });
     </script>
 </body>
