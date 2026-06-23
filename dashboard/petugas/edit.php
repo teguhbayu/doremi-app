@@ -28,11 +28,13 @@ if (!$petugas) {
     exit;
 }
 
+$isSelfEdit = (int) ($_SESSION['userId'] ?? 0) === (int) $id;
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nama = trim($_POST['namaPetugas'] ?? '');
     $email = trim($_POST['emailPetugas'] ?? '');
-    $no = trim($_POST['noPetugas'] ?? '');
-    $jabatan = trim($_POST['jabatanPetugas'] ?? '');
+    $no = (string) preg_replace('/\D+/', '', trim($_POST['noPetugas'] ?? ''));
+    $jabatan = $isSelfEdit ? (string) $petugas['Jabatan'] : trim($_POST['jabatanPetugas'] ?? '');
     $password = trim($_POST['passwordPetugas'] ?? '');
     $confirmPassword = trim($_POST['confirmPasswordPetugas'] ?? '');
 
@@ -41,10 +43,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $baseSchema = v::keySet(
         v::key('nama', v::stringType()->length(3, 100)),
         v::key('email', v::email()->length(3, 100)),
-        v::key('no', v::digit()->length(10, 15)),
+        v::key('no', v::digit()->length(10, 16)),
         v::key('jabatan', v::alpha()->in(["PENGURUS", "SIGAP", "SERVANDA", "MAINTENANCE"])),
-        v::key('password', v::optional(v::length(5, 100))),
-        v::key('confirmPassword', v::optional(v::length(5, 100)))
+        v::key('password', v::optional(v::length(8, 100))),
+        v::key('confirmPassword', v::optional(v::length(8, 100)))
     );
 
     $postData = [
@@ -114,20 +116,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="en">
 <?php require '../../head.php'; ?>
 
-<body class="tw:p-0 tw:m-0 relative tw:flex">
+<body class="dashboard-body tw:p-0 tw:m-0 relative tw:flex">
     <?php require '../components/sidebar.php'; ?>
-    <main class="tw:md:ml-75 tw:grow">
-        <div class="tw:pt-20 tw:md:pt-5 tw:px-5 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
-            <h1 class="tw:font-bold tw:mb-5 tw:text-4xl tw:text-black">
+    <main class="dashboard-main tw:md:ml-75 tw:grow">
+        <div class="dashboard-page tw:pt-20 tw:md:pt-5 tw:px-5 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
+            <?php require dirname(__DIR__) . '/components/breadcrumb.php'; ?>
+            <h1 class="page-title" data-kicker="Perbarui Data" data-subtitle="Ubah profil petugas, jabatan, dan kredensial login tanpa keluar dari alur kerja master data.">
                 Edit Petugas
             </h1>
+            <div class="page-toolbar" data-note="Kosongkan password jika tidak ingin mengubah akses login">
+                <a href="index.php" class="page-secondary-btn">
+                    <i class="iconsax" icon-name="arrow-left-2"></i>
+                    <span>Kembali ke daftar</span>
+                </a>
+            </div>
 
-            <form method="POST">
-                <div class="mb-3">
-                    <label for="petugasID" class="form-label">ID Petugas</label>
-                    <input type="text" class="form-control" id="petugasID"
-                        value="<?= htmlspecialchars($petugas['PetugasID']) ?>" disabled>
-                </div>
+            <form method="POST" class="form-shell">
                 <div class="mb-3">
                     <label for="namaPetugas" class="form-label">Nama Petugas</label>
                     <input type="text" name="namaPetugas" class="form-control" id="namaPetugas"
@@ -140,12 +144,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
                 <div class="mb-3">
                     <label for="noPetugas" class="form-label">No. HP</label>
-                    <input type="number" name="noPetugas" class="form-control" id="noPetugas"
+                    <input type="text" name="noPetugas" class="form-control" id="noPetugas" inputmode="numeric"
+                        pattern="[0-9]{10,16}" maxlength="16"
                         value="<?= htmlspecialchars($petugas['NoHP']) ?>">
                 </div>
                 <div class="mb-3">
                     <label for="jabatanPetugas" class="form-label">Jabatan</label>
-                    <select class="form-select" name="jabatanPetugas" id="jabatanPetugas">
+                    <select class="form-select" name="jabatanPetugas" id="jabatanPetugas" <?= $isSelfEdit ? 'disabled' : '' ?>>
                         <option disabled>Pilih Salah Satu</option>
                         <?php foreach (["PENGURUS", "SIGAP", "SERVANDA", "MAINTENANCE"] as $role): ?>
                             <option value="<?= $role ?>" <?= $petugas['Jabatan'] === $role ? 'selected' : '' ?>>
@@ -153,15 +158,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </option>
                         <?php endforeach; ?>
                     </select>
+                    <?php if ($isSelfEdit): ?>
+                        <span class="form-hint">Jabatan akun yang sedang aktif tidak bisa diubah dari sesi yang sama.</span>
+                    <?php endif; ?>
                 </div>
                 <div class="mb-3">
                     <label for="passwordPetugas" class="form-label">Password Baru <span
                             class="tw:text-gray-400 tw:text-sm">(kosongkan jika tidak ingin mengubah)</span></label>
-                    <input type="password" name="passwordPetugas" class="form-control" id="passwordPetugas">
+                    <input type="password" name="passwordPetugas" class="form-control" id="passwordPetugas" minlength="8" autocomplete="new-password">
+                    <span class="form-hint">Saran: pakai minimal 8 karakter dengan kombinasi huruf besar, huruf kecil, dan angka.</span>
                 </div>
                 <div class="mb-3">
                     <label for="confirmPasswordPetugas" class="form-label">Konfirmasi Password Baru</label>
-                    <input type="password" name="confirmPasswordPetugas" class="form-control"
+                    <input type="password" name="confirmPasswordPetugas" class="form-control" minlength="8" autocomplete="new-password"
                         id="confirmPasswordPetugas">
                 </div>
                 <div class="tw:w-full tw:flex tw:justify-end tw:mt-2">

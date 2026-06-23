@@ -64,15 +64,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="en">
 <?php require '../../head.php'; ?>
 
-<body class="tw:p-0 tw:m-0 relative tw:flex">
+<body class="dashboard-body tw:p-0 tw:m-0 relative tw:flex">
     <?php require '../components/sidebar.php'; ?>
-    <main class="tw:md:ml-75 tw:grow">
-        <div class="tw:pt-20 tw:md:pt-5 tw:px-5 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
-            <h1 class="tw:font-bold tw:mb-5 tw:text-4xl tw:text-black">
+    <main class="dashboard-main tw:md:ml-75 tw:grow">
+        <div class="dashboard-page tw:pt-20 tw:md:pt-5 tw:px-5 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
+            <?php require dirname(__DIR__) . '/components/breadcrumb.php'; ?>
+            <h1 class="page-title" data-kicker="Tambah Data" data-subtitle="Catat barang baru lengkap dengan jumlah, lokasi, dan catatan agar inventaris tetap tertib.">
                 Tambah Inventaris
             </h1>
+            <div class="page-toolbar" data-note="Form inventaris baru">
+                <a href="index.php" class="page-secondary-btn">
+                    <i class="iconsax" icon-name="arrow-left-2"></i>
+                    <span>Kembali ke daftar</span>
+                </a>
+            </div>
 
-            <form method="POST">
+            <form method="POST" class="form-shell">
                 <div class="mb-3">
                     <label for="namaBarang" class="form-label">Nama Barang</label>
                     <input type="text" name="namaBarang" class="form-control" id="namaBarang" required>

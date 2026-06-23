@@ -10,6 +10,8 @@ if (!isset($_SESSION['userId'])) {
 }
 require '../../db.php';
 
+$ruanganTypes = ['Public Space', 'Ruang Ibadah', 'Ruang Belajar', 'Ruang Organisasi', 'Area Olahraga', 'Area Parkir', 'Area Servis'];
+
 $id = $_GET['id'] ?? null;
 if (!$id) {
     header("Location: /doremi-app/dashboard/ruangan/");
@@ -28,6 +30,10 @@ if (!$ruangan) {
     exit;
 }
 
+if (!in_array($ruangan['JenisRuangan'], $ruanganTypes, true)) {
+    $ruanganTypes[] = $ruangan['JenisRuangan'];
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nama = trim($_POST['namaRuangan'] ?? '');
     $jenis = trim($_POST['jenisRuangan'] ?? '');
@@ -36,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $ruanganSchema = v::keySet(
         v::key('nama', v::stringType()->length(1, 100)),
-        v::key('jenis', v::stringType()->length(1, 50)),
+        v::key('jenis', v::in($ruanganTypes)),
         v::key('lantai', v::in(['1', '2', '3', '4', '5', '6', '7'])),
         v::key('keterangan', v::stringType()->length(0, 500))
     );
@@ -75,20 +81,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="en">
 <?php require '../../head.php'; ?>
 
-<body class="tw:p-0 tw:m-0 relative tw:flex">
+<body class="dashboard-body tw:p-0 tw:m-0 relative tw:flex">
     <?php require '../components/sidebar.php'; ?>
-    <main class="tw:md:ml-75 tw:grow">
-        <div class="tw:pt-20 tw:md:pt-5 tw:px-5 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
-            <h1 class="tw:font-bold tw:mb-5 tw:text-4xl tw:text-black">
+    <main class="dashboard-main tw:md:ml-75 tw:grow">
+        <div class="dashboard-page tw:pt-20 tw:md:pt-5 tw:px-5 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
+            <?php require dirname(__DIR__) . '/components/breadcrumb.php'; ?>
+            <h1 class="page-title" data-kicker="Perbarui Data" data-subtitle="Sesuaikan identitas ruangan, lantai, dan keterangan agar data ruang tetap akurat.">
                 Edit Ruangan
             </h1>
+            <div class="page-toolbar" data-note="Perubahan tersimpan ke master ruangan">
+                <a href="index.php" class="page-secondary-btn">
+                    <i class="iconsax" icon-name="arrow-left-2"></i>
+                    <span>Kembali ke daftar</span>
+                </a>
+            </div>
 
-            <form method="POST">
-                <div class="mb-3">
-                    <label for="ruanganID" class="form-label">ID Ruangan</label>
-                    <input type="text" class="form-control" id="ruanganID"
-                        value="<?= htmlspecialchars($ruangan['RuanganID']) ?>" disabled>
-                </div>
+            <form method="POST" class="form-shell">
                 <div class="mb-3">
                     <label for="namaRuangan" class="form-label">Nama Ruangan</label>
                     <input type="text" name="namaRuangan" class="form-control" id="namaRuangan"
@@ -96,8 +104,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
                 <div class="mb-3">
                     <label for="jenisRuangan" class="form-label">Jenis Ruangan</label>
-                    <input type="text" name="jenisRuangan" class="form-control" id="jenisRuangan"
-                        value="<?= htmlspecialchars($ruangan['JenisRuangan']) ?>" required>
+                    <select class="form-select" name="jenisRuangan" id="jenisRuangan" required>
+                        <?php foreach ($ruanganTypes as $jenisRuangan): ?>
+                            <option value="<?= htmlspecialchars($jenisRuangan) ?>" <?= $ruangan['JenisRuangan'] === $jenisRuangan ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($jenisRuangan) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <span class="form-hint">Jenis ruangan dibuat statis supaya pengelompokan data tetap konsisten.</span>
                 </div>
                 <div class="mb-3">
                     <label for="lantaiRuangan" class="form-label">Lantai</label>

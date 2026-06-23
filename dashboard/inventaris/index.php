@@ -12,6 +12,7 @@ $query = mysqli_query($db, "SELECT i.*, k.NomorKamar, r.NamaRuangan
                             LEFT JOIN kamar k ON i.KamarID = k.KamarID 
                             LEFT JOIN ruangan r ON i.RuanganID = r.RuanganID 
                             WHERE i.IsDeleted = 0;");
+$totalInventaris = mysqli_num_rows($query);
 ?>
 
 
@@ -19,38 +20,38 @@ $query = mysqli_query($db, "SELECT i.*, k.NomorKamar, r.NamaRuangan
 <html lang="en">
 <?php require '../../head.php'; ?>
 
-<body class="tw:p-0 tw:m-0 relative tw:flex">
+<body class="dashboard-body tw:p-0 tw:m-0 relative tw:flex">
     <?php require '../components/sidebar.php'; ?>
-    <main class="tw:md:ml-75 tw:grow">
-        <div class="tw:pt-20 tw:md:pt-5 tw:px-5 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
-            <h1 class="tw:font-bold tw:mb-5 tw:text-4xl tw:text-black">
+    <main class="dashboard-main tw:md:ml-75 tw:grow">
+        <div class="dashboard-page tw:pt-20 tw:md:pt-5 tw:px-5 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
+            <?php require dirname(__DIR__) . '/components/breadcrumb.php'; ?>
+            <h1 class="page-title" data-kicker="Master Inventaris" data-subtitle="Pantau aset, jumlah barang, dan lokasinya dalam tampilan yang lebih bersih dan mudah dipindai.">
                 Kelola Inventaris
             </h1>
-            <div class="tw:w-full tw:flex tw:justify-end">
+            <div class="page-toolbar" data-note="<?= $totalInventaris ?> item inventaris aktif">
 
                 <a href="create.php"
-                    class="tw:bg-secondary tw:text-white tw:px-3 tw:py-2 tw:rounded-lg tw:hover:bg-accent tw:duration-300 tw:transition-all tw:inline-flex tw:items-center tw:gap-2">
+                    class="page-primary-btn">
                     <i class="iconsax tw:text-2xl " icon-name="add-square"></i>
                     <span>
-                        Tambah
+                        Tambah Inventaris
                     </span>
                 </a>
             </div>
-            <div class="tw:mt-3 tw:overflow-x-auto tw:rounded-lg tw:border tw:border-gray-300">
-                <table id="inventarisTable" class="table text-center align-middle tw:mb-0 tw:w-full">
+            <div class="table-panel">
+                <div class="doremi-table-wrapper">
+                <table id="inventarisTable" class="table doremi-table text-center align-middle tw:mb-0 tw:w-full">
                 <thead>
                     <tr>
-                        <th scope="col" class="text-center align-middle" style="width: 10%;">ID</th>
-                        <th scope="col" class="text-center align-middle" style="width: 30%;">Nama Barang</th>
+                        <th scope="col" class="text-center align-middle" style="width: 35%;">Nama Barang</th>
                         <th scope="col" class="text-center align-middle" style="width: 10%;">Jumlah</th>
-                        <th scope="col" class="text-center align-middle" style="width: 30%;">Lokasi</th>
+                        <th scope="col" class="text-center align-middle" style="width: 35%;">Lokasi</th>
                         <th scope="col" class="text-center align-middle" style="width: 20%;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php while ($inventaris = mysqli_fetch_assoc($query)) { ?>
                         <tr>
-                            <th scope="row"><?php echo $inventaris["InventarisID"]; ?></th>
                             <td><?php echo $inventaris["NamaBarang"]; ?></td>
                             <td><?php echo $inventaris["Jumlah"]; ?></td>
                             <td>
@@ -67,12 +68,12 @@ $query = mysqli_query($db, "SELECT i.*, k.NomorKamar, r.NamaRuangan
                             <td>
                                 <div class="tw:inline-flex tw:justify-center tw:items-center tw:gap-1 tw:text-black">
 
-                                    <a href="edit.php?id=<?php echo $inventaris["InventarisID"] ?>">
+                                    <a href="edit.php?id=<?php echo $inventaris["InventarisID"] ?>" class="icon-action" title="Edit Inventaris">
                                         <i class="iconsax tw:text-lg" icon-name="edit-2"></i>
                                     </a>
-                                    <button type="button" class="tw:bg-transparent tw:border-0 tw:p-0"
+                                    <button type="button" class="icon-action icon-action--danger"
                                         data-bs-toggle="modal" data-bs-target="#deleteModal"
-                                        data-bs-id="<?php echo $inventaris["InventarisID"] ?>">
+                                        data-bs-id="<?php echo $inventaris["InventarisID"] ?>" title="Hapus Inventaris">
                                         <i class="iconsax tw:text-lg" icon-name="trash"></i>
                                     </button>
                                 </div>
@@ -82,6 +83,7 @@ $query = mysqli_query($db, "SELECT i.*, k.NomorKamar, r.NamaRuangan
                 </tbody>
             </table>
         </div>
+            </div>
     </main>
 
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
@@ -124,7 +126,7 @@ $query = mysqli_query($db, "SELECT i.*, k.NomorKamar, r.NamaRuangan
                 info: true,
                 columnDefs: [
                     {
-                        targets: [0, 3],
+                        targets: [2, 3],
                         orderable: false
                     },
                     {

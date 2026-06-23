@@ -51,9 +51,9 @@ foreach ($kamars as $kamar) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nama = trim($_POST['namaPenghuni'] ?? '');
-    $nim = trim($_POST['nimPenghuni'] ?? '');
-    $email = trim($_POST['emailPenghuni'] ?? '');
-    $no = trim($_POST['noPenghuni'] ?? '');
+    $nim = penghuni_normalize_nim($_POST['nimPenghuni'] ?? '');
+    $email = penghuni_normalize_email($_POST['emailPenghuni'] ?? '');
+    $no = penghuni_normalize_phone($_POST['noPenghuni'] ?? '');
     $jk = trim($_POST['jkPenghuni'] ?? '');
     $kamarId = trim($_POST['kamarPenghuni'] ?? '');
     $alamat = trim($_POST['alamatPenghuni'] ?? '');
@@ -64,14 +64,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $baseSchema = v::keySet(
         v::key('nama', v::stringType()->length(3, 100)),
-        v::key('nim', v::stringType()->length(5, 15)),
+        v::key('nim', v::stringType()),
         v::key('email', v::email()->length(3, 100)),
-        v::key('no', v::digit()->length(10, 15)),
+        v::key('no', v::stringType()),
         v::key('jk', v::in(['L', 'P'])),
         v::key('kamarId', v::numericVal()),
         v::key('alamat', v::stringType()->length(3, 255)),
-        v::key('password', v::optional(v::length(5, 100))),
-        v::key('confirmPassword', v::optional(v::length(5, 100)))
+        v::key('password', v::optional(v::length(8, 100))),
+        v::key('confirmPassword', v::optional(v::length(8, 100)))
     );
 
     $postData = [
@@ -91,6 +91,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
+    if (!penghuni_is_valid_nim($nim)) {
+        header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&status=error&message=NIM harus 5-25 karakter dan hanya boleh berisi huruf, angka, titik, underscore, atau strip!');
+        exit;
+    }
+
+    if (!penghuni_is_valid_phone($no)) {
+        header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&status=error&message=No. HP harus 10-16 digit angka yang valid!');
+        exit;
+    }
+
     if ($isChangingPassword && $password !== $confirmPassword) {
         header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&status=error&message=Password Tidak Cocok!');
         exit;
@@ -102,18 +112,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    $duplicateCheckStmt = mysqli_prepare(
-        $db,
-        "SELECT PenghuniID, Nim, Email, NoHP
-         FROM penghuni
-         WHERE IsDeleted = 0 AND PenghuniID != ? AND (Nim = ? OR Email = ? OR NoHP = ?)
-         LIMIT 1"
-    );
-    mysqli_stmt_bind_param($duplicateCheckStmt, 'isss', $id, $nim, $email, $no);
-    mysqli_stmt_execute($duplicateCheckStmt);
-    $duplicateCheckResult = mysqli_stmt_get_result($duplicateCheckStmt);
-    $duplicatePenghuni = mysqli_fetch_assoc($duplicateCheckResult);
-    mysqli_stmt_close($duplicateCheckStmt);
+    $duplicateMatches = penghuni_find_identity_matches($db, $nim, $email, $no, 0, (int) $id);
+    $duplicatePenghuni = $duplicateMatches[0] ?? null;
 
     if ($duplicatePenghuni) {
         header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&status=error&message=' . urlencode(penghuni_duplicate_identity_message($duplicatePenghuni, $nim, $email, $no)));
@@ -154,24 +154,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="en">
 <?php require '../../head.php'; ?>
 
-<body class="tw:p-0 tw:m-0 relative tw:flex">
+<body class="dashboard-body tw:p-0 tw:m-0 relative tw:flex">
     <?php require '../components/sidebar.php'; ?>
-    <main class="tw:md:ml-75 tw:grow">
-        <div class="tw:pt-20 tw:md:pt-5 tw:px-5 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
-            <h1 class="tw:font-bold tw:mb-5 tw:text-4xl tw:text-black">
+    <main class="dashboard-main tw:md:ml-75 tw:grow">
+        <div class="dashboard-page tw:pt-20 tw:md:pt-5 tw:px-5 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
+            <?php require dirname(__DIR__) . '/components/breadcrumb.php'; ?>
+            <h1 class="page-title" data-kicker="Perbarui Data" data-subtitle="Perbarui profil penghuni, kamar, dan akses login sambil menjaga validasi kamar tetap konsisten.">
                 Edit Penghuni
             </h1>
+            <div class="page-toolbar" data-note="Kosongkan password jika hanya ingin mengubah profil penghuni">
+                <a href="index.php" class="page-secondary-btn">
+                    <i class="iconsax" icon-name="arrow-left-2"></i>
+                    <span>Kembali ke daftar</span>
+                </a>
+            </div>
 
-            <form method="POST">
-                <div class="mb-3">
-                    <label for="penghuniID" class="form-label">ID Penghuni</label>
-                    <input type="text" class="form-control" id="penghuniID"
-                        value="<?= htmlspecialchars($penghuni['PenghuniID']) ?>" disabled>
-                </div>
+            <form method="POST" class="form-shell">
                 <div class="mb-3">
                     <label for="nimPenghuni" class="form-label">NIM</label>
-                    <input type="text" name="nimPenghuni" class="form-control" id="nimPenghuni"
+                    <input type="text" name="nimPenghuni" class="form-control" id="nimPenghuni" maxlength="25"
                         value="<?= htmlspecialchars($penghuni['Nim']) ?>" required>
+                    <span class="form-hint">Gunakan 5-25 karakter tanpa spasi agar validasi NIM tetap konsisten.</span>
                 </div>
                 <div class="mb-3">
                     <label for="namaPenghuni" class="form-label">Nama Penghuni</label>
@@ -185,8 +188,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
                 <div class="mb-3">
                     <label for="noPenghuni" class="form-label">No. HP</label>
-                    <input type="number" name="noPenghuni" class="form-control" id="noPenghuni"
+                    <input type="text" name="noPenghuni" class="form-control" id="noPenghuni" inputmode="numeric"
+                        pattern="[0-9]{10,16}" maxlength="16"
                         value="<?= htmlspecialchars($penghuni['NoHP']) ?>" required>
+                    <span class="form-hint">Masukkan 10-16 digit angka aktif tanpa spasi atau simbol.</span>
                 </div>
                 <div class="mb-3">
                     <label for="jkPenghuni" class="form-label">Jenis Kelamin</label>
@@ -213,11 +218,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="mb-3">
                     <label for="passwordPenghuni" class="form-label">Password Baru <span
                             class="tw:text-gray-400 tw:text-sm">(kosongkan jika tidak ingin mengubah)</span></label>
-                    <input type="password" name="passwordPenghuni" class="form-control" id="passwordPenghuni">
+                    <input type="password" name="passwordPenghuni" class="form-control" id="passwordPenghuni" minlength="8" autocomplete="new-password">
+                    <span class="form-hint">Saran: pakai minimal 8 karakter dengan kombinasi huruf besar, huruf kecil, dan angka.</span>
                 </div>
                 <div class="mb-3">
                     <label for="confirmPasswordPenghuni" class="form-label">Konfirmasi Password Baru</label>
-                    <input type="password" name="confirmPasswordPenghuni" class="form-control"
+                    <input type="password" name="confirmPasswordPenghuni" class="form-control" minlength="8" autocomplete="new-password"
                         id="confirmPasswordPenghuni">
                 </div>
                 <div class="tw:w-full tw:flex tw:justify-end tw:mt-2">

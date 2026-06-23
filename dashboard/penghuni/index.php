@@ -8,6 +8,7 @@ if (!isset($_SESSION['userId'])) {
 require '../../db.php';
 
 $query = mysqli_query($db, "SELECT p.*, k.NomorKamar FROM penghuni p LEFT JOIN kamar k ON p.KamarID = k.KamarID WHERE p.IsDeleted = 0;");
+$totalPenghuni = mysqli_num_rows($query);
 ?>
 
 
@@ -15,51 +16,51 @@ $query = mysqli_query($db, "SELECT p.*, k.NomorKamar FROM penghuni p LEFT JOIN k
 <html lang="en">
 <?php require '../../head.php'; ?>
 
-<body class="tw:p-0 tw:m-0 relative tw:flex">
+<body class="dashboard-body tw:p-0 tw:m-0 relative tw:flex">
     <?php require '../components/sidebar.php'; ?>
-    <main class="tw:md:ml-75 tw:grow">
-        <div class="tw:pt-20 tw:md:pt-5 tw:px-5 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
-            <h1 class="tw:font-bold tw:mb-5 tw:text-4xl tw:text-black">
+    <main class="dashboard-main tw:md:ml-75 tw:grow">
+        <div class="dashboard-page tw:pt-20 tw:md:pt-5 tw:px-5 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
+            <?php require dirname(__DIR__) . '/components/breadcrumb.php'; ?>
+            <h1 class="page-title" data-kicker="Master Penghuni" data-subtitle="Pantau identitas penghuni, penempatan kamar, dan pengelolaan akun dengan tampilan yang lebih modern.">
                 Kelola Penghuni
             </h1>
 
-            <div class="tw:w-full tw:flex tw:justify-end">
+            <div class="page-toolbar" data-note="<?= $totalPenghuni ?> penghuni aktif">
                 <a href="create.php"
-                    class="tw:bg-secondary tw:text-white tw:px-3 tw:py-2 tw:rounded-lg tw:hover:bg-accent tw:duration-300 tw:transition-all tw:inline-flex tw:items-center tw:gap-2">
+                    class="page-primary-btn">
                     <i class="iconsax tw:text-2xl " icon-name="add-square"></i>
                     <span>
-                        Tambah
+                        Tambah Penghuni
                     </span>
                 </a>
             </div>
 
-            <div class="tw:mt-3 tw:overflow-x-auto tw:rounded-lg tw:border tw:border-gray-300">
-                <table id="penghuniTable" class="table text-center align-middle tw:mb-0 tw:w-full">
+            <div class="table-panel">
+                <div class="doremi-table-wrapper">
+                <table id="penghuniTable" class="table doremi-table text-center align-middle tw:mb-0 tw:w-full">
                 <thead>
                     <tr>
-                        <th scope="col" class="text-center align-middle" style="width: 10%;">ID</th>
-                        <th scope="col" class="text-center align-middle" style="width: 15%;">NIM</th>
+                        <th scope="col" class="text-center align-middle" style="width: 20%;">NIM</th>
                         <th scope="col" class="text-center align-middle" style="width: 30%;">Nama</th>
-                        <th scope="col" class="text-center align-middle" style="width: 10%;">Kamar</th>
+                        <th scope="col" class="text-center align-middle" style="width: 15%;">Kamar</th>
                         <th scope="col" class="text-center align-middle" style="width: 20%;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php while ($penghuni = mysqli_fetch_assoc($query)) { ?>
                         <tr>
-                            <th scope="row"><?php echo $penghuni["PenghuniID"]; ?></th>
                             <td><?php echo $penghuni["Nim"]; ?></td>
                             <td class="tw:text-left"><?php echo $penghuni["NamaPenghuni"]; ?></td>
                             <td><?php echo $penghuni["NomorKamar"] ?? 'N/A'; ?></td>
                             <td>
                                 <div class="tw:inline-flex tw:justify-center tw:items-center tw:gap-1 tw:text-black">
 
-                                    <a href="edit.php?id=<?php echo $penghuni["PenghuniID"] ?>">
+                                    <a href="edit.php?id=<?php echo $penghuni["PenghuniID"] ?>" class="icon-action" title="Edit Penghuni">
                                         <i class="iconsax tw:text-lg" icon-name="edit-2"></i>
                                     </a>
-                                    <button type="button" class="tw:bg-transparent tw:border-0 tw:p-0"
+                                    <button type="button" class="icon-action icon-action--danger"
                                         data-bs-toggle="modal" data-bs-target="#deleteModal"
-                                        data-bs-id="<?php echo $penghuni["PenghuniID"] ?>">
+                                        data-bs-id="<?php echo $penghuni["PenghuniID"] ?>" title="Hapus Penghuni">
                                         <i class="iconsax tw:text-lg" icon-name="trash"></i>
                                     </button>
                                 </div>
@@ -69,6 +70,7 @@ $query = mysqli_query($db, "SELECT p.*, k.NomorKamar FROM penghuni p LEFT JOIN k
                 </tbody>
             </table>
         </div>
+            </div>
     </main>
 
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
@@ -111,7 +113,7 @@ $query = mysqli_query($db, "SELECT p.*, k.NomorKamar FROM penghuni p LEFT JOIN k
                 info: true,
                 columnDefs: [
                     {
-                        targets: [0, 3],
+                        targets: [2, 3],
                         orderable: false
                     },
                     {

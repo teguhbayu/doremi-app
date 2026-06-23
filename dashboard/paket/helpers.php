@@ -105,6 +105,26 @@ function paket_status_meta(?string $status): array
     };
 }
 
+function paket_is_final_status(?string $status): bool
+{
+    return in_array($status, ['Sudah Diambil', 'TERTUKAR'], true);
+}
+
+function paket_penghuni_option_label(array $penghuni): string
+{
+    $label = trim((string) ($penghuni['NamaPenghuni'] ?? ''));
+
+    if (!empty($penghuni['Nim'])) {
+        $label .= ' (' . trim((string) $penghuni['Nim']) . ')';
+    }
+
+    if (!empty($penghuni['NomorKamar'])) {
+        $label .= ' - Kamar ' . trim((string) $penghuni['NomorKamar']);
+    }
+
+    return $label;
+}
+
 function paket_cleanup_legacy_photo(?string $currentPath): void
 {
     if (empty($currentPath) || !str_starts_with($currentPath, 'assets/uploads/paket/')) {

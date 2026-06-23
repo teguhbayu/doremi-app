@@ -22,51 +22,50 @@ $query = mysqli_query(
     GROUP BY k.KamarID, k.NomorKamar, k.KapasitasPenghuni, k.Lantai
     ORDER BY k.NomorKamar ASC"
 );
+$totalKamar = mysqli_num_rows($query);
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <?php require '../../head.php'; ?>
 
-<body class="tw:p-0 tw:m-0 relative tw:flex">
+<body class="dashboard-body tw:p-0 tw:m-0 relative tw:flex">
     <?php require '../components/sidebar.php'; ?>
 
-    <main class="tw:md:ml-75 tw:grow">
-        <div class="tw:pt-20 tw:md:pt-5 tw:px-5 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
-            <h1 class="tw:font-bold tw:mb-5 tw:text-4xl tw:text-black">
+    <main class="dashboard-main tw:md:ml-75 tw:grow">
+        <div class="dashboard-page tw:pt-20 tw:md:pt-5 tw:px-5 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
+            <?php require dirname(__DIR__) . '/components/breadcrumb.php'; ?>
+            <h1 class="page-title" data-kicker="Master Kamar" data-subtitle="Monitor kapasitas, lantai, dan detail penghuni pada setiap kamar dengan layout yang lebih informatif.">
                 Kelola Kamar
             </h1>
 
-            <div class="tw:w-full tw:flex tw:justify-end">
+            <div class="page-toolbar" data-note="<?= $totalKamar ?> kamar terdaftar">
                 <a href="create.php"
-                    class="tw:bg-secondary tw:text-white tw:px-3 tw:py-2 tw:rounded-lg tw:hover:bg-accent tw:duration-300 tw:transition-all tw:inline-flex tw:items-center tw:gap-2">
+                    class="page-primary-btn">
                     <i class="iconsax tw:text-2xl" icon-name="add-square"></i>
-                    <span>Tambah</span>
+                    <span>Tambah Kamar</span>
                 </a>
             </div>
 
-            <div class="tw:mt-3 tw:overflow-x-auto tw:rounded-lg tw:border tw:border-gray-300">
+            <div class="table-panel">
+                <div class="doremi-table-wrapper">
                 <table id="kamarTable" class="table doremi-table text-center align-middle tw:mb-0">
                     <thead>
                         <tr>
-                            <th scope="col" class="text-center align-middle" style="width: 10%;">No</th>
-                            <th scope="col" class="text-center align-middle" style="width: 25%;">Nomor Kamar</th>
-                            <th scope="col" class="text-center align-middle" style="width: 25%;">Jumlah Penghuni</th>
+                            <th scope="col" class="text-center align-middle" style="width: 30%;">Nomor Kamar</th>
+                            <th scope="col" class="text-center align-middle" style="width: 30%;">Jumlah Penghuni</th>
                             <th scope="col" class="text-center align-middle" style="width: 20%;">Lantai</th>
                             <th scope="col" class="text-center align-middle" style="width: 20%;">Aksi</th>
                         </tr>
                     </thead>
 
                     <tbody>
-                        <?php $nomorUrut = 1; ?>
                         <?php while ($kamar = mysqli_fetch_assoc($query)) { ?>
                             <tr>
-                                <th scope="row"><?php echo $nomorUrut++; ?></th>
                                 <td>
-                                    <a href="detail.php?id=<?php echo (int) $kamar["KamarID"]; ?>"
-                                        class="tw:font-semibold tw:text-primary tw:hover:text-accent tw:hover:underline tw:no-underline">
+                                    <span class="tw:font-semibold tw:text-primary">
                                         <?php echo htmlspecialchars($kamar["NomorKamar"]); ?>
-                                    </a>
+                                    </span>
                                 </td>
                                 <td>
                                     <div class="tw:font-semibold">
@@ -79,13 +78,17 @@ $query = mysqli_query(
                                 <td>Lantai <?php echo $kamar["Lantai"]; ?></td>
                                 <td>
                                     <div class="tw:inline-flex tw:justify-center tw:items-center tw:gap-1 tw:text-black">
-                                        <a href="edit.php?id=<?php echo $kamar["KamarID"]; ?>">
+                                        <a href="detail.php?id=<?php echo (int) $kamar["KamarID"]; ?>" class="detail-action-btn" title="Lihat Detail Kamar">
+                                            <i class="iconsax tw:text-lg" icon-name="document-text-1"></i>
+                                            <span>Detail</span>
+                                        </a>
+                                        <a href="edit.php?id=<?php echo $kamar["KamarID"]; ?>" class="icon-action" title="Edit Kamar">
                                             <i class="iconsax tw:text-lg" icon-name="edit-2"></i>
                                         </a>
 
-                                        <button type="button" class="tw:bg-transparent tw:border-0 tw:p-0"
+                                        <button type="button" class="icon-action icon-action--danger"
                                             data-bs-toggle="modal" data-bs-target="#deleteModal"
-                                            data-bs-id="<?php echo $kamar["KamarID"]; ?>">
+                                            data-bs-id="<?php echo $kamar["KamarID"]; ?>" title="Hapus Kamar">
                                             <i class="iconsax tw:text-lg" icon-name="trash"></i>
                                         </button>
                                     </div>
@@ -94,6 +97,7 @@ $query = mysqli_query(
                         <?php } ?>
                     </tbody>
                 </table>
+            </div>
             </div>
         </div>
     </main>
@@ -143,12 +147,12 @@ $query = mysqli_query(
             new DataTable('#kamarTable', {
                 autoWidth: false,
                 ordering: true,
-                searching: true,
+                searching: false,
                 paging: true,
                 info: true,
                 columnDefs: [
                     {
-                        targets: [0, 4],
+                        targets: 3,
                         orderable: false
                     },
                     {

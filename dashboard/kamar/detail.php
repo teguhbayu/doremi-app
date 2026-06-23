@@ -59,11 +59,12 @@ $sisaKapasitas = max(0, (int) $kamar['KapasitasPenghuni'] - (int) $kamar['Jumlah
 <html lang="en">
 <?php require '../../head.php'; ?>
 
-<body class="tw:p-0 tw:m-0 relative tw:flex tw:bg-[#f8fafc] tw:min-h-screen">
+<body class="dashboard-body tw:p-0 tw:m-0 relative tw:flex tw:bg-[#f8fafc] tw:min-h-screen">
     <?php require '../components/sidebar.php'; ?>
 
-    <main class="tw:md:ml-75 tw:grow">
-        <div class="tw:pt-20 tw:md:pt-8 tw:px-8 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
+    <main class="dashboard-main tw:md:ml-75 tw:grow">
+        <div class="dashboard-page tw:pt-20 tw:md:pt-8 tw:px-8 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
+            <?php require dirname(__DIR__) . '/components/breadcrumb.php'; ?>
             <div class="tw:flex tw:flex-col tw:gap-4 tw:md:flex-row tw:md:items-center tw:md:justify-between tw:mb-8">
                 <div>
                     <h1 class="tw:font-bold tw:text-4xl tw:text-slate-900 tw:m-0">
@@ -137,7 +138,6 @@ $sisaKapasitas = max(0, (int) $kamar['KapasitasPenghuni'] - (int) $kamar['Jumlah
                         <table id="penghuniKamarTable" class="table doremi-table text-center align-middle tw:mb-0 tw:w-full">
                             <thead>
                                 <tr>
-                                    <th scope="col" class="text-center align-middle" style="width: 10%;">ID</th>
                                     <th scope="col" class="text-center align-middle" style="width: 20%;">NIM</th>
                                     <th scope="col" class="text-center align-middle" style="width: 25%;">Nama</th>
                                     <th scope="col" class="text-center align-middle" style="width: 15%;">Jenis Kelamin</th>
@@ -148,7 +148,6 @@ $sisaKapasitas = max(0, (int) $kamar['KapasitasPenghuni'] - (int) $kamar['Jumlah
                             <tbody>
                                 <?php foreach ($penghunis as $penghuni): ?>
                                     <tr>
-                                        <th scope="row"><?= (int) $penghuni['PenghuniID'] ?></th>
                                         <td><?= htmlspecialchars($penghuni['Nim']) ?></td>
                                         <td class="tw:text-start">
                                             <div class="tw:font-semibold"><?= htmlspecialchars($penghuni['NamaPenghuni']) ?></div>
@@ -186,7 +185,7 @@ $sisaKapasitas = max(0, (int) $kamar['KapasitasPenghuni'] - (int) $kamar['Jumlah
                     info: true,
                     columnDefs: [
                         {
-                            targets: 5,
+                            targets: 4,
                             orderable: false
                         },
                         {

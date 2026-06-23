@@ -19,6 +19,12 @@ if ($action === 'create_request') {
         exit;
     }
 
+    $keperluanLength = function_exists('mb_strlen') ? mb_strlen($keperluan) : strlen($keperluan);
+    if ($keperluanLength > 20) {
+        header("Location: index.php?status=error&message=Keperluan maksimal 20 karakter!");
+        exit;
+    }
+
     $currentTime = date('H:i');
     $maxTime = '22:00';
 
@@ -59,8 +65,13 @@ if ($action === 'create_request') {
 }
 
 elseif ($action === 'confirm_exit') {
-    $id = $_POST['id'] ?? '';
+    $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
     $now = date('Y-m-d H:i:s');
+
+    if (!$id) {
+        header("Location: index.php?status=error&message=Data izin keluar tidak valid!");
+        exit;
+    }
     
     $stmt = mysqli_prepare($db, "UPDATE inoutpenghuni SET Status = 'Keluar', WaktuKeluar = ?, PetugasID = ? WHERE InOutID = ?");
     mysqli_stmt_bind_param($stmt, 'sii', $now, $userId, $id);
@@ -74,8 +85,13 @@ elseif ($action === 'confirm_exit') {
 }
 
 elseif ($action === 'confirm_entry') {
-    $id = $_POST['id'] ?? '';
+    $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
     $now = date('Y-m-d H:i:s');
+
+    if (!$id) {
+        header("Location: index.php?status=error&message=Data izin masuk tidak valid!");
+        exit;
+    }
     
     $stmt = mysqli_prepare($db, "UPDATE inoutpenghuni SET Status = 'Masuk', WaktuMasuk = ? WHERE InOutID = ?");
     mysqli_stmt_bind_param($stmt, 'si', $now, $id);
