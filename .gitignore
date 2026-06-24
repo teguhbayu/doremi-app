@@ -1,7 +1,6 @@
 /vendor/
 .env
 node_modules/
-.agents/
 doremi.sql
 assets/uploads/*
 !assets/uploads/.gitkeep
