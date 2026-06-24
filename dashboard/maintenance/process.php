@@ -1,7 +1,10 @@
 <?php
 session_start();
 require 'helpers.php';
-maintenance_require_roles(['PENGURUS', 'MAINTENANCE']);
+
+// 1. Strict Role Authorization: Only the MAINTENANCE team can execute this script
+maintenance_require_roles(['MAINTENANCE']);
+
 require '../../db.php';
 
 $action = $_POST['action'] ?? '';

@@ -69,7 +69,6 @@ $totalReports = count($reports);
                                 <th scope="col">Pelapor</th>
                                 <th scope="col">Lokasi / Target</th>
                                 <th scope="col">Tingkat Urgensi</th>
-                                <th scope="col">Deskripsi</th>
                                 <th scope="col">Tanggal Lapor</th>
                                 <th scope="col">Status</th>
                                 <th scope="col">Aksi</th>
@@ -103,13 +102,15 @@ $totalReports = count($reports);
                                             <div class="tw:text-xs tw:text-slate-500">-</div>
                                         <?php endif; ?>
                                     </td>
+                                    <!-- PENYESUAIAN WARNA TINGKAT URGENSI SECARA DINAMIS -->
                                     <td>
-                                        <span class="badge <?= $severityMeta['class'] ?> tw:text-xs"><?= $severityMeta['label'] ?></span>
-                                    </td>
-                                    <td>
-                                        <span class="tw:text-sm tw:inline-block tw:max-w-xs tw:truncate" title="<?= htmlspecialchars($r['Deskripsi']) ?>">
-                                            <?= htmlspecialchars($r['Deskripsi']) ?>
-                                        </span>
+                                        <?php if ($r['JenisLaporan'] === 'Kerusakan Darurat / Berat'): ?>
+                                            <span class="badge bg-danger text-white tw:text-xs">Darurat</span>
+                                        <?php elseif ($r['JenisLaporan'] === 'Kerusakan Sedang'): ?>
+                                            <span class="badge bg-warning text-dark tw:text-xs">Sedang</span>
+                                        <?php else: ?>
+                                            <span class="badge bg-success text-white tw:text-xs">Ringan</span>
+                                        <?php endif; ?>
                                     </td>
                                     <td><?= date('d M Y', strtotime($r['TanggalLapor'])) ?></td>
                                     <td>
@@ -123,7 +124,8 @@ $totalReports = count($reports);
                                                 <span>Detail</span>
                                             </button>
 
-                                            <?php if ($role === 'MAINTENANCE' || $role === 'PENGURUS'): ?>
+                                            <!-- FILTER AKSES: Hanya role MAINTENANCE yang dapat memproses dan menyelesaikan laporan -->
+                                            <?php if ($role === 'MAINTENANCE'): ?>
                                                 <?php if ($r['StatusMaintenance'] === 'Diajukan'): ?>
                                                     <form action="process.php" method="POST" class="tw:inline">
                                                         <input type="hidden" name="action" value="claim">
@@ -138,7 +140,7 @@ $totalReports = count($reports);
                                                 <?php endif; ?>
                                             <?php endif; ?>
 
-                                            <!-- Dynamic Edit/Delete display for ticket owners (even if they are MAINTENANCE role) -->
+                                            <!-- Tombol Edit/Hapus dinamis hanya untuk pembuat laporan yang sah -->
                                             <?php if ($r['StatusMaintenance'] === 'Diajukan'): ?>
                                                 <?php 
                                                     $isOwner = false;
@@ -176,12 +178,18 @@ $totalReports = count($reports);
                                                     <div>
                                                         <label class="tw:text-xs tw:text-slate-500">Tingkat Kerusakan</label>
                                                         <p class="tw:font-semibold">
-                                                            <span class="badge <?= $severityMeta['class'] ?>"><?= $severityMeta['label'] ?></span>
+                                                            <?php if ($r['JenisLaporan'] === 'Kerusakan Darurat / Berat'): ?>
+                                                                <span class="badge bg-danger text-white">Darurat</span>
+                                                            <?php elseif ($r['JenisLaporan'] === 'Kerusakan Sedang'): ?>
+                                                                <span class="badge bg-warning text-dark">Sedang</span>
+                                                            <?php else: ?>
+                                                                <span class="badge bg-success text-white">Ringan</span>
+                                                            <?php endif; ?>
                                                         </p>
                                                     </div>
                                                     <div>
                                                         <label class="tw:text-xs tw:text-slate-500">Deskripsi Masalah</label>
-                                                        <p class="tw:text-slate-700"><?= nl2br(htmlspecialchars($r['Deskripsi'])) ?></p>
+                                                        <p class="tw:text-slate-700 tw:whitespace-pre-line tw:break-words" style="word-break: break-word; overflow-wrap: break-word;"><?= htmlspecialchars($r['Deskripsi']) ?></p>
                                                     </div>
                                                     <?php if (!empty($r['FotoLaporan'])): ?>
                                                         <div>
@@ -204,7 +212,7 @@ $totalReports = count($reports);
                                                             </div>
                                                             <div class="tw:mb-3">
                                                                 <label class="tw:text-xs tw:text-emerald-600">Keterangan Hasil Kerja</label>
-                                                                <p class="tw:text-emerald-950 tw:mb-0"><?= nl2br(htmlspecialchars($r['Keterangan'] ?? '-')) ?></p>
+                                                                <p class="tw:text-emerald-950 tw:mb-0 tw:break-words" style="word-break: break-word; overflow-wrap: break-word;"><?= nl2br(htmlspecialchars($r['Keterangan'] ?? '-')) ?></p>
                                                             </div>
                                                             <?php if (!empty($r['FotoMaintenance'])): ?>
                                                                 <div>
@@ -224,7 +232,7 @@ $totalReports = count($reports);
                                 </div>
 
                                 <!-- Completion Form Modal -->
-                                <?php if ($r['StatusMaintenance'] === 'Diproses'): ?>
+                                <?php if ($role === 'MAINTENANCE' && $r['StatusMaintenance'] === 'Diproses'): ?>
                                     <div class="modal fade text-start" id="completeModal<?= $r['MaintenanceID'] ?>" tabindex="-1" aria-hidden="true">
                                         <div class="modal-dialog modal-dialog-centered">
                                             <div class="modal-content">
