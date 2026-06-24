@@ -1292,6 +1292,24 @@ a {
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
+  position: relative;
+}
+
+@media (max-width: 767px) {
+  .table-panel::before {
+    content: '\f0b2\00a0 Geser tabel ke kiri/kanan untuk melihat semua kolom';
+    font-family: 'Font Awesome 6 Free', sans-serif;
+    font-weight: 900;
+    display: block;
+    font-size: 11px;
+    color: #64748b;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 6px 12px;
+    margin-bottom: 10px;
+    text-align: center;
+  }
 }
 
 .table-panel > :is(.tw\:overflow-x-auto, .doremi-table-wrapper, .dt-container, .dataTables_wrapper) {
@@ -1648,11 +1666,30 @@ a {
 
 .dashboard-body .tw\:overflow-x-auto,
 .doremi-table-wrapper {
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
   border-radius: 22px !important;
   border: none !important;
   background: transparent !important;
   box-shadow: none !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Scroll hint badge — muncul di mobile saja */
+.doremi-table-wrapper::after {
+  content: none;
+}
+
+@media (max-width: 767px) {
+  .doremi-table-wrapper {
+    border-radius: 16px !important;
+  }
+
+  /* Tabel minimal 600px agar kolom tidak terlalu sempit */
+  .doremi-table-wrapper .doremi-table,
+  .doremi-table-wrapper .table {
+    min-width: 600px;
+  }
 }
 
 .dashboard-body .table,
