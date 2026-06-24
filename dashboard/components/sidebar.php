@@ -11,6 +11,7 @@ switch ($_SESSION["userRole"]) {
             ["title" => "Ruangan", "target" => "/doremi-app/dashboard/ruangan/", "icon" => "buildings-1"],
             ["title" => "Inventaris", "target" => "/doremi-app/dashboard/inventaris/", "icon" => "archive-book"],
             ["title" => "Maintenance", "target" => "/doremi-app/dashboard/maintenance/", "icon" => "setting-2"],
+            ["title" => "Laporan Maintenance", "target" => "/doremi-app/dashboard/maintenance/report.php", "icon" => "fa-solid fa-chart-bar"],
         ];
         break;
     case "PENGHUNI":
@@ -39,6 +40,7 @@ switch ($_SESSION["userRole"]) {
         $menus = [
             ["title" => "Home", "target" => "/doremi-app/dashboard/", "icon" => "home-2"],
             ["title" => "Pekerjaan Maintenance", "target" => "/doremi-app/dashboard/maintenance/", "icon" => "setting-2"],
+            ["title" => "Laporan", "target" => "/doremi-app/dashboard/maintenance/report.php", "icon" => "fa-solid fa-chart-bar"],
         ];
         break;
 }
@@ -78,18 +80,39 @@ switch ($_SESSION["userRole"]) {
                 <nav class="dashboard-sidebar__nav">
                     <?php
                     $currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-                    foreach ($menus as $menu) {
-                        $isActive = false;
-                        if ($menu["target"] == "/doremi-app/dashboard/") {
-                            $isActive = ($currentPath == "/doremi-app/dashboard/" || $currentPath == "/doremi-app/dashboard/index.php");
+                    
+                    // Cari menu dengan kecocokan target terpanjang (paling spesifik)
+                    $bestMatchIndex = -1;
+                    $longestMatchLen = 0;
+                    foreach ($menus as $idx => $menu) {
+                        $target = $menu["target"];
+                        $isMatch = false;
+                        if ($target == "/doremi-app/dashboard/") {
+                            $isMatch = ($currentPath == "/doremi-app/dashboard/" || $currentPath == "/doremi-app/dashboard/index.php");
                         } else {
-                            $isActive = str_starts_with($currentPath, $menu["target"]);
+                            $isMatch = str_starts_with($currentPath, $target);
                         }
+                        
+                        if ($isMatch) {
+                            $matchLen = strlen($target);
+                            if ($matchLen > $longestMatchLen) {
+                                $longestMatchLen = $matchLen;
+                                $bestMatchIndex = $idx;
+                            }
+                        }
+                    }
+
+                    foreach ($menus as $idx => $menu) {
+                        $isActive = ($idx === $bestMatchIndex);
                         ?>
                         <a @click="sidebarOpen = false"
                             class="dashboard-sidebar__link <?= $isActive ? 'is-active' : '' ?>"
                             href="<?= htmlspecialchars($menu["target"]) ?>">
-                            <i class="iconsax" icon-name="<?= htmlspecialchars($menu["icon"]) ?>"></i>
+                            <?php if (str_starts_with($menu["icon"], 'fa-')) { ?>
+                                <i class="<?= htmlspecialchars($menu["icon"]) ?>"></i>
+                            <?php } else { ?>
+                                <i class="iconsax" icon-name="<?= htmlspecialchars($menu["icon"]) ?>"></i>
+                            <?php } ?>
                             <span><?= htmlspecialchars($menu["title"]) ?></span>
                         </a>
                     <?php } ?>

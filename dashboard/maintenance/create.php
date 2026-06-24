@@ -201,16 +201,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </p>
                         <div class="dashboard-guide-list">
                             <div class="dashboard-guide-item dashboard-guide-item--danger">
-                                <strong class="tw:text-red-700">Darurat (Imminent Danger)</strong>
+                                <strong class="tw:text-red-700">Darurat <i>(Imminent Danger)</i></strong>
                                 <p class="tw:text-xs">Kondisi bahaya nyata yang mengancam keselamatan fisik segera (misal: korsleting aktif, kebocoran gas, kebakaran, banjir besar).</p>
                             </div>
                             <div class="dashboard-guide-item dashboard-guide-item--warning">
-                                <strong class="tw:text-amber-700">Sedang (Serious Hazard)</strong>
+                                <strong class="tw:text-amber-700">Sedang <i>(Serious Hazard)</i></strong>
                                 <p class="tw:text-xs">Mengganggu fungsi hidup harian atau keamanan mendesak (air mati total, kunci pintu luar rusak, toilet mampet).</p>
                             </div>
                             <!-- Desain Hijau Lembut untuk Kerusakan Ringan -->
                             <div class="dashboard-guide-item" style="border-left-color: #166534; background-color: #f0fdf4;">
-                                <strong style="color: #166534;">Ringan (Other-than-Serious)</strong>
+                                <strong style="color: #166534;">Ringan <i>(Other-than-Serious)</i></strong>
                                 <p class="tw:text-xs" style="color: #15803d;">Kerusakan minor/kosmetik yang tidak mengancam keselamatan fisik (keran menetes, engsel longgar, lampu redup).</p>
                             </div>
                         </div>
