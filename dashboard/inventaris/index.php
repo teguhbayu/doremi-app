@@ -52,22 +52,31 @@ $totalInventaris = mysqli_num_rows($query);
                 <tbody>
                     <?php while ($inventaris = mysqli_fetch_assoc($query)) { ?>
                         <tr>
-                            <td><?php echo $inventaris["NamaBarang"]; ?></td>
-                            <td><?php echo $inventaris["Jumlah"]; ?></td>
+                            <td><?php echo htmlspecialchars($inventaris["NamaBarang"]); ?></td>
+                            <td><?php echo htmlspecialchars($inventaris["Jumlah"]); ?></td>
                             <td>
                                 <?php 
+                                    $lokasiStr = "N/A";
                                     if ($inventaris["NomorKamar"]) {
-                                        echo "Kamar: " . $inventaris["NomorKamar"];
+                                        $lokasiStr = "Kamar: " . $inventaris["NomorKamar"];
                                     } elseif ($inventaris["NamaRuangan"]) {
-                                        echo "Ruangan: " . $inventaris["NamaRuangan"];
-                                    } else {
-                                        echo "N/A";
+                                        $lokasiStr = "Ruangan: " . $inventaris["NamaRuangan"];
                                     }
+                                    echo htmlspecialchars($lokasiStr);
                                 ?>
                             </td>
                             <td>
-                                <div class="tw:inline-flex tw:justify-center tw:items-center tw:gap-1 tw:text-black">
-
+                                <div class="tw:inline-flex tw:justify-center tw:items-center tw:gap-2 tw:text-black">
+                                    <button type="button" class="detail-action-btn"
+                                        data-bs-toggle="modal" data-bs-target="#detailModal"
+                                        data-bs-nama="<?php echo htmlspecialchars($inventaris["NamaBarang"]); ?>"
+                                        data-bs-jumlah="<?php echo htmlspecialchars($inventaris["Jumlah"]); ?>"
+                                        data-bs-lokasi="<?php echo htmlspecialchars($lokasiStr); ?>"
+                                        data-bs-keterangan="<?php echo htmlspecialchars($inventaris["Keterangan"]); ?>"
+                                        title="Detail Inventaris">
+                                        <i class="iconsax tw:text-lg" icon-name="document-text-1"></i>
+                                        <span>Detail</span>
+                                    </button>
                                     <a href="edit.php?id=<?php echo $inventaris["InventarisID"] ?>" class="icon-action" title="Edit Inventaris">
                                         <i class="iconsax tw:text-lg" icon-name="edit-2"></i>
                                     </a>
@@ -85,7 +94,6 @@ $totalInventaris = mysqli_num_rows($query);
         </div>
             </div>
     </main>
-
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -99,6 +107,38 @@ $totalInventaris = mysqli_num_rows($query);
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
                     <a href="#" id="confirmDelete" class="btn btn-danger">Hapus</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detail Modal -->
+    <div class="modal fade text-start" id="detailModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Detail Inventaris</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="tw:flex tw:flex-col tw:gap-3">
+                        <div>
+                            <label class="tw:text-xs tw:text-slate-500">Nama Barang</label>
+                            <p id="detailNama" class="tw:font-semibold tw:mb-0"></p>
+                        </div>
+                        <div>
+                            <label class="tw:text-xs tw:text-slate-500">Jumlah</label>
+                            <p id="detailJumlah" class="tw:font-semibold tw:mb-0"></p>
+                        </div>
+                        <div>
+                            <label class="tw:text-xs tw:text-slate-500">Lokasi</label>
+                            <p id="detailLokasi" class="tw:font-semibold tw:mb-0"></p>
+                        </div>
+                        <div>
+                            <label class="tw:text-xs tw:text-slate-500">Keterangan</label>
+                            <p id="detailKeterangan" class="tw:text-slate-700 tw:whitespace-pre-line tw:break-words tw:mb-0" style="word-break: break-word; overflow-wrap: break-word;"></p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -118,42 +158,58 @@ $totalInventaris = mysqli_num_rows($query);
             })
         }
 
+        const detailModal = document.getElementById('detailModal')
+        if (detailModal) {
+            detailModal.addEventListener('show.bs.modal', event => {
+                const button = event.relatedTarget
+                const nama = button.getAttribute('data-bs-nama')
+                const jumlah = button.getAttribute('data-bs-jumlah')
+                const lokasi = button.getAttribute('data-bs-lokasi')
+                const keterangan = button.getAttribute('data-bs-keterangan') || '-'
+
+                detailModal.querySelector('#detailNama').textContent = nama
+                detailModal.querySelector('#detailJumlah').textContent = jumlah + " unit"
+                detailModal.querySelector('#detailLokasi').textContent = lokasi
+                detailModal.querySelector('#detailKeterangan').textContent = keterangan
+            })
+        }
+
         new DataTable('#inventarisTable', {
-                autoWidth: false,
-                ordering: true,
-                searching: true,
-                paging: true,
-                info: true,
-                columnDefs: [
-                    {
-                        targets: [3, 4],
-                        orderable: false
-                    },
-                    {
-                        targets: '_all',
-                        className: 'text-center align-middle'
-                    }
-                ],
-                layout: {
-                    topStart: 'pageLength',
-                    topEnd: 'search',
-                    bottomStart: 'info',
-                    bottomEnd: 'paging'
+            autoWidth: false,
+            ordering: true,
+            searching: true,
+            paging: true,
+            info: true,
+            columnDefs: [
+                {
+                    targets: [3],
+                    orderable: false
                 },
-                language: {
-                    search: "Cari:",
-                    lengthMenu: "Tampilkan _MENU_ data",
-                    info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
-                    infoEmpty: "Tidak ada data",
-                    zeroRecords: "Data tidak ditemukan",
-                    paginate: {
-                        first: "Pertama",
-                        last: "Terakhir",
-                        next: "Berikutnya",
-                        previous: "Sebelumnya"
-                    }
+                {
+                    targets: '_all',
+                    className: 'text-center align-middle'
                 }
-            });
+            ],
+            layout: {
+                topStart: 'pageLength',
+                topEnd: 'search',
+                bottomStart: 'info',
+                bottomEnd: 'paging'
+            },
+            language: {
+                search: "Cari:",
+                lengthMenu: "Tampilkan _MENU_ data",
+                info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                infoEmpty: "Tidak ada data",
+                zeroRecords: "Data tidak ditemukan",
+                paginate: {
+                    first: "Pertama",
+                    last: "Terakhir",
+                    next: "Berikutnya",
+                    previous: "Sebelumnya"
+                }
+            }
+        });
     </script>
 </body>
 

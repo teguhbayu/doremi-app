@@ -69,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <main class="dashboard-main tw:md:ml-75 tw:grow">
         <div class="dashboard-page tw:pt-20 tw:md:pt-5 tw:px-5 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
             <?php require dirname(__DIR__) . '/components/breadcrumb.php'; ?>
-            <h1 class="page-title" data-kicker="Tambah Data" data-subtitle="Catat barang baru lengkap dengan jumlah, lokasi, dan catatan agar inventaris tetap tertib.">
+            <h1 class="page-title" data-kicker="Tambah Data" data-subtitle="Catat barang dengan jumlah, lokasi, dan catatan agar inventaris tetap tertib.">
                 Tambah Inventaris
             </h1>
             <div class="page-toolbar" data-note="Form inventaris baru">
@@ -79,10 +79,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </a>
             </div>
 
-            <form method="POST" class="form-shell">
+            <form method="POST" class="form-shell" x-data="{ nama: '', keterangan: '' }">
                 <div class="mb-3">
                     <label for="namaBarang" class="form-label">Nama Barang</label>
-                    <input type="text" name="namaBarang" class="form-control" id="namaBarang" maxlength="100" required>
+                    <input type="text" name="namaBarang" class="form-control" id="namaBarang" x-model="nama" maxlength="100" required>
+                    <div class="tw:text-xs tw:text-slate-400 tw:mt-1 tw:text-right">
+                        <span :class="nama.length >= 100 ? 'tw:text-red-600 tw:font-semibold' : (nama.length >= 90 ? 'tw:text-amber-700 tw:font-semibold' : '')" x-text="nama.length">0</span>/100 karakter
+                    </div>
                 </div>
                 <div class="mb-3">
                     <label for="jumlahBarang" class="form-label">Jumlah</label>
@@ -106,7 +109,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
                 <div class="mb-3">
                     <label for="keteranganBarang" class="form-label">Keterangan</label>
-                    <textarea name="keteranganBarang" class="form-control" id="keteranganBarang" rows="3"></textarea>
+                    <textarea name="keteranganBarang" class="form-control" id="keteranganBarang" x-model="keterangan" maxlength="500" rows="3"></textarea>
+                    <div class="tw:text-xs tw:text-slate-400 tw:mt-1 tw:text-right">
+                        <span :class="keterangan.length >= 500 ? 'tw:text-red-600 tw:font-semibold' : (keterangan.length >= 450 ? 'tw:text-amber-700 tw:font-semibold' : '')" x-text="keterangan.length">0</span>/500 karakter
+                    </div>
                 </div>
                 <div class="tw:w-full tw:flex tw:justify-end tw:mt-2">
                     <button type="submit"

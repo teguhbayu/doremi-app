@@ -10,7 +10,7 @@ if (!isset($_SESSION['userId'])) {
 }
 require '../../db.php';
 
-$ruanganTypes = ['Public Space', 'Ruang Jemur', 'Lapangan Olahraga', 'Balkon', 'Kamar Mandi'];
+$ruanganTypes = ['Ruang Ibadah', 'Ruang Publik', 'Ruang Jemur', 'Lapangan Olahraga', 'Balkon', 'Kamar Mandi'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nama = trim($_POST['namaRuangan'] ?? '');
@@ -76,10 +76,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </a>
             </div>
 
-            <form method="POST" class="form-shell">
+            <form method="POST" class="form-shell" x-data="{ nama: '', keterangan: '' }">
                 <div class="mb-3">
                     <label for="namaRuangan" class="form-label">Nama Ruangan</label>
-                    <input type="text" name="namaRuangan" class="form-control" id="namaRuangan" maxlength="100" required>
+                    <input type="text" name="namaRuangan" class="form-control" id="namaRuangan" x-model="nama" maxlength="100" required>
+                    <div class="tw:text-xs tw:text-slate-400 tw:mt-1 tw:text-right">
+                        <span :class="nama.length >= 100 ? 'tw:text-red-600 tw:font-semibold' : (nama.length >= 90 ? 'tw:text-amber-700 tw:font-semibold' : '')" x-text="nama.length">0</span>/100 karakter
+                    </div>
                 </div>
                 <div class="mb-3">
                     <label for="jenisRuangan" class="form-label">Jenis Ruangan</label>
@@ -107,7 +110,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
                 <div class="mb-3">
                     <label for="keteranganRuangan" class="form-label">Keterangan</label>
-                    <textarea name="keteranganRuangan" class="form-control" id="keteranganRuangan" rows="3"></textarea>
+                    <textarea name="keteranganRuangan" class="form-control" id="keteranganRuangan" x-model="keterangan" maxlength="500" rows="3"></textarea>
+                    <div class="tw:text-xs tw:text-slate-400 tw:mt-1 tw:text-right">
+                        <span :class="keterangan.length >= 500 ? 'tw:text-red-600 tw:font-semibold' : (keterangan.length >= 450 ? 'tw:text-amber-700 tw:font-semibold' : '')" x-text="keterangan.length">0</span>/500 karakter
+                    </div>
                 </div>
                 <div class="tw:w-full tw:flex tw:justify-end tw:mt-2">
                     <button type="submit"

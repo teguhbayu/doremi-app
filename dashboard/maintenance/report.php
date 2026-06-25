@@ -486,7 +486,7 @@ mysqli_free_result($res);
                         <td><span style="font-size:11px; font-weight:600; padding:2px 8px; border-radius:20px; <?= $statusStyle ?>"><?= htmlspecialchars($r['StatusMaintenance']) ?></span></td>
                         <td><?= $r['TanggalLapor'] ? date('d M Y', strtotime($r['TanggalLapor'])) : '—' ?></td>
                         <td><?= $r['TanggalSelesai'] ? date('d M Y', strtotime($r['TanggalSelesai'])) : '—' ?></td>
-                        <td><?= $r['Durasi'] !== null ? $r['Durasi'] . ' hr' : '—' ?></td>
+                        <td><?= $r['Durasi'] !== null ? $r['Durasi'] . ' jm' : '—' ?></td>
                         <?php if ($role === 'PENGURUS'): ?><td><?= htmlspecialchars($r['Petugas'] ?? '—') ?></td><?php endif; ?>
                     </tr>
                 <?php endforeach; ?>
