@@ -15,7 +15,7 @@ if (!$id) {
     maintenance_redirect('index.php', 'error', 'ID laporan tidak valid.');
 }
 
-$stmt = mysqli_prepare($db, "SELECT * FROM maintenance WHERE MaintenanceID = ? LIMIT 1");
+$stmt = mysqli_prepare($db, "SELECT * FROM maintenance WHERE MaintenanceID = ? AND IsDeleted = 0 LIMIT 1");
 mysqli_stmt_bind_param($stmt, 'i', $id);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);

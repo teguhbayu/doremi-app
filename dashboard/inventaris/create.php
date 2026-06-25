@@ -82,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <form method="POST" class="form-shell">
                 <div class="mb-3">
                     <label for="namaBarang" class="form-label">Nama Barang</label>
-                    <input type="text" name="namaBarang" class="form-control" id="namaBarang" required>
+                    <input type="text" name="namaBarang" class="form-control" id="namaBarang" maxlength="100" required>
                 </div>
                 <div class="mb-3">
                     <label for="jumlahBarang" class="form-label">Jumlah</label>

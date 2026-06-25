@@ -92,26 +92,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <?php require '../../head.php'; ?>
 
 <body class="dashboard-body tw:p-0 tw:m-0 relative tw:flex tw:bg-[#f8fafc] tw:min-h-screen">
-    <!-- Sidebar Komponen -->
     <?php require '../components/sidebar.php'; ?>
 
     <main class="dashboard-main tw:md:ml-75 tw:grow">
         <div class="dashboard-page tw:pt-20 tw:md:pt-8 tw:px-8 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
-            <!-- Breadcrumb Komponen -->
+            
             <?php require dirname(__DIR__) . '/components/breadcrumb.php'; ?>
 
             <h1 class="page-title tw:mb-6" data-kicker="Form Laporan" data-subtitle="Buat laporan kerusakan baru secara terperinci agar segera ditindaklanjuti oleh tim pemeliharaan asrama.">
                 Ajukan Laporan Maintenance
             </h1>
 
-            <!-- Grid Layout Layout Dua Kolom (Sesuai Struktur Side-by-Side Dashboard Asrama) -->
+            
             <div class="tw:grid tw:grid-cols-1 tw:lg:grid-cols-3 tw:gap-8">
                 
-                <!-- Kolom Kiri: Form Shell (Lebar 2/3) -->
+               
                 <div class="tw:lg:col-span-2">
                     <form action="create.php" method="POST" enctype="multipart/form-data" class="form-shell" style="max-width: 100%;">
                         
-                        <!-- 1. Input Skala Prioritas / Jenis Laporan (OSHA Guideline) -->
+                        
                         <div class="mb-3 form-shell__full">
                             <label for="skala_prioritas" class="form-label">Skala Prioritas (Berbasis Kriteria OSHA)</label>
                             <select name="skala_prioritas" id="skala_prioritas" class="form-select" required onchange="verifyPriority()">
@@ -121,11 +120,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <option value="Kerusakan Darurat / Berat" data-osha="imminent">Darurat (Emergency / Ancaman Keselamatan Jiwa & Fisik)</option>
                             </select>
                             
-                            <!-- Notifikasi OSHA Dinamis (merah legam #7f1d1d jika darurat) -->
+                        
                             <div id="osha-helper" class="tw:mt-2 tw:p-3 tw:rounded-xl tw:text-xs tw:hidden tw:border"></div>
                         </div>
 
-                        <!-- 2. Target Lokasi Laporan (Radio Toggle) -->
+                        
                         <div class="mb-3 form-shell__full">
                             <label class="form-label">Target Lokasi Laporan</label>
                             <div class="tw:flex tw:gap-4 tw:mt-1 tw:mb-3">
@@ -139,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </div>
                             </div>
 
-                            <!-- Dropdown Pilihan Ruangan -->
+                        
                             <div id="ruangan-container">
                                 <select name="ruangan_id" id="ruangan_id" class="form-select" required>
                                     <option value="" disabled selected>Pilih Ruangan</option>
@@ -151,7 +150,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </select>
                             </div>
 
-                            <!-- Dropdown Pilihan Inventaris (Hidden by default) -->
                             <div id="inventaris-container" class="tw:hidden">
                                 <select name="inventaris_id" id="inventaris_id" class="form-select">
                                     <option value="" disabled selected>Pilih Inventaris / Barang</option>
@@ -164,7 +162,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </div>
                         </div>
 
-                        <!-- 3. Input Deskripsi Masalah (Maksimal 500 Karakter) -->
+                        
                         <div class="mb-3 form-shell__full">
                             <label for="deskripsi" class="form-label">Deskripsi Masalah</label>
                             <textarea name="deskripsi" id="deskripsi" maxlength="500" class="form-control" rows="4" required 
@@ -174,14 +172,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </div>
                         </div>
 
-                        <!-- 4. Unggah Foto Laporan -->
+                        
                         <div class="mb-4 form-shell__full">
                             <label for="foto_laporan" class="form-label">Foto Masalah / Kerusakan</label>
                             <input type="file" name="foto_laporan" id="foto_laporan" class="form-control" accept="image/png,image/jpeg,image/webp">
                             <div class="form-text">Format file didukung: JPG, PNG, atau WEBP (Maksimal 2MB).</div>
                         </div>
 
-                        <!-- Submit Toolbar -->
+                        
                         <div class="tw:w-full tw:flex tw:justify-end tw:gap-3 form-shell__full">
                             <a href="index.php" class="page-secondary-btn">Batal</a>
                             <button type="submit" class="page-primary-btn">Kirim Laporan</button>
@@ -189,7 +187,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </form>
                 </div>
 
-                <!-- Kolom Kanan: Panduan Pengisian Statis (Lebar 1/3) -->
+                
                 <div class="tw:lg:col-span-1">
                     <div class="dashboard-side-panel">
                         <h5 class="dashboard-side-panel__title tw:flex tw:items-center tw:gap-2 tw:mb-3">
@@ -208,7 +206,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <strong class="tw:text-amber-700">Sedang <i>(Serious Hazard)</i></strong>
                                 <p class="tw:text-xs">Mengganggu fungsi hidup harian atau keamanan mendesak (air mati total, kunci pintu luar rusak, toilet mampet).</p>
                             </div>
-                            <!-- Desain Hijau Lembut untuk Kerusakan Ringan -->
+                            
                             <div class="dashboard-guide-item" style="border-left-color: #166534; background-color: #f0fdf4;">
                                 <strong style="color: #166534;">Ringan <i>(Other-than-Serious)</i></strong>
                                 <p class="tw:text-xs" style="color: #15803d;">Kerusakan minor/kosmetik yang tidak mengancam keselamatan fisik (keran menetes, engsel longgar, lampu redup).</p>
@@ -221,7 +219,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </main>
 
-    <!-- SweetAlert & System JS Loader -->
+    
     <?php require '../../bootstrap.php'; ?>
     <?php require '../../validation_alert.php'; ?>
 
@@ -239,7 +237,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if (category === 'imminent') {
                 helper.classList.remove('tw:hidden');
-                // Mengatur warna MERAH LEGAM (#7f1d1d) dan border merah halus
                 helper.setAttribute('style', 'background-color: #fef2f2; color: #7f1d1d; border-color: #fee2e2; font-weight: 600;');
                 helper.innerHTML = "<strong>⚠️ Peringatan Darurat:</strong> Kondisi ini harus merupakan ancaman keselamatan fisik segera. Laporan palsu atau penyalahgunaan kategori ini dapat dikenakan sanksi administratif.";
                 

@@ -10,7 +10,7 @@ if (!isset($_SESSION['userId'])) {
 }
 require '../../db.php';
 
-$ruanganTypes = ['Public Space', 'Ruang Ibadah', 'Ruang Belajar', 'Ruang Organisasi', 'Area Olahraga', 'Area Parkir', 'Area Servis'];
+$ruanganTypes = ['Public Space', 'Ruang Jemur', 'Lapangan Olahraga', 'Balkon', 'Kamar Mandi'];
 
 $id = $_GET['id'] ?? null;
 if (!$id) {
@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $ruanganSchema = v::keySet(
         v::key('nama', v::stringType()->length(1, 100)),
         v::key('jenis', v::in($ruanganTypes)),
-        v::key('lantai', v::in(['1', '2', '3', '4', '5', '6', '7'])),
+        v::key('lantai', v::in(['1', '2', '3', '4', '5', '6', '7', '1 Gedung Sekretariat', '2 Gedung Sekretariat'])),
         v::key('keterangan', v::stringType()->length(0, 500))
     );
 
@@ -99,7 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <form method="POST" class="form-shell">
                 <div class="mb-3">
                     <label for="namaRuangan" class="form-label">Nama Ruangan</label>
-                    <input type="text" name="namaRuangan" class="form-control" id="namaRuangan"
+                    <input type="text" name="namaRuangan" class="form-control" id="namaRuangan" maxlength="100"
                         value="<?= htmlspecialchars($ruangan['NamaRuangan']) ?>" required>
                 </div>
                 <div class="mb-3">
@@ -111,7 +111,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </option>
                         <?php endforeach; ?>
                     </select>
-                    <span class="form-hint">Jenis ruangan dibuat statis supaya pengelompokan data tetap konsisten.</span>
                 </div>
                 <div class="mb-3">
                     <label for="lantaiRuangan" class="form-label">Lantai</label>
@@ -124,6 +123,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <option value="5" <?= $ruangan['Lantai'] == '5' ? 'selected' : '' ?>>Lantai 5</option>
                         <option value="6" <?= $ruangan['Lantai'] == '6' ? 'selected' : '' ?>>Lantai 6</option>
                         <option value="7" <?= $ruangan['Lantai'] == '7' ? 'selected' : '' ?>>Lantai 7</option>
+                        <option value="1 Gedung Sekretariat" <?= $ruangan['Lantai'] == '1 Gedung Sekretariat' ? 'selected' : '' ?>>Lantai 1 Gedung Sekretariat</option>
+                        <option value="2 Gedung Sekretariat" <?= $ruangan['Lantai'] == '2 Gedung Sekretariat' ? 'selected' : '' ?>>Lantai 2 Gedung Sekretariat</option>
                     </select>
                 </div>
                 <div class="mb-3">

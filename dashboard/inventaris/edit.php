@@ -98,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <form method="POST" class="form-shell">
                 <div class="mb-3">
                     <label for="namaBarang" class="form-label">Nama Barang</label>
-                    <input type="text" name="namaBarang" class="form-control" id="namaBarang"
+                    <input type="text" name="namaBarang" class="form-control" id="namaBarang" maxlength="100"
                         value="<?= htmlspecialchars($inventaris['NamaBarang']) ?>" required>
                 </div>
                 <div class="mb-3">

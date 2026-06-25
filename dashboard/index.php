@@ -25,7 +25,7 @@ $stats = [];
 if ($role === 'PENGURUS') {
     $activePenghuni = mysqli_fetch_assoc(mysqli_query($db, "SELECT COUNT(*) as total FROM penghuni WHERE IsDeleted = 0 AND IsActive = 1"))['total'];
     $pendingInOut = mysqli_fetch_assoc(mysqli_query($db, "SELECT COUNT(*) as total FROM inoutpenghuni WHERE Status = 'Pending'"))['total'];
-    $pendingMaintenance = mysqli_fetch_assoc(mysqli_query($db, "SELECT COUNT(*) as total FROM maintenance WHERE StatusMaintenance = 'Diajukan'"))['total'];
+    $pendingMaintenance = mysqli_fetch_assoc(mysqli_query($db, "SELECT COUNT(*) as total FROM maintenance WHERE StatusMaintenance = 'Diajukan' AND IsDeleted = 0"))['total'];
     $pendingPackagePickup = mysqli_fetch_assoc(mysqli_query(
         $db,
         "SELECT COUNT(*) AS total
@@ -66,7 +66,7 @@ if ($role === 'PENGHUNI') {
         $db,
         "SELECT StatusMaintenance
          FROM maintenance
-         WHERE PenghuniID = $userId"
+         WHERE PenghuniID = $userId AND IsDeleted = 0"
     );
     $maintenanceSummary = ['Diajukan' => 0, 'Diproses' => 0, 'Selesai' => 0];
     while ($row = mysqli_fetch_assoc($maintenanceSummaryResult)) {
@@ -91,7 +91,7 @@ if ($role === 'MAINTENANCE') {
         LEFT JOIN penghuni p ON m.PenghuniID = p.PenghuniID
         LEFT JOIN petugas pt ON m.PetugasID = pt.PetugasID
         LEFT JOIN inventaris i ON m.InventarisID = i.InventarisID
-        WHERE m.StatusMaintenance = 'Diproses' AND m.PetugasID = $userId
+        WHERE m.StatusMaintenance = 'Diproses' AND m.PetugasID = $userId AND m.IsDeleted = 0
         ORDER BY m.MaintenanceID DESC
         LIMIT 5
     ";
@@ -99,31 +99,31 @@ if ($role === 'MAINTENANCE') {
     $myTasks = mysqli_fetch_all($myTasksResult, MYSQLI_ASSOC);
     mysqli_free_result($myTasksResult);
 
-    $res = mysqli_query($db, "SELECT COUNT(*) as total FROM maintenance WHERE StatusMaintenance = 'Diajukan'");
+    $res = mysqli_query($db, "SELECT COUNT(*) as total FROM maintenance WHERE StatusMaintenance = 'Diajukan' AND IsDeleted = 0");
     $pendingTasks = mysqli_fetch_assoc($res)['total'];
     mysqli_free_result($res);
 
-    $res = mysqli_query($db, "SELECT COUNT(*) as total FROM maintenance WHERE StatusMaintenance = 'Diproses' AND PetugasID = $userId");
+    $res = mysqli_query($db, "SELECT COUNT(*) as total FROM maintenance WHERE StatusMaintenance = 'Diproses' AND PetugasID = $userId AND IsDeleted = 0");
     $myOngoingTasks = mysqli_fetch_assoc($res)['total'];
     mysqli_free_result($res);
 
-    $res = mysqli_query($db, "SELECT COUNT(*) as total FROM maintenance WHERE StatusMaintenance = 'Selesai' AND PetugasID = $userId");
+    $res = mysqli_query($db, "SELECT COUNT(*) as total FROM maintenance WHERE StatusMaintenance = 'Selesai' AND PetugasID = $userId AND IsDeleted = 0");
     $myCompletedTasks = mysqli_fetch_assoc($res)['total'];
     mysqli_free_result($res);
 
-    $res = mysqli_query($db, "SELECT COUNT(*) as total FROM maintenance WHERE JenisLaporan = 'Kerusakan Darurat / Berat' AND StatusMaintenance != 'Selesai'");
+    $res = mysqli_query($db, "SELECT COUNT(*) as total FROM maintenance WHERE JenisLaporan = 'Kerusakan Darurat / Berat' AND StatusMaintenance != 'Selesai' AND IsDeleted = 0");
     $activeEmergencyTasks = mysqli_fetch_assoc($res)['total'];
     mysqli_free_result($res);
 
     // Pie chart: distribusi status laporan
     $pieData = ['Diajukan' => 0, 'Diproses' => 0, 'Selesai' => 0];
-    $res = mysqli_query($db, "SELECT StatusMaintenance, COUNT(*) as total FROM maintenance WHERE StatusMaintenance IN ('Diajukan','Diproses','Selesai') GROUP BY StatusMaintenance");
+    $res = mysqli_query($db, "SELECT StatusMaintenance, COUNT(*) as total FROM maintenance WHERE StatusMaintenance IN ('Diajukan','Diproses','Selesai') AND IsDeleted = 0 GROUP BY StatusMaintenance");
     while ($row = mysqli_fetch_assoc($res)) { $pieData[$row['StatusMaintenance']] = (int)$row['total']; }
     mysqli_free_result($res);
 
     // Trend 7 hari
     $trend7Raw = [];
-    $res = mysqli_query($db, "SELECT DATE(TanggalLapor) AS hari, COUNT(*) AS total FROM maintenance WHERE TanggalLapor >= DATE_SUB(CURDATE(), INTERVAL 6 DAY) GROUP BY hari ORDER BY hari ASC");
+    $res = mysqli_query($db, "SELECT DATE(TanggalLapor) AS hari, COUNT(*) AS total FROM maintenance WHERE TanggalLapor >= DATE_SUB(CURDATE(), INTERVAL 6 DAY) AND IsDeleted = 0 GROUP BY hari ORDER BY hari ASC");
     while ($row = mysqli_fetch_assoc($res)) { $trend7Raw[$row['hari']] = (int)$row['total']; }
     mysqli_free_result($res);
     $trend7Labels = []; $trend7Values = [];
@@ -135,7 +135,7 @@ if ($role === 'MAINTENANCE') {
 
     // Trend 30 hari
     $trend30Raw = [];
-    $res = mysqli_query($db, "SELECT DATE(TanggalLapor) AS hari, COUNT(*) AS total FROM maintenance WHERE TanggalLapor >= DATE_SUB(CURDATE(), INTERVAL 29 DAY) GROUP BY hari ORDER BY hari ASC");
+    $res = mysqli_query($db, "SELECT DATE(TanggalLapor) AS hari, COUNT(*) AS total FROM maintenance WHERE TanggalLapor >= DATE_SUB(CURDATE(), INTERVAL 29 DAY) AND IsDeleted = 0 GROUP BY hari ORDER BY hari ASC");
     while ($row = mysqli_fetch_assoc($res)) { $trend30Raw[$row['hari']] = (int)$row['total']; }
     mysqli_free_result($res);
     $trend30Labels = []; $trend30Values = [];
@@ -147,7 +147,7 @@ if ($role === 'MAINTENANCE') {
 
     // Trend 6 bulan
     $trend6mRaw = [];
-    $res = mysqli_query($db, "SELECT DATE_FORMAT(TanggalLapor, '%Y-%m') AS bulan, COUNT(*) AS total FROM maintenance WHERE TanggalLapor >= DATE_SUB(CURDATE(), INTERVAL 5 MONTH) GROUP BY bulan ORDER BY bulan ASC");
+    $res = mysqli_query($db, "SELECT DATE_FORMAT(TanggalLapor, '%Y-%m') AS bulan, COUNT(*) AS total FROM maintenance WHERE TanggalLapor >= DATE_SUB(CURDATE(), INTERVAL 5 MONTH) AND IsDeleted = 0 GROUP BY bulan ORDER BY bulan ASC");
     while ($row = mysqli_fetch_assoc($res)) { $trend6mRaw[$row['bulan']] = (int)$row['total']; }
     mysqli_free_result($res);
     for ($i = 5; $i >= 0; $i--) {
