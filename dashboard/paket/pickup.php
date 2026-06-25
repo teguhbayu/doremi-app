@@ -129,10 +129,10 @@ $statusMeta = paket_status_meta($paket['Status'] ?? 'Belum Diambil');
 <html lang="en">
 <?php require '../../head.php'; ?>
 
-<body class="dashboard-body tw:p-0 tw:m-0 relative tw:flex tw:bg-[#f8fafc] tw:min-h-screen">
+<body class="dashboard-body tw:p-0 tw:m-0 tw:relative tw:flex tw:bg-[#f8fafc] tw:min-h-screen">
     <?php require '../components/sidebar.php'; ?>
-    <main class="dashboard-main tw:md:ml-75 tw:grow">
-        <div class="dashboard-page tw:pt-20 tw:md:pt-8 tw:px-8 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
+    <main class="dashboard-main tw:md:ml-[20.5rem] tw:grow">
+        <div class="dashboard-page tw:pt-24 tw:md:pt-9 tw:px-4 tw:md:px-8 tw:pb-8 tw:w-full">
             <?php require dirname(__DIR__) . '/components/breadcrumb.php'; ?>
             <h1 class="page-title" data-kicker="Pengambilan Paket" data-subtitle="Lengkapi status, bukti foto, dan catatan pengambilan agar riwayat paket penghuni tercatat rapi dan siap direview SIGAP.">
                 <?= $isLocked ? 'Detail Pengambilan Paket' : 'Catat Pengambilan Paket' ?>

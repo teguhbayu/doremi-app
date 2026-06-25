@@ -162,7 +162,7 @@ if ($role === 'MAINTENANCE') {
 <html lang="en">
 <?php require '../head.php'; ?>
 
-<body class="dashboard-body tw:p-0 tw:m-0 relative tw:flex tw:bg-[#f8fafc] tw:min-h-screen tw:overflow-x-hidden">
+<body class="dashboard-body tw:p-0 tw:m-0 tw:relative tw:flex tw:bg-[#f8fafc] tw:min-h-screen tw:overflow-x-hidden">
     <div
         class="tw:absolute tw:top-[-10%] tw:right-[-5%] tw:w-[500px] tw:h-[500px] tw:bg-primary/5 tw:rounded-full tw:blur-[120px] tw:pointer-events-none">
     </div>
@@ -171,8 +171,8 @@ if ($role === 'MAINTENANCE') {
     </div>
 
     <?php require 'components/sidebar.php'; ?>
-    <main class="dashboard-main tw:md:ml-75 tw:grow tw:relative tw:z-10">
-        <div class="dashboard-page tw:pt-20 tw:md:pt-8 tw:px-8 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
+    <main class="dashboard-main tw:md:ml-[20.5rem] tw:grow tw:relative tw:z-10">
+        <div class="dashboard-page tw:pt-24 tw:md:pt-9 tw:px-4 tw:md:px-8 tw:pb-8 tw:w-full">
             <h1 class="page-title" data-kicker="Dashboard Utama"
                 data-subtitle="Selamat datang kembali di dashboard DOREMI. Semua aktivitas operasional asrama ada di satu tempat dan mengikuti pola kerja yang sama.">
                 Halo, <?= htmlspecialchars($userName) ?>
@@ -229,7 +229,7 @@ if ($role === 'MAINTENANCE') {
 
             <!-- 2. BLOK STATS UNTUK PENGHUNI -->
             <?php elseif ($role === 'PENGHUNI'): ?>
-                <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:xl:grid-cols-4 tw:gap-6 tw:mb-10">
+                <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:xl:grid-cols-4 tw:gap-8 tw:mb-10">
                     <div class="dashboard-stat-card">
                         <div class="dashboard-stat-card__row">
                             <div class="dashboard-stat-card__icon dashboard-stat-card__icon--primary">
@@ -391,7 +391,7 @@ if ($role === 'MAINTENANCE') {
                     <div class="dashboard-side-panel">
                         <h5 class="dashboard-side-panel__title">Ringkasan Paket</h5>
                         <p class="dashboard-side-panel__copy">Pantau paket yang baru datang, yang belum diambil, dan kasus tertukar tanpa harus masuk ke menu paket dulu.</p>
-                        <div class="dashboard-info-list">
+                        <div class="dashboard-info-list" style="gap: 1.25rem;">
                             <div class="dashboard-info-item">
                                 <span class="dashboard-info-item__label">Belum diambil</span>
                                 <strong><?= $paketBelumDiambil ?> paket</strong>
@@ -416,7 +416,7 @@ if ($role === 'MAINTENANCE') {
                     <div class="dashboard-side-panel">
                         <h5 class="dashboard-side-panel__title">Status Laporan Kerusakan</h5>
                         <p class="dashboard-side-panel__copy">Lihat progres laporan yang Anda kirim, mulai dari diajukan sampai selesai dikerjakan.</p>
-                        <div class="dashboard-info-list">
+                        <div class="dashboard-info-list" style="gap: 1.25rem;">
                             <div class="dashboard-info-item">
                                 <span class="dashboard-info-item__label">Diajukan</span>
                                 <strong><?= $maintenanceSummary['Diajukan'] ?> laporan</strong>

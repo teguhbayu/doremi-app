@@ -22,7 +22,6 @@
     --tw-color-slate-200: oklch(92.9% 0.013 255.508);
     --tw-color-slate-400: oklch(70.4% 0.04 256.788);
     --tw-color-slate-500: oklch(55.4% 0.046 257.417);
-    --tw-color-slate-600: oklch(44.6% 0.043 257.281);
     --tw-color-slate-700: oklch(37.2% 0.044 257.287);
     --tw-color-slate-900: oklch(20.8% 0.042 265.755);
     --tw-color-gray-50: oklch(98.5% 0.002 247.839);
@@ -78,7 +77,6 @@
     --tw-color-secondary: #19a7ce;
     --tw-color-accent: #afd3e2;
     --tw-color-background: #f6f1f1;
-    --tw-color-tertiary: #2380a5;
   }
 }
 @layer base {
@@ -430,9 +428,6 @@
   .tw\:w-\[500px\] {
     width: 500px !important;
   }
-  .tw\:w-dvw {
-    width: 100dvw !important;
-  }
   .tw\:w-full {
     width: 100% !important;
   }
@@ -722,11 +717,14 @@
   .tw\:pt-16 {
     padding-top: calc(var(--tw-spacing) * 16) !important;
   }
-  .tw\:pt-20 {
-    padding-top: calc(var(--tw-spacing) * 20) !important;
+  .tw\:pt-24 {
+    padding-top: calc(var(--tw-spacing) * 24) !important;
   }
   .tw\:pb-4 {
     padding-bottom: calc(var(--tw-spacing) * 4) !important;
+  }
+  .tw\:pb-8 {
+    padding-bottom: calc(var(--tw-spacing) * 8) !important;
   }
   .tw\:pb-16 {
     padding-bottom: calc(var(--tw-spacing) * 16) !important;
@@ -1096,9 +1094,9 @@
       margin-top: calc(var(--tw-spacing) * 10) !important;
     }
   }
-  .tw\:md\:ml-75 {
+  .tw\:md\:ml-\[20\.5rem\] {
     @media (width >= 48rem) {
-      margin-left: calc(var(--tw-spacing) * 75) !important;
+      margin-left: 20.5rem !important;
     }
   }
   .tw\:md\:flex {
@@ -1109,11 +1107,6 @@
   .tw\:md\:hidden {
     @media (width >= 48rem) {
       display: none !important;
-    }
-  }
-  .tw\:md\:w-full {
-    @media (width >= 48rem) {
-      width: 100% !important;
     }
   }
   .tw\:md\:max-w-3xl {
@@ -1146,6 +1139,11 @@
       justify-content: space-between !important;
     }
   }
+  .tw\:md\:px-8 {
+    @media (width >= 48rem) {
+      padding-inline: calc(var(--tw-spacing) * 8) !important;
+    }
+  }
   .tw\:md\:px-10 {
     @media (width >= 48rem) {
       padding-inline: calc(var(--tw-spacing) * 10) !important;
@@ -1156,14 +1154,9 @@
       padding-block: calc(var(--tw-spacing) * 4) !important;
     }
   }
-  .tw\:md\:pt-5 {
+  .tw\:md\:pt-9 {
     @media (width >= 48rem) {
-      padding-top: calc(var(--tw-spacing) * 5) !important;
-    }
-  }
-  .tw\:md\:pt-8 {
-    @media (width >= 48rem) {
-      padding-top: calc(var(--tw-spacing) * 8) !important;
+      padding-top: calc(var(--tw-spacing) * 9) !important;
     }
   }
   .tw\:md\:text-6xl {

@@ -69,14 +69,8 @@ switch ($_SESSION["userRole"]) {
                 </span>
             </a>
 
-            <!-- 
-              SMOOTHED CONTAINER:
-              - Flex layout restricts it to remaining screen space.
-              - Padding + Negative Margin allows active button shadows to display without clipping.
-              - Mask-image creates a subtle gradient fade at the top and bottom borders.
-            -->
-            <div style="flex: 1; overflow-y: auto; padding: 15px 15px 35px 15px; margin: -15px -15px -35px -15px; -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 20px, black calc(100% - 35px), transparent 100%); mask-image: linear-gradient(to bottom, transparent 0%, black 20px, black calc(100% - 35px), transparent 100%);">
-                <p class="dashboard-sidebar__eyebrow" style="padding-top: 5px;">Menu <?= htmlspecialchars($_SESSION["userRole"]) ?></p>
+            <div class="dashboard-sidebar__scroll">
+                <p class="dashboard-sidebar__eyebrow">Menu <?= htmlspecialchars($_SESSION["userRole"]) ?></p>
                 <nav class="dashboard-sidebar__nav">
                     <?php
                     $currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);

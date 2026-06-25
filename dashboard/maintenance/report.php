@@ -220,12 +220,12 @@ mysqli_free_result($res);
 <!DOCTYPE html>
 <html lang="id">
 <?php require '../../head.php'; ?>
-<body class="dashboard-body tw:p-0 tw:m-0 relative tw:flex tw:bg-[#f8fafc] tw:min-h-screen tw:overflow-x-hidden">
+<body class="dashboard-body tw:p-0 tw:m-0 tw:relative tw:flex tw:bg-[#f8fafc] tw:min-h-screen tw:overflow-x-hidden">
 
 <?php require '../components/sidebar.php'; ?>
 
-<main class="dashboard-main tw:md:ml-75 tw:grow tw:relative tw:z-10">
-<div class="dashboard-page tw:pt-20 tw:md:pt-8 tw:px-8 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full" id="report-content">
+<main class="dashboard-main tw:md:ml-[20.5rem] tw:grow tw:relative tw:z-10">
+<div class="dashboard-page tw:pt-24 tw:md:pt-9 tw:px-4 tw:md:px-8 tw:pb-8 tw:w-full" id="report-content">
 
     <!-- ── Header ─────────────────────────────────────────────────────────── -->
     <h1 class="page-title" data-kicker="Laporan &amp; Analitik"

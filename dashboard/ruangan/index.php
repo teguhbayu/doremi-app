@@ -16,10 +16,10 @@ $totalRuangan = mysqli_num_rows($query);
 <html lang="en">
 <?php require '../../head.php'; ?>
 
-<body class="dashboard-body tw:p-0 tw:m-0 relative tw:flex">
+<body class="dashboard-body tw:p-0 tw:m-0 tw:relative tw:flex">
     <?php require '../components/sidebar.php'; ?>
-    <main class="dashboard-main tw:md:ml-75 tw:grow">
-        <div class="dashboard-page tw:pt-20 tw:md:pt-5 tw:px-5 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
+    <main class="dashboard-main tw:md:ml-[20.5rem] tw:grow">
+        <div class="dashboard-page tw:pt-24 tw:md:pt-9 tw:px-4 tw:md:px-8 tw:pb-8 tw:w-full">
             <?php require dirname(__DIR__) . '/components/breadcrumb.php'; ?>
             <h1 class="page-title" data-kicker="Master Ruangan" data-subtitle="Susun area bersama, lantai, dan kategori ruangan agar operasional asrama lebih mudah dipantau.">
                 Kelola Ruangan
