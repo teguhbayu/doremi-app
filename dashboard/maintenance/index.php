@@ -8,12 +8,12 @@ $role = $_SESSION['userRole'];
 $userId = (int)$_SESSION['userId'];
 session_write_close(); // Lepas session lock — halaman ini hanya baca session
 
-$whereClause = "";
+$whereClause = "WHERE m.IsDeleted = 0";
 if ($role !== 'MAINTENANCE') {
     if ($role === 'PENGHUNI') {
-        $whereClause = "WHERE m.PenghuniID = $userId";
+        $whereClause .= " AND m.PenghuniID = $userId";
     } else {
-        $whereClause = "WHERE m.PetugasID = $userId AND m.PenghuniID IS NULL";
+        $whereClause .= " AND m.PetugasID = $userId AND m.PenghuniID IS NULL";
     }
 }
 
@@ -103,7 +103,7 @@ $totalReports = count($reports);
                                             <div class="tw:text-xs tw:text-slate-500">-</div>
                                         <?php endif; ?>
                                     </td>
-                                    <!-- PENYESUAIAN WARNA TINGKAT URGENSI SECARA DINAMIS -->
+                                    
                                     <td>
                                         <?php if ($r['JenisLaporan'] === 'Kerusakan Darurat / Berat'): ?>
                                             <span class="badge bg-danger text-white tw:text-xs">Darurat</span>
@@ -125,7 +125,7 @@ $totalReports = count($reports);
                                                 <span>Detail</span>
                                             </button>
 
-                                            <!-- FILTER AKSES: Hanya role MAINTENANCE yang dapat memproses dan menyelesaikan laporan -->
+                                            
                                             <?php if ($role === 'MAINTENANCE'): ?>
                                                 <?php if ($r['StatusMaintenance'] === 'Diajukan'): ?>
                                                     <form action="process.php" method="POST" class="tw:inline">
@@ -141,7 +141,7 @@ $totalReports = count($reports);
                                                 <?php endif; ?>
                                             <?php endif; ?>
 
-                                            <!-- Tombol Edit/Hapus dinamis hanya untuk pembuat laporan yang sah -->
+                                            
                                             <?php if ($r['StatusMaintenance'] === 'Diajukan'): ?>
                                                 <?php 
                                                     $isOwner = false;
@@ -166,7 +166,7 @@ $totalReports = count($reports);
                                     </td>
                                 </tr>
 
-                                <!-- Details Modal -->
+                                
                                 <div class="modal fade text-start" id="detailModal<?= $r['MaintenanceID'] ?>" tabindex="-1" aria-hidden="true">
                                     <div class="modal-dialog modal-dialog-centered">
                                         <div class="modal-content">
@@ -232,7 +232,7 @@ $totalReports = count($reports);
                                     </div>
                                 </div>
 
-                                <!-- Completion Form Modal -->
+                               
                                 <?php if ($role === 'MAINTENANCE' && $r['StatusMaintenance'] === 'Diproses'): ?>
                                     <div class="modal fade text-start" id="completeModal<?= $r['MaintenanceID'] ?>" tabindex="-1" aria-hidden="true">
                                         <div class="modal-dialog modal-dialog-centered">
@@ -274,7 +274,7 @@ $totalReports = count($reports);
         </div>
     </main>
 
-    <!-- Delete Confirmation Modal -->
+
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">

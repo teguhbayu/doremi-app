@@ -39,23 +39,30 @@ $totalRuangan = mysqli_num_rows($query);
                 <table id="ruanganTable" class="table doremi-table text-center align-middle tw:mb-0 tw:w-full">
                 <thead>
                     <tr>
-                        <th scope="col" class="text-center align-middle" style="width: 30%;">Nama Ruangan</th>
-                        <th scope="col" class="text-center align-middle" style="width: 15%;">Jenis</th>
-                        <th scope="col" class="text-center align-middle" style="width: 10%;">Lantai</th>
-                        <th scope="col" class="text-center align-middle" style="width: 25%;">Keterangan</th>
+                        <th scope="col" class="text-center align-middle" style="width: 40%;">Nama Ruangan</th>
+                        <th scope="col" class="text-center align-middle" style="width: 25%;">Jenis</th>
+                        <th scope="col" class="text-center align-middle" style="width: 15%;">Lantai</th>
                         <th scope="col" class="text-center align-middle" style="width: 20%;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php while ($ruangan = mysqli_fetch_assoc($query)) { ?>
                         <tr>
-                            <td><?php echo $ruangan["NamaRuangan"]; ?></td>
-                            <td><?php echo $ruangan["JenisRuangan"]; ?></td>
-                            <td>Lantai <?php echo $ruangan["Lantai"]; ?></td>
-                            <td><?php echo $ruangan["Keterangan"]; ?></td>
+                            <td><?php echo htmlspecialchars($ruangan["NamaRuangan"]); ?></td>
+                            <td><?php echo htmlspecialchars($ruangan["JenisRuangan"]); ?></td>
+                            <td>Lantai <?php echo htmlspecialchars($ruangan["Lantai"]); ?></td>
                             <td>
-                                <div class="tw:inline-flex tw:justify-center tw:items-center tw:gap-1 tw:text-black">
-
+                                <div class="tw:inline-flex tw:justify-center tw:items-center tw:gap-2 tw:text-black">
+                                    <button type="button" class="detail-action-btn"
+                                        data-bs-toggle="modal" data-bs-target="#detailModal"
+                                        data-bs-nama="<?php echo htmlspecialchars($ruangan["NamaRuangan"]); ?>"
+                                        data-bs-jenis="<?php echo htmlspecialchars($ruangan["JenisRuangan"]); ?>"
+                                        data-bs-lantai="Lantai <?php echo htmlspecialchars($ruangan["Lantai"]); ?>"
+                                        data-bs-keterangan="<?php echo htmlspecialchars($ruangan["Keterangan"]); ?>"
+                                        title="Detail Ruangan">
+                                        <i class="iconsax tw:text-lg" icon-name="document-text-1"></i>
+                                        <span>Detail</span>
+                                    </button>
                                     <a href="edit.php?id=<?php echo $ruangan["RuanganID"] ?>" class="icon-action" title="Edit Ruangan">
                                         <i class="iconsax tw:text-lg" icon-name="edit-2"></i>
                                     </a>
@@ -72,9 +79,9 @@ $totalRuangan = mysqli_num_rows($query);
             </table>
         </div>
             </div>
-    </main>
-
+     </main>
     <!-- Modal -->
+    <!-- Modal Hapus -->
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -88,6 +95,38 @@ $totalRuangan = mysqli_num_rows($query);
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
                     <a href="#" id="confirmDelete" class="btn btn-danger">Hapus</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detail Modal -->
+    <div class="modal fade text-start" id="detailModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Detail Ruangan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="tw:flex tw:flex-col tw:gap-3">
+                        <div>
+                            <label class="tw:text-xs tw:text-slate-500">Nama Ruangan</label>
+                            <p id="detailNama" class="tw:font-semibold tw:mb-0"></p>
+                        </div>
+                        <div>
+                            <label class="tw:text-xs tw:text-slate-500">Jenis Ruangan</label>
+                            <p id="detailJenis" class="tw:font-semibold tw:mb-0"></p>
+                        </div>
+                        <div>
+                            <label class="tw:text-xs tw:text-slate-500">Lantai</label>
+                            <p id="detailLantai" class="tw:font-semibold tw:mb-0"></p>
+                        </div>
+                        <div>
+                            <label class="tw:text-xs tw:text-slate-500">Keterangan</label>
+                            <p id="detailKeterangan" class="tw:text-slate-700 tw:whitespace-pre-line tw:break-words tw:mb-0" style="word-break: break-word; overflow-wrap: break-word;"></p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -107,7 +146,23 @@ $totalRuangan = mysqli_num_rows($query);
             })
         }
 
-         document.addEventListener('DOMContentLoaded', () => {
+        const detailModal = document.getElementById('detailModal')
+        if (detailModal) {
+            detailModal.addEventListener('show.bs.modal', event => {
+                const button = event.relatedTarget
+                const nama = button.getAttribute('data-bs-nama')
+                const jenis = button.getAttribute('data-bs-jenis')
+                const lantai = button.getAttribute('data-bs-lantai')
+                const keterangan = button.getAttribute('data-bs-keterangan') || '-'
+
+                detailModal.querySelector('#detailNama').textContent = nama
+                detailModal.querySelector('#detailJenis').textContent = jenis
+                detailModal.querySelector('#detailLantai').textContent = lantai
+                detailModal.querySelector('#detailKeterangan').textContent = keterangan
+            })
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
             new DataTable('#ruanganTable', {
                 autoWidth: false,
                 ordering: true,
@@ -116,7 +171,7 @@ $totalRuangan = mysqli_num_rows($query);
                 info: true,
                 columnDefs: [
                     {
-                        targets: [3, 5],
+                        targets: [3],
                         orderable: false
                     },
                     {
@@ -144,7 +199,7 @@ $totalRuangan = mysqli_num_rows($query);
                     }
                 }
             });
-            });
+        });
     </script>
 
 </body>

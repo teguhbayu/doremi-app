@@ -95,11 +95,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </a>
             </div>
 
-            <form method="POST" class="form-shell">
+            <form method="POST" class="form-shell" x-data="<?= htmlspecialchars(json_encode(['nama' => $inventaris['NamaBarang'] ?? '', 'keterangan' => $inventaris['Keterangan'] ?? ''])) ?>">
                 <div class="mb-3">
                     <label for="namaBarang" class="form-label">Nama Barang</label>
-                    <input type="text" name="namaBarang" class="form-control" id="namaBarang"
-                        value="<?= htmlspecialchars($inventaris['NamaBarang']) ?>" required>
+                    <input type="text" name="namaBarang" class="form-control" id="namaBarang" x-model="nama" maxlength="100" required>
+                    <div class="tw:text-xs tw:text-slate-400 tw:mt-1 tw:text-right">
+                        <span :class="nama.length >= 100 ? 'tw:text-red-600 tw:font-semibold' : (nama.length >= 90 ? 'tw:text-amber-700 tw:font-semibold' : '')" x-text="nama.length">0</span>/100 karakter
+                    </div>
                 </div>
                 <div class="mb-3">
                     <label for="jumlahBarang" class="form-label">Jumlah</label>
@@ -132,8 +134,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
                 <div class="mb-3">
                     <label for="keteranganBarang" class="form-label">Keterangan</label>
-                    <textarea name="keteranganBarang" class="form-control" id="keteranganBarang"
-                        rows="3"><?= htmlspecialchars($inventaris['Keterangan']) ?></textarea>
+                    <textarea name="keteranganBarang" class="form-control" id="keteranganBarang" x-model="keterangan" maxlength="500" rows="3"></textarea>
+                    <div class="tw:text-xs tw:text-slate-400 tw:mt-1 tw:text-right">
+                        <span :class="keterangan.length >= 500 ? 'tw:text-red-600 tw:font-semibold' : (keterangan.length >= 450 ? 'tw:text-amber-700 tw:font-semibold' : '')" x-text="keterangan.length">0</span>/500 karakter
+                    </div>
                 </div>
                 <div class="tw:w-full tw:flex tw:justify-end tw:mt-2">
                     <button type="submit"

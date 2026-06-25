@@ -16,7 +16,7 @@ if (!$id) {
 }
 
 if ($action === 'claim') {
-    $stmt = mysqli_prepare($db, "UPDATE maintenance SET StatusMaintenance = 'Diproses', PetugasID = ? WHERE MaintenanceID = ?");
+    $stmt = mysqli_prepare($db, "UPDATE maintenance SET StatusMaintenance = 'Diproses', PetugasID = ? WHERE MaintenanceID = ? AND IsDeleted = 0");
     mysqli_stmt_bind_param($stmt, 'ii', $userId, $id);
 
     if (mysqli_stmt_execute($stmt)) {
@@ -48,7 +48,7 @@ elseif ($action === 'complete') {
 
     $stmt = mysqli_prepare(
         $db,
-        "UPDATE maintenance SET StatusMaintenance = 'Selesai', TanggalSelesai = ?, Keterangan = ?, FotoMaintenance = ? WHERE MaintenanceID = ?"
+        "UPDATE maintenance SET StatusMaintenance = 'Selesai', TanggalSelesai = ?, Keterangan = ?, FotoMaintenance = ? WHERE MaintenanceID = ? AND IsDeleted = 0"
     );
     mysqli_stmt_bind_param($stmt, 'sssi', $tanggalSelesai, $keterangan, $fotoMaintenance, $id);
 

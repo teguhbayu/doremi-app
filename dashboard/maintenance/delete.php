@@ -14,7 +14,7 @@ if (!$id) {
 }
 
 // Fetch report details
-$stmt = mysqli_prepare($db, "SELECT * FROM maintenance WHERE MaintenanceID = ? LIMIT 1");
+$stmt = mysqli_prepare($db, "SELECT * FROM maintenance WHERE MaintenanceID = ? AND IsDeleted = 0 LIMIT 1");
 mysqli_stmt_bind_param($stmt, 'i', $id);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
@@ -47,8 +47,8 @@ if (!$isOwner) {
     maintenance_redirect('index.php', 'error', 'Anda tidak memiliki wewenang untuk menghapus laporan ini.');
 }
 
-// Execute hard delete
-$deleteStmt = mysqli_prepare($db, "DELETE FROM maintenance WHERE MaintenanceID = ?");
+// Execute soft delete
+$deleteStmt = mysqli_prepare($db, "UPDATE maintenance SET IsDeleted = 1 WHERE MaintenanceID = ?");
 mysqli_stmt_bind_param($deleteStmt, 'i', $id);
 
 if (mysqli_stmt_execute($deleteStmt)) {

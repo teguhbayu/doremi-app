@@ -50,7 +50,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel') {
         LEFT JOIN petugas tech ON m.PetugasID   = tech.PetugasID
         LEFT JOIN ruangan r    ON m.RuanganID   = r.RuanganID
         LEFT JOIN inventaris i ON m.InventarisID= i.InventarisID
-        WHERE $whereDate
+        WHERE $whereDate AND m.IsDeleted = 0
         ORDER BY m.TanggalLapor DESC
     ";
     $exportRes = mysqli_query($db, $exportQuery);
@@ -82,7 +82,7 @@ $res = mysqli_query($db, "
         SUM(CASE WHEN m.StatusMaintenance = 'Diajukan' THEN 1 ELSE 0 END) AS diajukan,
         ROUND(AVG(CASE WHEN m.StatusMaintenance = 'Selesai' AND m.TanggalSelesai IS NOT NULL
             THEN DATEDIFF(m.TanggalSelesai, m.TanggalLapor) ELSE NULL END), 1) AS avg_hari
-    FROM maintenance m WHERE $whereDate
+    FROM maintenance m WHERE $whereDate AND m.IsDeleted = 0
 ");
 $stats = mysqli_fetch_assoc($res);
 mysqli_free_result($res);
@@ -101,7 +101,7 @@ $pieData = [
     'Kerusakan Sedang'          => 0, 
     'Kerusakan Ringan'          => 0
 ];
-$res = mysqli_query($db, "SELECT m.JenisLaporan, COUNT(*) AS n FROM maintenance m WHERE $whereDate GROUP BY m.JenisLaporan");
+$res = mysqli_query($db, "SELECT m.JenisLaporan, COUNT(*) AS n FROM maintenance m WHERE $whereDate AND m.IsDeleted = 0 GROUP BY m.JenisLaporan");
 while ($row = mysqli_fetch_assoc($res)) {
     if (array_key_exists($row['JenisLaporan'], $pieData)) {
         $pieData[$row['JenisLaporan']] = (int) $row['n'];
@@ -114,7 +114,7 @@ $priorityBgColors = array_map(fn($k) => $priorityColors[$k], $priorityOrder);
 // ── Query: Trend Laporan ──────────────────────────────────────────────────────
 if (in_array($range, ['7d', '30d'])) {
     $days = $range === '7d' ? 7 : 30;
-    $res = mysqli_query($db, "SELECT DATE(m.TanggalLapor) AS d, COUNT(*) AS n FROM maintenance m WHERE $whereDate GROUP BY d ORDER BY d ASC");
+    $res = mysqli_query($db, "SELECT DATE(m.TanggalLapor) AS d, COUNT(*) AS n FROM maintenance m WHERE $whereDate AND m.IsDeleted = 0 GROUP BY d ORDER BY d ASC");
     $trendRaw = [];
     while ($row = mysqli_fetch_assoc($res)) { $trendRaw[$row['d']] = (int) $row['n']; }
     mysqli_free_result($res);
@@ -125,7 +125,7 @@ if (in_array($range, ['7d', '30d'])) {
         $trendValues[] = $trendRaw[$key] ?? 0;
     }
 } else {
-    $res = mysqli_query($db, "SELECT DATE_FORMAT(m.TanggalLapor, '%Y-%m') AS m, COUNT(*) AS n FROM maintenance m WHERE $whereDate GROUP BY m ORDER BY m ASC");
+    $res = mysqli_query($db, "SELECT DATE_FORMAT(m.TanggalLapor, '%Y-%m') AS m, COUNT(*) AS n FROM maintenance m WHERE $whereDate AND m.IsDeleted = 0 GROUP BY m ORDER BY m ASC");
     $trendRaw = [];
     while ($row = mysqli_fetch_assoc($res)) { $trendRaw[$row['m']] = (int) $row['n']; }
     mysqli_free_result($res);
@@ -150,7 +150,7 @@ $res = mysqli_query($db, "
     SELECT r.NamaRuangan, COUNT(*) AS n
     FROM maintenance m
     JOIN ruangan r ON m.RuanganID = r.RuanganID
-    WHERE $whereDate AND m.RuanganID IS NOT NULL
+    WHERE $whereDate AND m.RuanganID IS NOT NULL AND m.IsDeleted = 0
     GROUP BY m.RuanganID, r.NamaRuangan
     ORDER BY n DESC LIMIT 5
 ");
@@ -166,7 +166,7 @@ $stackedData = [
     'Kerusakan Sedang'          => ['Diajukan' => 0, 'Diproses' => 0, 'Selesai' => 0],
     'Kerusakan Ringan'          => ['Diajukan' => 0, 'Diproses' => 0, 'Selesai' => 0],
 ];
-$res = mysqli_query($db, "SELECT m.JenisLaporan, m.StatusMaintenance, COUNT(*) AS n FROM maintenance m WHERE $whereDate GROUP BY m.JenisLaporan, m.StatusMaintenance");
+$res = mysqli_query($db, "SELECT m.JenisLaporan, m.StatusMaintenance, COUNT(*) AS n FROM maintenance m WHERE $whereDate AND m.IsDeleted = 0 GROUP BY m.JenisLaporan, m.StatusMaintenance");
 while ($row = mysqli_fetch_assoc($res)) {
     $j = $row['JenisLaporan'];
     $s = $row['StatusMaintenance'];
@@ -188,7 +188,7 @@ if ($role === 'PENGURUS') {
                    THEN DATEDIFF(m.TanggalSelesai, m.TanggalLapor) ELSE NULL END), 1) AS avg_hari
         FROM maintenance m
         JOIN petugas pt ON m.PetugasID = pt.PetugasID
-        WHERE $whereDate AND m.PetugasID IS NOT NULL AND pt.Jabatan = 'MAINTENANCE' AND pt.IsDeleted = 0
+        WHERE $whereDate AND m.PetugasID IS NOT NULL AND pt.Jabatan = 'MAINTENANCE' AND pt.IsDeleted = 0 AND m.IsDeleted = 0
         GROUP BY m.PetugasID, pt.NamaPetugas
         ORDER BY selesai DESC, total DESC
     ");
@@ -211,7 +211,7 @@ $res = mysqli_query($db, "
     LEFT JOIN petugas tech  ON m.PetugasID    = tech.PetugasID
     LEFT JOIN ruangan r     ON m.RuanganID    = r.RuanganID
     LEFT JOIN inventaris i  ON m.InventarisID = i.InventarisID
-    WHERE $whereDate
+    WHERE $whereDate AND m.IsDeleted = 0
     ORDER BY m.TanggalLapor DESC
 ");
 while ($row = mysqli_fetch_assoc($res)) { $detailRows[] = $row; }
@@ -486,7 +486,7 @@ mysqli_free_result($res);
                         <td><span style="font-size:11px; font-weight:600; padding:2px 8px; border-radius:20px; <?= $statusStyle ?>"><?= htmlspecialchars($r['StatusMaintenance']) ?></span></td>
                         <td><?= $r['TanggalLapor'] ? date('d M Y', strtotime($r['TanggalLapor'])) : '—' ?></td>
                         <td><?= $r['TanggalSelesai'] ? date('d M Y', strtotime($r['TanggalSelesai'])) : '—' ?></td>
-                        <td><?= $r['Durasi'] !== null ? $r['Durasi'] . ' hr' : '—' ?></td>
+                        <td><?= $r['Durasi'] !== null ? $r['Durasi'] . ' jm' : '—' ?></td>
                         <?php if ($role === 'PENGURUS'): ?><td><?= htmlspecialchars($r['Petugas'] ?? '—') ?></td><?php endif; ?>
                     </tr>
                 <?php endforeach; ?>
