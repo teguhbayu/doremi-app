@@ -52,7 +52,8 @@ switch ($_SESSION["userRole"]) {
             <strong>DOREMI</strong>
             <span>Dashboard Operasional Asrama</span>
         </div>
-        <button @click="sidebarOpen = !sidebarOpen" class="dashboard-topbar__toggle" type="button" aria-label="Buka menu">
+        <button @click="sidebarOpen = !sidebarOpen" class="dashboard-topbar__toggle" type="button"
+            aria-label="Buka menu">
             <i class="iconsax tw:text-2xl" :icon-name="sidebarOpen ? 'x-circle' : 'hamburger-menu'"></i>
         </button>
     </div>
@@ -60,8 +61,9 @@ switch ($_SESSION["userRole"]) {
     <aside class="dashboard-sidebar" :class="{ 'is-open': sidebarOpen }">
         <div class="dashboard-sidebar__panel">
             <a class="dashboard-sidebar__brand" href="/doremi-app/dashboard/">
-                <span class="dashboard-sidebar__brand-mark">
-                    <img src="/doremi-app/images/logo.png" alt="Logo DOREMI">
+                <span
+                    class="dashboard-sidebar__brand-mark tw:flex tw:justify-center tw:items-center tw:p-2 tw:size-fit">
+                    <img src="/doremi-app/images/logo.png" alt="Logo DOREMI" class="tw:size-8 tw:aspect-square">
                 </span>
                 <span>
                     <strong>DOREMI</strong>
@@ -75,12 +77,15 @@ switch ($_SESSION["userRole"]) {
               - Padding + Negative Margin allows active button shadows to display without clipping.
               - Mask-image creates a subtle gradient fade at the top and bottom borders.
             -->
-            <div style="flex: 1; overflow-y: auto; padding: 15px 15px 35px 15px; margin: -15px -15px -35px -15px; -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 20px, black calc(100% - 35px), transparent 100%); mask-image: linear-gradient(to bottom, transparent 0%, black 20px, black calc(100% - 35px), transparent 100%);">
-                <p class="dashboard-sidebar__eyebrow" style="padding-top: 5px;">Menu <?= htmlspecialchars($_SESSION["userRole"]) ?></p>
+            <div
+                style="flex: 1; overflow-y: auto; padding: 15px 15px 35px 15px; margin: -15px -15px -35px -15px; -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 20px, black calc(100% - 35px), transparent 100%); mask-image: linear-gradient(to bottom, transparent 0%, black 20px, black calc(100% - 35px), transparent 100%);">
+                <p class="dashboard-sidebar__eyebrow" style="padding-top: 5px;">Menu
+                    <?= htmlspecialchars($_SESSION["userRole"]) ?>
+                </p>
                 <nav class="dashboard-sidebar__nav">
                     <?php
                     $currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-                    
+
                     // Cari menu dengan kecocokan target terpanjang (paling spesifik)
                     $bestMatchIndex = -1;
                     $longestMatchLen = 0;
@@ -92,7 +97,7 @@ switch ($_SESSION["userRole"]) {
                         } else {
                             $isMatch = str_starts_with($currentPath, $target);
                         }
-                        
+
                         if ($isMatch) {
                             $matchLen = strlen($target);
                             if ($matchLen > $longestMatchLen) {
@@ -105,8 +110,7 @@ switch ($_SESSION["userRole"]) {
                     foreach ($menus as $idx => $menu) {
                         $isActive = ($idx === $bestMatchIndex);
                         ?>
-                        <a @click="sidebarOpen = false"
-                            class="dashboard-sidebar__link <?= $isActive ? 'is-active' : '' ?>"
+                        <a @click="sidebarOpen = false" class="dashboard-sidebar__link <?= $isActive ? 'is-active' : '' ?>"
                             href="<?= htmlspecialchars($menu["target"]) ?>">
                             <?php if (str_starts_with($menu["icon"], 'fa-')) { ?>
                                 <i class="<?= htmlspecialchars($menu["icon"]) ?>"></i>
