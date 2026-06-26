@@ -115,6 +115,23 @@ if ($role === 'MAINTENANCE') {
     $activeEmergencyTasks = mysqli_fetch_assoc($res)['total'];
     mysqli_free_result($res);
 
+    // Ambil detail laporan darurat yang masih aktif
+    $emergencyListQuery = "
+        SELECT m.MaintenanceID, m.Deskripsi, m.StatusMaintenance, m.TanggalLapor,
+               r.NamaRuangan, r.Lantai AS LantaiRuangan,
+               p.NamaPenghuni, pt.NamaPetugas AS NamaReporterPetugas, i.NamaBarang
+        FROM maintenance m
+        LEFT JOIN ruangan r ON m.RuanganID = r.RuanganID
+        LEFT JOIN penghuni p ON m.PenghuniID = p.PenghuniID
+        LEFT JOIN petugas pt ON m.PetugasID = pt.PetugasID
+        LEFT JOIN inventaris i ON m.InventarisID = i.InventarisID
+        WHERE m.JenisLaporan = 'Kerusakan Darurat / Berat' AND m.StatusMaintenance != 'Selesai' AND m.IsDeleted = 0
+        ORDER BY m.TanggalLapor ASC
+    ";
+    $emergencyListResult = mysqli_query($db, $emergencyListQuery);
+    $emergencyList = mysqli_fetch_all($emergencyListResult, MYSQLI_ASSOC);
+    mysqli_free_result($emergencyListResult);
+
     // Pie chart: distribusi status laporan
     $pieData = ['Diajukan' => 0, 'Diproses' => 0, 'Selesai' => 0];
     $res = mysqli_query($db, "SELECT StatusMaintenance, COUNT(*) as total FROM maintenance WHERE StatusMaintenance IN ('Diajukan','Diproses','Selesai') AND IsDeleted = 0 GROUP BY StatusMaintenance");
@@ -174,7 +191,7 @@ if ($role === 'MAINTENANCE') {
     <main class="dashboard-main tw:md:ml-75 tw:grow tw:relative tw:z-10">
         <div class="dashboard-page tw:pt-20 tw:md:pt-8 tw:px-8 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
             <h1 class="page-title" data-kicker="Dashboard Utama"
-                data-subtitle="Selamat datang kembali di dashboard DOREMI. Semua aktivitas operasional asrama ada di satu tempat dan mengikuti pola kerja yang sama.">
+                data-subtitle="Selamat datang kembali di dashboard DOREMI. Semua aktivitas operasional Dormitory ada di satu tempat dan mengikuti pola kerja yang sama.">
                 Halo, <?= htmlspecialchars($userName) ?>
             </h1>
 
@@ -442,7 +459,80 @@ if ($role === 'MAINTENANCE') {
             <!-- 4. BERANDA DINAMIS KHUSUS UNTUK MAINTENANCE TEAM -->
             <?php elseif ($role === 'MAINTENANCE'): ?>
 
-                <!-- Baris 1: Pekerjaan Aktif + Protokol Keselamatan -->
+                <!-- Baris 1: Laporan Darurat Aktif -->
+                <?php if ($activeEmergencyTasks > 0): ?>
+                <div class="tw:mb-8">
+                    <!-- Header Alert Banner -->
+                    <div style="background: linear-gradient(135deg, #7f1d1d, #bc4f45); border-radius: 16px 16px 0 0; padding: 16px 24px; display: flex; align-items: center; gap: 14px;">
+                        <div style="width:40px; height:40px; border-radius:50%; background:rgba(255,255,255,0.15); display:flex; align-items:center; justify-content:center; flex-shrink:0; animation: pulse-ring 1.5s ease-in-out infinite;">
+                            <i class="fa-solid fa-triangle-exclamation" style="color:#fff; font-size:18px;"></i>
+                        </div>
+                        <div style="flex:1;">
+                            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                                <span style="color:#fff; font-size:15px; font-weight:800; letter-spacing:-0.01em;">Laporan Darurat Aktif</span>
+                                <span style="background:rgba(255,255,255,0.22); color:#fff; font-size:11px; font-weight:700; padding:2px 10px; border-radius:20px;"><?= $activeEmergencyTasks ?> laporan</span>
+                            </div>
+                            <p style="color:rgba(255,255,255,0.78); font-size:12px; margin:3px 0 0;">Laporan bertingkat kerusakan darurat / berat yang belum selesai. Tangani segera sesuai protokol prioritas OSHA.</p>
+                        </div>
+                        <a href="/doremi-app/dashboard/maintenance/" style="background:rgba(255,255,255,0.18); color:#fff; border:1.5px solid rgba(255,255,255,0.3); font-size:12px; font-weight:700; padding:8px 16px; border-radius:10px; text-decoration:none; white-space:nowrap; flex-shrink:0;">Lihat Semua &rarr;</a>
+                    </div>
+
+                    <!-- List Laporan -->
+                    <div style="border: 1.5px solid #fca5a5; border-top:0; border-radius: 0 0 16px 16px; background:#fff; overflow:hidden;">
+                        <?php foreach ($emergencyList as $idx => $em): ?>
+                            <?php
+                                $emLokasi = !empty($em['NamaRuangan'])
+                                    ? 'Ruangan ' . htmlspecialchars($em['NamaRuangan']) . ' · Lantai ' . htmlspecialchars($em['LantaiRuangan'])
+                                    : (!empty($em['NamaBarang']) ? 'Inventaris: ' . htmlspecialchars($em['NamaBarang']) : 'Lokasi tidak diketahui');
+                                $emPelapor = htmlspecialchars($em['NamaPenghuni'] ?? $em['NamaReporterPetugas'] ?? 'Staff');
+                                $emStatus = $em['StatusMaintenance'];
+                                $emStatusColor = $emStatus === 'Diproses' ? '#2F7FF0' : '#f59e0b';
+                                $emStatusBg   = $emStatus === 'Diproses' ? '#eff6ff' : '#fffbeb';
+                            ?>
+                            <div style="display:flex; align-items:flex-start; gap:14px; padding:16px 24px; <?= $idx < count($emergencyList) - 1 ? 'border-bottom:1px solid #fee2e2;' : '' ?>">
+                                <!-- Nomor urut -->
+                                <div style="width:28px; height:28px; border-radius:50%; background:#fee2e2; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px;">
+                                    <span style="font-size:11px; font-weight:800; color:#dc2626;"><?= $idx + 1 ?></span>
+                                </div>
+                                <!-- Konten -->
+                                <div style="flex:1; min-width:0;">
+                                    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:4px;">
+                                        <span style="font-size:13px; font-weight:700; color:#1e293b;"><?= $emLokasi ?></span>
+                                        <span style="font-size:11px; font-weight:600; color:<?= $emStatusColor ?>; background:<?= $emStatusBg ?>; padding:2px 9px; border-radius:20px; border:1px solid <?= $emStatusColor ?>33;"><?= htmlspecialchars($emStatus) ?></span>
+                                    </div>
+                                    <p style="font-size:12px; color:#475569; margin:0 0 6px; line-height:1.5; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;"><?= htmlspecialchars($em['Deskripsi']) ?></p>
+                                    <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                                        <span style="font-size:11px; color:#94a3b8;"><i class="fa-solid fa-user" style="margin-right:4px;"></i><?= $emPelapor ?></span>
+                                        <span style="font-size:11px; color:#94a3b8;"><i class="fa-solid fa-calendar-days" style="margin-right:4px;"></i><?= date('d M Y', strtotime($em['TanggalLapor'])) ?></span>
+                                    </div>
+                                </div>
+                                <!-- CTA -->
+                                <a href="/doremi-app/dashboard/maintenance/" style="font-size:11px; font-weight:700; color:#dc2626; background:#fee2e2; padding:6px 12px; border-radius:8px; text-decoration:none; white-space:nowrap; flex-shrink:0; margin-top:2px;">Proses &rarr;</a>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+                <style>
+                    @keyframes pulse-ring {
+                        0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.35); }
+                        50%       { box-shadow: 0 0 0 8px rgba(255,255,255,0); }
+                    }
+                </style>
+                <?php else: ?>
+                <div class="tw:mb-8">
+                    <div style="border:1.5px solid #d1fae5; border-radius:16px; background:#f0fdf4; padding:20px 24px; display:flex; align-items:center; gap:14px;">
+                        <div style="width:40px; height:40px; border-radius:50%; background:#bbf7d0; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                            <i class="fa-solid fa-shield-halved" style="color:#15803d; font-size:18px;"></i>
+                        </div>
+                        <div>
+                            <span style="font-size:14px; font-weight:800; color:#14532d;">Tidak Ada Laporan Darurat</span>
+                            <p style="font-size:12px; color:#16a34a; margin:3px 0 0;">Saat ini tidak ada laporan dengan skala prioritas darurat yang aktif. Kondisi asrama aman terkendali.</p>
+                        </div>
+                    </div>
+                </div>
+                <?php endif; ?>
+
+                <!-- Baris 2: Pekerjaan Aktif + Protokol Keselamatan -->
                 <div class="tw:grid tw:grid-cols-1 tw:lg:grid-cols-2 tw:gap-8 tw:mb-8">
 
                     <!-- Panel Kiri: Tugas Aktif (beautified) -->
@@ -530,118 +620,6 @@ if ($role === 'MAINTENANCE') {
                     </div>
 
                 </div>
-
-                <!-- Baris 2: Charts (Pie + Trend) -->
-                <div class="tw:grid tw:grid-cols-1 tw:lg:grid-cols-2 tw:gap-8">
-
-                    <!-- Pie Chart: Distribusi Status Laporan -->
-                    <div class="dashboard-side-panel">
-                        <h5 class="dashboard-side-panel__title tw:flex tw:items-center tw:gap-2">
-                            <i class="fa-solid fa-chart-pie"></i> Distribusi Status Laporan
-                        </h5>
-                        <p class="dashboard-side-panel__copy">Proporsi laporan berdasarkan status: menunggu, sedang dikerjakan, dan selesai.</p>
-                        <div class="tw:h-[260px] tw:flex tw:justify-center tw:mt-2">
-                            <canvas id="maintenancePieChart"></canvas>
-                        </div>
-                    </div>
-
-                    <!-- Trend Chart dengan date range filter -->
-                    <div class="dashboard-side-panel">
-                        <div class="tw:flex tw:items-center tw:justify-between tw:flex-wrap tw:gap-3 tw:mb-1">
-                            <h5 class="dashboard-side-panel__title tw:flex tw:items-center tw:gap-2 tw:mb-0">
-                                <i class="fa-solid fa-arrow-trend-up"></i> Trend Laporan Masuk
-                            </h5>
-                            <div style="display:flex; gap:6px;">
-                                <button id="btn7d" onclick="switchTrend('7d')" style="font-size:11px; padding:4px 10px; border-radius:20px; border:1.5px solid #146c94; background:#146c94; color:#fff; cursor:pointer; font-weight:600;">7 Hari</button>
-                                <button id="btn30d" onclick="switchTrend('30d')" style="font-size:11px; padding:4px 10px; border-radius:20px; border:1.5px solid #e2e8f0; background:#fff; color:#64748b; cursor:pointer; font-weight:500;">30 Hari</button>
-                                <button id="btn6m" onclick="switchTrend('6m')" style="font-size:11px; padding:4px 10px; border-radius:20px; border:1.5px solid #e2e8f0; background:#fff; color:#64748b; cursor:pointer; font-weight:500;">6 Bulan</button>
-                            </div>
-                        </div>
-                        <p class="dashboard-side-panel__copy" id="trendDescription">Jumlah laporan maintenance yang masuk dalam 7 hari terakhir.</p>
-                        <div class="tw:h-[220px] tw:mt-2">
-                            <canvas id="maintenanceTrendChart"></canvas>
-                        </div>
-                    </div>
-
-                </div>
-
-                <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
-                <script>
-                    (function() {
-                        // Pie Chart
-                        const pieCtx = document.getElementById('maintenancePieChart').getContext('2d');
-                        new Chart(pieCtx, {
-                            type: 'doughnut',
-                            data: {
-                                labels: ['Diajukan', 'Diproses', 'Selesai'],
-                                datasets: [{
-                                    data: [<?= $pieData['Diajukan'] ?>, <?= $pieData['Diproses'] ?>, <?= $pieData['Selesai'] ?>],
-                                    backgroundColor: ['#f59e0b', '#2F7FF0', '#10b981'],
-                                    borderWidth: 0,
-                                    hoverOffset: 8
-                                }]
-                            },
-                            options: {
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                cutout: '68%',
-                                plugins: {
-                                    legend: { position: 'bottom', labels: { boxWidth: 12, padding: 16, font: { size: 12 } } }
-                                }
-                            }
-                        });
-
-                        // Trend Chart datasets
-                        const trendDatasets = {
-                            '7d':  { labels: <?= json_encode($trend7Labels) ?>,  values: <?= json_encode($trend7Values) ?>,  desc: 'Jumlah laporan maintenance yang masuk dalam 7 hari terakhir.' },
-                            '30d': { labels: <?= json_encode($trend30Labels) ?>, values: <?= json_encode($trend30Values) ?>, desc: 'Jumlah laporan maintenance yang masuk dalam 30 hari terakhir.' },
-                            '6m':  { labels: <?= json_encode($trend6mLabels) ?>, values: <?= json_encode($trend6mValues) ?>, desc: 'Jumlah laporan maintenance yang masuk dalam 6 bulan terakhir.' },
-                        };
-
-                        const trendCtx = document.getElementById('maintenanceTrendChart').getContext('2d');
-                        const trendChart = new Chart(trendCtx, {
-                            type: 'line',
-                            data: {
-                                labels: trendDatasets['7d'].labels,
-                                datasets: [{
-                                    label: 'Laporan Masuk',
-                                    data: trendDatasets['7d'].values,
-                                    borderColor: '#146c94',
-                                    backgroundColor: 'rgba(20,108,148,0.08)',
-                                    borderWidth: 2.5,
-                                    pointBackgroundColor: '#146c94',
-                                    pointRadius: 4,
-                                    fill: true,
-                                    tension: 0.4
-                                }]
-                            },
-                            options: {
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                plugins: { legend: { display: false } },
-                                scales: {
-                                    y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 11 } }, grid: { color: 'rgba(0,0,0,0.05)' } },
-                                    x: { ticks: { font: { size: 11 }, maxRotation: 45, maxTicksLimit: 8 }, grid: { display: false } }
-                                }
-                            }
-                        });
-
-                        const btnStyle = { active: { background: '#146c94', color: '#fff', borderColor: '#146c94', fontWeight: '600' }, inactive: { background: '#fff', color: '#64748b', borderColor: '#e2e8f0', fontWeight: '500' } };
-
-                        window.switchTrend = function(range) {
-                            const d = trendDatasets[range];
-                            trendChart.data.labels = d.labels;
-                            trendChart.data.datasets[0].data = d.values;
-                            trendChart.update();
-                            document.getElementById('trendDescription').textContent = d.desc;
-                            ['7d','30d','6m'].forEach(r => {
-                                const btn = document.getElementById('btn' + r);
-                                const s = r === range ? btnStyle.active : btnStyle.inactive;
-                                Object.assign(btn.style, { background: s.background, color: s.color, borderColor: s.borderColor, fontWeight: s.fontWeight });
-                            });
-                        };
-                    })();
-                </script>
 
             <?php else: ?>
                 <div class="dashboard-side-panel">

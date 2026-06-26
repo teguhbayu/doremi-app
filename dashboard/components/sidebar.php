@@ -39,7 +39,7 @@ switch ($_SESSION["userRole"]) {
     case "MAINTENANCE":
         $menus = [
             ["title" => "Home", "target" => "/doremi-app/dashboard/", "icon" => "home-2"],
-            ["title" => "Pekerjaan", "target" => "/doremi-app/dashboard/maintenance/", "icon" => "setting-2"],
+            ["title" => "Maintenance", "target" => "/doremi-app/dashboard/maintenance/", "icon" => "setting-2"],
             ["title" => "Laporan Maintenance", "target" => "/doremi-app/dashboard/maintenance/report.php", "icon" => "fa-solid fa-chart-bar"],
         ];
         break;
