@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['userId'])) {
     header("Location: /doremi-app/login.php");
@@ -44,10 +44,10 @@ if ($role === 'SIGAP') {
 <html lang="en">
 <?php require '../../head.php'; ?>
 
-<body class="dashboard-body tw:p-0 tw:m-0 relative tw:flex tw:bg-[#f8fafc] tw:min-h-screen">
+<body class="dashboard-body tw:p-0 tw:m-0 tw:relative tw:flex tw:min-h-screen">
     <?php require '../components/sidebar.php'; ?>
-    <main class="dashboard-main tw:md:ml-75 tw:grow">
-        <div class="dashboard-page tw:pt-20 tw:md:pt-8 tw:px-8 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
+    <main class="tw:md:ml-75 tw:grow">
+        <div class="tw:pt-20 tw:md:pt-8 tw:px-8 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
             <?php require dirname(__DIR__) . '/components/breadcrumb.php'; ?>
             <h1 class="page-title" data-kicker="Perizinan Penghuni"
                 data-subtitle="<?= htmlspecialchars($role === 'SIGAP' ? 'Konfirmasi permintaan keluar, pantau penghuni yang masih berada di luar area asrama, dan akses log aktivitas dari satu menu yang sama.' : 'Ajukan izin keluar, cek statusnya, dan lihat riwayat aktivitas keluar masuk Anda dalam satu halaman.') ?>">
@@ -57,7 +57,7 @@ if ($role === 'SIGAP') {
             <div class="page-toolbar"
                 data-note="<?= htmlspecialchars($role === 'SIGAP' ? $pendingCount . ' permintaan menunggu, ' . $outsideCount . ' penghuni di luar' : ($hasActiveRequest ? $activeRequestCount . ' izin aktif masih berjalan' : 'Belum ada izin aktif')) ?>">
                 <?php if ($role === 'SIGAP'): ?>
-                    <a href="log.php" class="page-secondary-btn">
+                    <a href="log.php" class="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:min-h-12 tw:px-4 tw:py-[0.85rem] tw:rounded-2xl tw:border tw:border-[rgba(22,60,122,0.12)] tw:font-extrabold tw:no-underline tw:text-slate-900 tw:bg-[rgba(255,255,255,0.82)] tw:hover:bg-gray-50 tw:transition-all tw:text-sm">
                         <i class="iconsax tw:text-xl" icon-name="document-text-1"></i>
                         <span>Lihat Semua Log</span>
                     </a>
@@ -67,9 +67,9 @@ if ($role === 'SIGAP') {
             <?php if ($role === 'PENGHUNI'): ?>
                 <div class="tw:grid tw:grid-cols-1 tw:lg:grid-cols-3 tw:gap-8">
                     <div class="tw:lg:col-span-1">
-                        <div class="dashboard-side-panel">
-                            <h5 class="dashboard-side-panel__title">Buat Izin Keluar</h5>
-                            <p class="dashboard-side-panel__copy">Tentukan jadwal keluar dan masuk beserta keperluan agar permintaan bisa dikonfirmasi oleh petugas SIGAP.</p>
+                        <div class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.88)] tw:shadow-sm">
+                            <h5 class="tw:m-0 tw:text-[1.2rem] tw:text-slate-900">Buat Izin Keluar</h5>
+                            <p class="tw:m-0 tw:text-slate-500 tw:leading-[1.75] tw:text-sm">Tentukan jadwal keluar dan masuk beserta keperluan agar permintaan bisa dikonfirmasi oleh petugas SIGAP.</p>
                             <?php if ($hasActiveRequest): ?>
                                 <div class="alert alert-warning tw:rounded-xl">
                                     Anda masih memiliki izin keluar yang aktif (Pending/Di Luar). Silakan selesaikan terlebih
@@ -111,12 +111,12 @@ if ($role === 'SIGAP') {
                                 <table id="historyTable" class="table doremi-table text-center align-middle tw:mb-0 tw:w-full">
                                     <thead>
                                         <tr>
-                                            <th scope="col" class="text-center align-middle" style="width: 20%;">Status</th>
-                                            <th scope="col" class="text-center align-middle" style="width: 40%;">Keperluan
+                                            <th scope="col" class="text-center align-middle">Status</th>
+                                            <th scope="col" class="text-center align-middle">Keperluan
                                             </th>
-                                            <th scope="col" class="text-center align-middle" style="width: 20%;">Waktu
+                                            <th scope="col" class="text-center align-middle">Waktu
                                                 Keluar</th>
-                                            <th scope="col" class="text-center align-middle" style="width: 20%;">Waktu Masuk
+                                            <th scope="col" class="text-center align-middle">Waktu Masuk
                                             </th>
                                         </tr>
                                     </thead>
@@ -150,7 +150,7 @@ if ($role === 'SIGAP') {
                 <div class="tw:flex tw:flex-col tw:gap-8">
                     <div class="table-panel">
                         <div class="tw:flex tw:items-center tw:gap-3 tw:mb-6">
-                            <div class="dashboard-stat-card__icon dashboard-stat-card__icon--warning">
+                            <div class="tw:w-[3.4rem] tw:h-[3.4rem] tw:inline-flex tw:items-center tw:justify-center tw:rounded-[20px] tw:flex-shrink-0 tw:text-amber-700 tw:bg-[rgba(250,236,207,0.82)]">
                                 <i class="fa-solid fa-arrow-up text-2xl"></i>
                             </div>
                             <h5 class="tw:font-bold tw:m-0">Akan Keluar</h5>
@@ -159,10 +159,10 @@ if ($role === 'SIGAP') {
                             <table id="pendingTable" class="table doremi-table text-center align-middle tw:mb-0 tw:w-full">
                                 <thead>
                                     <tr>
-                                        <th scope="col" class="text-center align-middle" style="width: 30%;">Penghuni</th>
-                                        <th scope="col" class="text-center align-middle" style="width: 20%;">Kamar</th>
-                                        <th scope="col" class="text-center align-middle" style="width: 30%;">Keperluan</th>
-                                        <th scope="col" class="text-center align-middle" style="width: 20%;">Aksi</th>
+                                        <th scope="col" class="text-center align-middle">Penghuni</th>
+                                        <th scope="col" class="text-center align-middle">Kamar</th>
+                                        <th scope="col" class="text-center align-middle">Keperluan</th>
+                                        <th scope="col" class="text-center align-middle">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -191,7 +191,7 @@ if ($role === 'SIGAP') {
 
                     <div class="table-panel">
                         <div class="tw:flex tw:items-center tw:gap-3 tw:mb-6">
-                            <div class="dashboard-stat-card__icon dashboard-stat-card__icon--primary">
+                            <div class="tw:w-[3.4rem] tw:h-[3.4rem] tw:inline-flex tw:items-center tw:justify-center tw:rounded-[20px] tw:flex-shrink-0 tw:text-primary tw:bg-accent/80">
                                 <i class="fa-solid fa-arrow-down text-2xl"></i>
                             </div>
                             <h5 class="tw:font-bold tw:m-0">Di Luar</h5>
@@ -200,11 +200,11 @@ if ($role === 'SIGAP') {
                             <table id="outsideTable" class="table doremi-table text-center align-middle tw:mb-0 tw:w-full">
                                 <thead>
                                     <tr>
-                                        <th scope="col" class="text-center align-middle" style="width: 30%;">Penghuni</th>
-                                        <th scope="col" class="text-center align-middle" style="width: 20%;">Kamar</th>
-                                        <th scope="col" class="text-center align-middle" style="width: 30%;">Waktu Keluar
+                                        <th scope="col" class="text-center align-middle">Penghuni</th>
+                                        <th scope="col" class="text-center align-middle">Kamar</th>
+                                        <th scope="col" class="text-center align-middle">Waktu Keluar
                                         </th>
-                                        <th scope="col" class="text-center align-middle" style="width: 20%;">Aksi</th>
+                                        <th scope="col" class="text-center align-middle">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
