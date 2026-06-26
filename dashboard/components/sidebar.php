@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 $menus = [];
 
 switch ($_SESSION["userRole"]) {
@@ -48,45 +48,42 @@ switch ($_SESSION["userRole"]) {
 
 <div x-data="{ sidebarOpen: false }">
     <div class="dashboard-topbar">
-        <div class="dashboard-topbar__brand">
-            <strong>DOREMI</strong>
-            <span>Dashboard Operasional Asrama</span>
+        <div class="tw:flex tw:flex-col tw:leading-[1.1]">
+            <strong class="tw:font-bold tw:text-slate-900">DOREMI</strong>
+            <span class="tw:text-slate-500 tw:text-xs">Dashboard Operasional Asrama</span>
         </div>
-        <button @click="sidebarOpen = !sidebarOpen" class="dashboard-topbar__toggle" type="button"
-            aria-label="Buka menu">
+        <button @click="sidebarOpen = !sidebarOpen"
+            class="tw:w-12 tw:h-12 tw:inline-flex tw:items-center tw:justify-center tw:rounded-2xl tw:bg-[rgba(47,127,240,0.08)] tw:text-primary"
+            type="button" aria-label="Buka menu">
             <i class="iconsax tw:text-2xl" :icon-name="sidebarOpen ? 'x-circle' : 'hamburger-menu'"></i>
         </button>
     </div>
 
     <aside class="dashboard-sidebar" :class="{ 'is-open': sidebarOpen }">
         <div class="dashboard-sidebar__panel">
-            <a class="dashboard-sidebar__brand" href="/doremi-app/dashboard/">
+            <a class="tw:flex tw:items-center  tw:gap-3 tw:p-[0.4rem] tw:no-underline" href="/doremi-app/dashboard/">
                 <span
-                    class="dashboard-sidebar__brand-mark tw:flex tw:justify-center tw:items-center tw:p-2 tw:size-fit">
-                    <img src="/doremi-app/images/logo.png" alt="Logo DOREMI" class="tw:size-8 tw:aspect-square">
+                    class="tw:flex tw:justify-center tw:items-center tw:bg-white/10! tw:rounded-[18px] tw:p-2 tw:size-fit">
+                    <img src="/doremi-app/images/logo.png" alt="Logo DOREMI"
+                        class="tw:size-8 tw:rounded-full tw:object-cover tw:aspect-square">
                 </span>
                 <span>
-                    <strong>DOREMI</strong>
-                    <span>Dormitory Control Center</span>
+                    <strong class="tw:block tw:text-white tw:text-[1.1rem] tw:font-bold">DOREMI</strong>
+                    <span class="tw:text-[rgba(255,255,255,0.60)] tw:text-[1rem]">Dormitory Control Center</span>
                 </span>
             </a>
 
-            <!-- 
-              SMOOTHED CONTAINER:
-              - Flex layout restricts it to remaining screen space.
-              - Padding + Negative Margin allows active button shadows to display without clipping.
-              - Mask-image creates a subtle gradient fade at the top and bottom borders.
-            -->
-            <div
-                style="flex: 1; overflow-y: auto; padding: 15px 15px 35px 15px; margin: -15px -15px -35px -15px; -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 20px, black calc(100% - 35px), transparent 100%); mask-image: linear-gradient(to bottom, transparent 0%, black 20px, black calc(100% - 35px), transparent 100%);">
-                <p class="dashboard-sidebar__eyebrow" style="padding-top: 5px;">Menu
+            <div class="tw:flex-1 tw:overflow-y-auto tw:py-[35px] tw:px-[15px] tw:-my-[35px] tw:-mx-[15px]"
+                style="-webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 20px, black calc(100% - 35px), transparent 100%); mask-image: linear-gradient(to bottom, transparent 0%, black 20px, black calc(100% - 35px), transparent 100%);">
+                <p
+                    class="tw:text-[0.76rem] tw:font-bold tw:tracking-[0.08em] tw:uppercase tw:text-[rgba(255,255,255,0.55)] tw:mt-1 tw:mb-1 tw:pt-[5px]">
+                    Menu
                     <?= htmlspecialchars($_SESSION["userRole"]) ?>
                 </p>
-                <nav class="dashboard-sidebar__nav">
+                <nav class="tw:grid tw:gap-2">
                     <?php
                     $currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
-                    // Cari menu dengan kecocokan target terpanjang (paling spesifik)
                     $bestMatchIndex = -1;
                     $longestMatchLen = 0;
                     foreach ($menus as $idx => $menu) {
@@ -123,13 +120,18 @@ switch ($_SESSION["userRole"]) {
                 </nav>
             </div>
 
-            <div class="dashboard-sidebar__footer">
-                <div class="dashboard-sidebar__user">
-                    <strong><?= htmlspecialchars($_SESSION["userName"]) ?></strong>
-                    <small><?= htmlspecialchars($_SESSION["userRole"]) ?></small>
+            <div
+                class="tw:mt-auto tw:p-4 tw:rounded-[18px] tw:bg-[rgba(255,255,255,0.08)] tw:border tw:border-[rgba(255,255,255,0.08)]">
+                <div class="tw:mb-3">
+                    <strong
+                        class="tw:block tw:text-white tw:font-bold"><?= htmlspecialchars($_SESSION["userName"]) ?></strong>
+                    <small
+                        class="tw:text-[rgba(255,255,255,0.60)] tw:text-[0.875em]"><?= htmlspecialchars($_SESSION["userRole"]) ?></small>
                 </div>
                 <form method="post" action="/doremi-app/logout.php">
-                    <button class="dashboard-sidebar__logout" type="submit">Logout</button>
+                    <button
+                        class="tw:w-full tw:min-h-[2.9rem] tw:rounded-2xl tw:text-white tw:font-extrabold tw:bg-[rgba(188,79,69,0.90)] tw:hover:bg-[rgba(188,79,69,1)] tw:transition-colors tw:font-extrabold"
+                        type="submit">Logout</button>
                 </form>
             </div>
         </div>

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require 'helpers.php';
 paket_require_roles(['SIGAP', 'PENGHUNI']);
@@ -65,10 +65,10 @@ $belumDiambil = count(array_filter($pakets, fn($paket) => ($paket['Status'] ?? '
 <html lang="en">
 <?php require '../../head.php'; ?>
 
-<body class="dashboard-body tw:p-0 tw:m-0 relative tw:flex tw:bg-[#f8fafc] tw:min-h-screen">
+<body class="dashboard-body tw:p-0 tw:m-0 tw:relative tw:flex tw:min-h-screen">
     <?php require '../components/sidebar.php'; ?>
-    <main class="dashboard-main tw:md:ml-75 tw:grow">
-        <div class="dashboard-page tw:pt-20 tw:md:pt-8 tw:px-8 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
+    <main class="tw:md:ml-75 tw:grow">
+        <div class="tw:pt-20 tw:md:pt-8 tw:px-8 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
             <?php require dirname(__DIR__) . '/components/breadcrumb.php'; ?>
             <h1 class="page-title" data-kicker="Distribusi Paket"
                 data-subtitle="<?= htmlspecialchars($role === 'SIGAP' ? 'Catat data paket masuk, pantau bukti pengambilan, dan review kasus paket tertukar dalam satu alur kerja yang konsisten.' : 'Lihat seluruh paket yang ditujukan kepada Anda berikut status pengambilan dan bukti pencatatannya.') ?>">
@@ -78,55 +78,55 @@ $belumDiambil = count(array_filter($pakets, fn($paket) => ($paket['Status'] ?? '
             <div class="page-toolbar" data-note="<?= $totalPaket ?> paket tercatat"></div>
 
             <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:xl:grid-cols-4 tw:gap-6 tw:mb-8">
-                <div class="dashboard-stat-card">
+                <div class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.85)] tw:shadow-sm">
                     <div class="tw:flex tw:items-center tw:gap-4">
-                        <div class="dashboard-stat-card__icon dashboard-stat-card__icon--primary">
+                        <div class="tw:w-[3.4rem] tw:h-[3.4rem] tw:inline-flex tw:items-center tw:justify-center tw:rounded-[20px] tw:flex-shrink-0 tw:text-primary tw:bg-accent/80">
                             <i class="iconsax tw:text-3xl" icon-name="box-1"></i>
                         </div>
                         <div>
-                            <span class="dashboard-stat-card__eyebrow">Total Paket</span>
-                            <strong class="dashboard-stat-card__value"><?= $totalPaket ?></strong>
+                            <span class="tw:block tw:text-slate-500 tw:text-[0.72rem] tw:font-extrabold tw:tracking-[0.08em] tw:uppercase">Total Paket</span>
+                            <strong class="tw:block tw:mt-[0.3rem] tw:text-[1.9rem] tw:leading-none tw:text-slate-900 tw:font-bold"><?= $totalPaket ?></strong>
                         </div>
                     </div>
                 </div>
-                <div class="dashboard-stat-card">
+                <div class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.85)] tw:shadow-sm">
                     <div class="tw:flex tw:items-center tw:gap-4">
-                        <div class="dashboard-stat-card__icon dashboard-stat-card__icon--warning">
+                        <div class="tw:w-[3.4rem] tw:h-[3.4rem] tw:inline-flex tw:items-center tw:justify-center tw:rounded-[20px] tw:flex-shrink-0 tw:text-amber-700 tw:bg-[rgba(250,236,207,0.82)]">
                             <i class="iconsax tw:text-3xl" icon-name="box-time"></i>
                         </div>
                         <div>
-                            <span class="dashboard-stat-card__eyebrow">Belum Diambil</span>
-                            <strong class="dashboard-stat-card__value"><?= $belumDiambil ?></strong>
+                            <span class="tw:block tw:text-slate-500 tw:text-[0.72rem] tw:font-extrabold tw:tracking-[0.08em] tw:uppercase">Belum Diambil</span>
+                            <strong class="tw:block tw:mt-[0.3rem] tw:text-[1.9rem] tw:leading-none tw:text-slate-900 tw:font-bold"><?= $belumDiambil ?></strong>
                         </div>
                     </div>
                 </div>
-                <div class="dashboard-stat-card">
+                <div class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.85)] tw:shadow-sm">
                     <div class="tw:flex tw:items-center tw:gap-4">
-                        <div class="dashboard-stat-card__icon dashboard-stat-card__icon--success">
+                        <div class="tw:w-[3.4rem] tw:h-[3.4rem] tw:inline-flex tw:items-center tw:justify-center tw:rounded-[20px] tw:flex-shrink-0 tw:text-emerald-800 tw:bg-[rgba(220,244,239,0.82)]">
                             <i class="iconsax tw:text-3xl" icon-name="box-tick"></i>
                         </div>
                         <div>
-                            <span class="dashboard-stat-card__eyebrow">Sudah Diambil</span>
-                            <strong class="dashboard-stat-card__value"><?= $sudahDiambil ?></strong>
+                            <span class="tw:block tw:text-slate-500 tw:text-[0.72rem] tw:font-extrabold tw:tracking-[0.08em] tw:uppercase">Sudah Diambil</span>
+                            <strong class="tw:block tw:mt-[0.3rem] tw:text-[1.9rem] tw:leading-none tw:text-slate-900 tw:font-bold"><?= $sudahDiambil ?></strong>
                         </div>
                     </div>
                 </div>
-                <div class="dashboard-stat-card">
+                <div class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.85)] tw:shadow-sm">
                     <div class="tw:flex tw:items-center tw:gap-4">
-                        <div class="dashboard-stat-card__icon dashboard-stat-card__icon--danger">
+                        <div class="tw:w-[3.4rem] tw:h-[3.4rem] tw:inline-flex tw:items-center tw:justify-center tw:rounded-[20px] tw:flex-shrink-0 tw:text-red-700 tw:bg-[rgba(245,221,218,0.82)]">
                             <i class="iconsax tw:text-3xl" icon-name="danger"></i>
                         </div>
                         <div>
-                            <span class="dashboard-stat-card__eyebrow">Tertukar</span>
-                            <strong class="dashboard-stat-card__value"><?= $tertukar ?></strong>
+                            <span class="tw:block tw:text-slate-500 tw:text-[0.72rem] tw:font-extrabold tw:tracking-[0.08em] tw:uppercase">Tertukar</span>
+                            <strong class="tw:block tw:mt-[0.3rem] tw:text-[1.9rem] tw:leading-none tw:text-slate-900 tw:font-bold"><?= $tertukar ?></strong>
                         </div>
                     </div>
                 </div>
             </div>
 
             <?php if ($role === 'SIGAP'): ?>
-                <div class="page-summary-actions tw:mb-6">
-                    <a href="create.php" class="page-primary-btn">
+                <div class="tw:inline-flex tw:items-center tw:gap-3 tw:flex-wrap tw:mt-4 tw:mb-6">
+                    <a href="create.php" class="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:min-h-12 tw:px-4 tw:py-[0.85rem] tw:rounded-2xl tw:border tw:border-transparent tw:font-extrabold tw:no-underline tw:text-white tw:bg-secondary tw:shadow-md tw:hover:bg-primary tw:transition-all tw:text-sm">
                         <i class="iconsax tw:text-xl" icon-name="add-square"></i>
                         <span>Tambah Paket</span>
                     </a>
@@ -198,15 +198,15 @@ $belumDiambil = count(array_filter($pakets, fn($paket) => ($paket['Status'] ?? '
                                         <div class="tw:inline-flex tw:flex-wrap tw:justify-center tw:items-center tw:gap-2 tw:text-black">
                                             <?php if ($role === 'SIGAP'): ?>
                                                 <a href="review.php?id=<?= (int) $paket['PaketID'] ?>"
-                                                    class="detail-action-btn" title="Review Status Pengambilan">
+                                                    class="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:min-h-10 tw:px-[0.95rem] tw:py-[0.7rem] tw:rounded-[14px] tw:border tw:border-[rgba(22,60,122,0.18)] tw:bg-accent/40 tw:text-primary tw:font-extrabold tw:no-underline tw:hover:bg-accent/70 tw:transition-all tw:text-sm" title="Review Status Pengambilan">
                                                     <i class="iconsax tw:text-lg" icon-name="document-text-1"></i>
                                                     <span>Review</span>
                                                 </a>
                                                 <a href="edit.php?id=<?= (int) $paket['PaketID'] ?>"
-                                                    class="icon-action" title="Edit Paket">
+                                                    class="tw:w-9 tw:h-9 tw:inline-flex tw:items-center tw:justify-center tw:rounded-[12px] tw:bg-[rgba(47,127,240,0.08)] tw:text-primary tw:no-underline tw:hover:bg-[rgba(47,127,240,0.16)] tw:transition-all" title="Edit Paket">
                                                     <i class="iconsax tw:text-lg" icon-name="edit-2"></i>
                                                 </a>
-                                                <button type="button" class="icon-action icon-action--danger"
+                                                <button type="button" class="tw:w-9 tw:h-9 tw:inline-flex tw:items-center tw:justify-center tw:rounded-[12px] tw:bg-[rgba(188,79,69,0.08)] tw:text-red-600 tw:no-underline tw:hover:bg-[rgba(188,79,69,0.16)] tw:transition-all"
                                                     data-bs-toggle="modal" data-bs-target="#deleteModal"
                                                     data-bs-id="<?= (int) $paket['PaketID'] ?>" title="Hapus Paket">
                                                     <i class="iconsax tw:text-lg" icon-name="trash"></i>

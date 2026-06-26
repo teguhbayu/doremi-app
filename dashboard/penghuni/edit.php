@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require '../../vendor/autoload.php';
 
 use Respect\Validation\Validator as v;
@@ -154,22 +154,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="en">
 <?php require '../../head.php'; ?>
 
-<body class="dashboard-body tw:p-0 tw:m-0 relative tw:flex">
+<body class="dashboard-body tw:p-0 tw:m-0 tw:relative tw:flex">
     <?php require '../components/sidebar.php'; ?>
-    <main class="dashboard-main tw:md:ml-75 tw:grow">
-        <div class="dashboard-page tw:pt-20 tw:md:pt-5 tw:px-5 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
+    <main class="tw:md:ml-75 tw:grow">
+        <div class="tw:pt-20 tw:md:pt-5 tw:px-5 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
             <?php require dirname(__DIR__) . '/components/breadcrumb.php'; ?>
             <h1 class="page-title" data-kicker="Perbarui Data" data-subtitle="Perbarui profil penghuni, kamar, dan akses login sambil menjaga validasi kamar tetap konsisten.">
                 Edit Penghuni
             </h1>
             <div class="page-toolbar" data-note="Kosongkan password jika hanya ingin mengubah profil penghuni">
-                <a href="index.php" class="page-secondary-btn">
+                <a href="index.php" class="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:min-h-12 tw:px-4 tw:py-[0.85rem] tw:rounded-2xl tw:border tw:border-[rgba(22,60,122,0.12)] tw:font-extrabold tw:no-underline tw:text-slate-900 tw:bg-[rgba(255,255,255,0.82)] tw:hover:bg-gray-50 tw:transition-all tw:text-sm">
                     <i class="iconsax" icon-name="arrow-left-2"></i>
                     <span>Kembali ke daftar</span>
                 </a>
             </div>
 
-            <form method="POST" class="form-shell">
+            <form method="POST" class="tw:grid tw:grid-cols-1 tw:lg:grid-cols-2 tw:gap-4 tw:max-w-[980px] tw:p-[1.45rem] tw:rounded-[24px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.88)] tw:shadow-sm">
                 <div class="mb-3">
                     <label for="nimPenghuni" class="form-label">NIM</label>
                     <input type="text" name="nimPenghuni" class="form-control" id="nimPenghuni"

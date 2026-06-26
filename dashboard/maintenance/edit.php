@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require 'helpers.php';
 // Allowed the MAINTENANCE role to edit their submitted tickets
@@ -123,17 +123,17 @@ $currentTargetValue = !empty($report['RuanganID']) ? $report['RuanganID'] : $rep
 <html lang="en">
 <?php require '../../head.php'; ?>
 
-<body class="dashboard-body tw:p-0 tw:m-0 relative tw:flex tw:bg-[#f8fafc] tw:min-h-screen">
+<body class="dashboard-body tw:p-0 tw:m-0 tw:relative tw:flex tw:min-h-screen">
     <?php require '../components/sidebar.php'; ?>
-    <main class="dashboard-main tw:md:ml-75 tw:grow">
-        <div class="dashboard-page tw:pt-20 tw:md:pt-8 tw:px-8 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
+    <main class="tw:md:ml-75 tw:grow">
+        <div class="tw:pt-20 tw:md:pt-8 tw:px-8 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
             <?php require dirname(__DIR__) . '/components/breadcrumb.php'; ?>
             <h1 class="page-title" data-kicker="Perbarui Laporan" data-subtitle="Ubah prioritas, target, deskripsi, dan bukti foto sebelum laporan masuk ke tahap proses penanganan teknisi.">
                 Edit Laporan
             </h1>
 
             <div class="page-toolbar" data-note="Hanya laporan berstatus diajukan yang dapat diperbarui">
-                <a href="index.php" class="page-secondary-btn">
+                <a href="index.php" class="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:min-h-12 tw:px-4 tw:py-[0.85rem] tw:rounded-2xl tw:border tw:border-[rgba(22,60,122,0.12)] tw:font-extrabold tw:no-underline tw:text-slate-900 tw:bg-[rgba(255,255,255,0.82)] tw:hover:bg-gray-50 tw:transition-all tw:text-sm">
                     <i class="iconsax tw:text-xl" icon-name="arrow-left-2"></i>
                     <span>Kembali</span>
                 </a>
@@ -141,22 +141,22 @@ $currentTargetValue = !empty($report['RuanganID']) ? $report['RuanganID'] : $rep
 
             <div class="tw:grid tw:grid-cols-1 tw:lg:grid-cols-3 tw:gap-8">
                 <div class="tw:lg:col-span-1">
-                    <div class="dashboard-side-panel tw:h-full">
-                        <h5 class="dashboard-side-panel__title">Panduan Tingkat Urgensi</h5>
-                        <p class="dashboard-side-panel__copy">Sesuaikan kategori tingkat kerusakan agar prioritas pengerjaan tetap akurat saat laporan diperbarui.</p>
+                    <div class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.88)] tw:shadow-sm tw:h-full">
+                        <h5 class="tw:m-0 tw:text-[1.2rem] tw:text-slate-900">Panduan Tingkat Urgensi</h5>
+                        <p class="tw:m-0 tw:text-slate-500 tw:leading-[1.75] tw:text-sm">Sesuaikan kategori tingkat kerusakan agar prioritas pengerjaan tetap akurat saat laporan diperbarui.</p>
 
-                        <div class="dashboard-guide-list">
-                            <div class="dashboard-guide-item">
+                        <div class="tw:grid tw:gap-[0.85rem]">
+                            <div class="tw:p-4 tw:rounded-[18px] tw:bg-[rgba(255,255,255,0.80)] tw:border tw:border-[rgba(22,60,122,0.10)] tw:border-l-4 tw:border-l-[rgba(20,108,148,0.30)]">
                                 <strong>Kerusakan Ringan</strong>
                                 <p>Masalah kecil yang tidak mengganggu fungsi vital asrama.</p>
                             </div>
 
-                            <div class="dashboard-guide-item dashboard-guide-item--warning">
+                            <div class="tw:p-4 tw:rounded-[18px] tw:bg-[rgba(250,236,207,0.55)] tw:border tw:border-l-4 tw:border-[rgba(212,141,47,0.20)] tw:border-l-amber-500">
                                 <strong>Kerusakan Sedang</strong>
                                 <p>Masalah yang mengurangi kenyamanan asrama tetapi tidak darurat.</p>
                             </div>
 
-                            <div class="dashboard-guide-item dashboard-guide-item--danger">
+                            <div class="tw:p-4 tw:rounded-[18px] tw:bg-[rgba(245,221,218,0.55)] tw:border tw:border-l-4 tw:border-[rgba(188,79,69,0.20)] tw:border-l-red-500">
                                 <strong>Kerusakan Darurat / Berat</strong>
                                 <p>Masalah darurat yang membahayakan struktural atau keselamatan penghuni.</p>
                             </div>
@@ -165,7 +165,7 @@ $currentTargetValue = !empty($report['RuanganID']) ? $report['RuanganID'] : $rep
                 </div>
 
                 <div class="tw:lg:col-span-2">
-                    <form method="POST" enctype="multipart/form-data" class="form-shell" x-data="{ targetType: '<?= $currentTargetType ?>' }">
+                    <form method="POST" enctype="multipart/form-data" class="tw:grid tw:grid-cols-1 tw:lg:grid-cols-2 tw:gap-4 tw:max-w-[980px] tw:p-[1.45rem] tw:rounded-[24px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.88)] tw:shadow-sm" x-data="{ targetType: '<?= $currentTargetType ?>' }">
                             <div class="mb-4">
                                 <label class="form-label tw:font-semibold">Skala Prioritas / Tingkat Kerusakan</label>
                                 <select name="jenisLaporan" class="form-select" required>
@@ -175,7 +175,7 @@ $currentTargetValue = !empty($report['RuanganID']) ? $report['RuanganID'] : $rep
                                 </select>
                             </div>
 
-                            <div class="mb-4 form-shell__full">
+                            <div class="mb-4 tw:col-span-full">
                                 <label class="form-label tw:font-semibold">Target / Objek Lokasi</label>
                                 <div class="tw:flex tw:gap-4 tw:mb-2">
                                     <label class="tw:inline-flex tw:items-center">
@@ -211,12 +211,12 @@ $currentTargetValue = !empty($report['RuanganID']) ? $report['RuanganID'] : $rep
                                 </div>
                             </div>
 
-                            <div class="mb-4 form-shell__full">
+                            <div class="mb-4 tw:col-span-full">
                                 <label class="form-label tw:font-semibold">Deskripsi Kerusakan</label>
                                 <textarea name="deskripsi" class="form-control" rows="4" required><?= htmlspecialchars($report['Deskripsi']) ?></textarea>
                             </div>
 
-                            <div class="mb-4 form-shell__full">
+                            <div class="mb-4 tw:col-span-full">
                                 <label class="form-label tw:font-semibold">Foto Bukti Kerusakan</label>
                                 <?php if (!empty($report['FotoLaporan'])): ?>
                                     <div class="tw:mb-3">
