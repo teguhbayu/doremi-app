@@ -22,7 +22,6 @@
     --tw-color-slate-200: oklch(92.9% 0.013 255.508);
     --tw-color-slate-400: oklch(70.4% 0.04 256.788);
     --tw-color-slate-500: oklch(55.4% 0.046 257.417);
-    --tw-color-slate-600: oklch(44.6% 0.043 257.281);
     --tw-color-slate-700: oklch(37.2% 0.044 257.287);
     --tw-color-slate-900: oklch(20.8% 0.042 265.755);
     --tw-color-gray-50: oklch(98.5% 0.002 247.839);
@@ -69,6 +68,7 @@
     --tw-radius-xl: 0.75rem;
     --tw-radius-2xl: 1rem;
     --tw-ease-out: cubic-bezier(0, 0, 0.2, 1);
+    --tw-animate-pulse: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     --tw-blur-3xl: 64px;
     --tw-default-transition-duration: 150ms;
     --tw-default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
@@ -381,6 +381,9 @@
   .tw\:h-56 {
     height: calc(var(--tw-spacing) * 56) !important;
   }
+  .tw\:h-60 {
+    height: calc(var(--tw-spacing) * 60) !important;
+  }
   .tw\:h-64 {
     height: calc(var(--tw-spacing) * 64) !important;
   }
@@ -461,6 +464,9 @@
   }
   .tw\:transform {
     transform: var(--tw-rotate-x,) var(--tw-rotate-y,) var(--tw-rotate-z,) var(--tw-skew-x,) var(--tw-skew-y,) !important;
+  }
+  .tw\:animate-pulse {
+    animation: var(--tw-animate-pulse) !important;
   }
   .tw\:cursor-pointer {
     cursor: pointer !important;
@@ -1469,6 +1475,11 @@ a {
   syntax: "*";
   inherits: false;
   initial-value: 0;
+}
+@keyframes pulse {
+  50% {
+    opacity: 0.5;
+  }
 }
 @layer properties {
   @supports ((-webkit-hyphens: none) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color:rgb(from red r g b)))) {
