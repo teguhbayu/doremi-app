@@ -8,7 +8,9 @@ $role = $_SESSION['userRole'];
 $userId = (int) $_SESSION['userId'];
 $latestPickupSubquery = "
     LEFT JOIN (
-        SELECT pp1.*
+        SELECT pp1.PengambilanPaketID, pp1.PaketID, pp1.PenghuniID, pp1.PetugasID, 
+               pp1.WaktuPengambilan, pp1.Status, pp1.Keterangan,
+               (pp1.FotoPengambilan IS NOT NULL AND pp1.FotoPengambilan != '') AS HasFotoPengambilan
         FROM pengambilanpaket pp1
         INNER JOIN (
             SELECT PaketID, MAX(PengambilanPaketID) AS LatestPengambilanPaketID
@@ -22,7 +24,7 @@ if ($role === 'SIGAP') {
     $query = mysqli_query(
         $db,
         "SELECT pk.*, ph.NamaPenghuni, ph.Nim, k.NomorKamar, pt.NamaPetugas,
-                pp.PengambilanPaketID, pp.Status, pp.WaktuPengambilan, pp.Keterangan, pp.FotoPengambilan
+                pp.PengambilanPaketID, pp.Status, pp.WaktuPengambilan, pp.Keterangan, pp.HasFotoPengambilan
          FROM paket pk
          JOIN penghuni ph ON pk.PenghuniID = ph.PenghuniID
          LEFT JOIN kamar k ON ph.KamarID = k.KamarID
@@ -37,7 +39,7 @@ if ($role === 'SIGAP') {
         "SELECT pk.*, ph.NamaPenghuni, ph.Nim, k.NomorKamar,
                 pt.NamaPetugas AS NamaPetugasPaket,
                 pp.PengambilanPaketID, pp.Status, pp.WaktuPengambilan,
-                pp.Keterangan, pp.FotoPengambilan
+                pp.Keterangan, pp.HasFotoPengambilan
          FROM paket pk
          JOIN penghuni ph ON pk.PenghuniID = ph.PenghuniID
          LEFT JOIN kamar k ON ph.KamarID = k.KamarID
@@ -214,8 +216,8 @@ $belumDiambil = count(array_filter($pakets, fn($paket) => ($paket['Status'] ?? '
                                                     class="tw:bg-secondary tw:text-white tw:px-3 tw:py-2 tw:rounded-lg tw:no-underline tw:hover:bg-accent tw:transition-all tw:text-sm">
                                                     <?= empty($paket['PengambilanPaketID']) ? 'Catat Pengambilan' : ($isPickupLocked ? 'Lihat Catatan' : 'Lengkapi Pengambilan') ?>
                                                 </a>
-                                                <?php if (!empty($paket['FotoPengambilan'])): ?>
-                                                    <a href="<?= htmlspecialchars(paket_photo_url($paket['FotoPengambilan'])) ?>"
+                                                <?php if (!empty($paket['HasFotoPengambilan'])): ?>
+                                                    <a href="../get_photo.php?type=paket_pengambilan&id=<?= (int) $paket['PaketID'] ?>"
                                                         target="_blank" rel="noopener noreferrer"
                                                         class="tw:bg-white tw:text-slate-700 tw:px-3 tw:py-2 tw:rounded-lg tw:border tw:border-slate-200 tw:no-underline tw:hover:bg-slate-50 tw:transition-all tw:text-sm">
                                                         Lihat Foto
@@ -280,7 +282,7 @@ $belumDiambil = count(array_filter($pakets, fn($paket) => ($paket['Status'] ?? '
                     order: [],
                     columnDefs: [
                         {
-                            targets: 7,
+                            targets: 6,
                             orderable: false
                         },
                         {

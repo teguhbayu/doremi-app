@@ -18,7 +18,11 @@ if ($role !== 'MAINTENANCE') {
 }
 
 $queryStr = "
-    SELECT m.*, 
+    SELECT m.MaintenanceID, m.PenghuniID, m.PetugasID, m.RuanganID, m.InventarisID,
+           m.TanggalLapor, m.JenisLaporan, m.Deskripsi, m.StatusMaintenance,
+           m.TanggalSelesai, m.Keterangan,
+           (m.FotoLaporan IS NOT NULL AND m.FotoLaporan != '') AS HasFotoLaporan,
+           (m.FotoMaintenance IS NOT NULL AND m.FotoMaintenance != '') AS HasFotoMaintenance,
            p.NamaPenghuni, p.Nim,
            pt.NamaPetugas AS NamaReporterPetugas,
            tech.NamaPetugas AS NamaTeknisi,
@@ -192,12 +196,17 @@ $totalReports = count($reports);
                                                         <label class="tw:text-xs tw:text-slate-500">Deskripsi Masalah</label>
                                                         <p class="tw:text-slate-700 tw:whitespace-pre-line tw:break-words" style="word-break: break-word; overflow-wrap: break-word;"><?= htmlspecialchars($r['Deskripsi']) ?></p>
                                                     </div>
-                                                    <?php if (!empty($r['FotoLaporan'])): ?>
+                                                     <?php if (!empty($r['HasFotoLaporan'])): ?>
                                                         <div>
                                                             <label class="tw:text-xs tw:text-slate-500 tw:mb-1 tw:block">Foto Masalah</label>
-                                                            <img src="<?= $r['FotoLaporan'] ?>" alt="Foto Laporan" class="tw:max-h-60 tw:rounded-lg tw:object-cover tw:border tw:w-full">
+                                                            <div class="tw:relative tw:w-full tw:h-60 tw:bg-slate-100 tw:rounded-lg tw:overflow-hidden tw:border">
+                                                                <div class="image-skeleton tw:absolute tw:inset-0 tw:bg-slate-100 tw:animate-pulse tw:flex tw:items-center tw:justify-center">
+                                                                    <i class="iconsax tw:text-4xl tw:text-slate-400" icon-name="gallery"></i>
+                                                                </div>
+                                                                <img data-src="../get_photo.php?type=maintenance_laporan&id=<?= $r['MaintenanceID'] ?>" src="" alt="Foto Laporan" class="image-target tw:absolute tw:inset-0 tw:w-full tw:h-full tw:object-cover tw:opacity-0 tw:transition-opacity tw:duration-300">
+                                                            </div>
                                                         </div>
-                                                    <?php endif; ?>
+                                                     <?php endif; ?>
                                                     
                                                     <?php if ($r['StatusMaintenance'] === 'Selesai'): ?>
                                                         <hr class="tw:my-3">
@@ -215,12 +224,17 @@ $totalReports = count($reports);
                                                                 <label class="tw:text-xs tw:text-emerald-600">Keterangan Hasil Kerja</label>
                                                                 <p class="tw:text-emerald-950 tw:mb-0 tw:break-words" style="word-break: break-word; overflow-wrap: break-word;"><?= nl2br(htmlspecialchars($r['Keterangan'] ?? '-')) ?></p>
                                                             </div>
-                                                            <?php if (!empty($r['FotoMaintenance'])): ?>
+                                                             <?php if (!empty($r['HasFotoMaintenance'])): ?>
                                                                 <div>
                                                                     <label class="tw:text-xs tw:text-emerald-600 tw:mb-1 tw:block">Foto Bukti Perbaikan</label>
-                                                                    <img src="<?= $r['FotoMaintenance'] ?>" alt="Foto Perbaikan" class="tw:max-h-60 tw:rounded-lg tw:object-cover tw:border tw:border-emerald-100 tw:w-full">
+                                                                    <div class="tw:relative tw:w-full tw:h-60 tw:bg-slate-100 tw:rounded-lg tw:overflow-hidden tw:border tw:border-emerald-100">
+                                                                        <div class="image-skeleton tw:absolute tw:inset-0 tw:bg-slate-100 tw:animate-pulse tw:flex tw:items-center tw:justify-center">
+                                                                            <i class="iconsax tw:text-4xl tw:text-slate-400" icon-name="gallery"></i>
+                                                                        </div>
+                                                                        <img data-src="../get_photo.php?type=maintenance_perbaikan&id=<?= $r['MaintenanceID'] ?>" src="" alt="Foto Perbaikan" class="image-target tw:absolute tw:inset-0 tw:w-full tw:h-full tw:object-cover tw:opacity-0 tw:transition-opacity tw:duration-300">
+                                                                    </div>
                                                                 </div>
-                                                            <?php endif; ?>
+                                                             <?php endif; ?>
                                                         </div>
                                                     <?php else: ?>
                                                         <hr class="tw:my-3">
@@ -334,6 +348,37 @@ $totalReports = count($reports);
                     confirmDelete.href = `delete.php?id=${id}`;
                 });
             }
+
+            // Load images in detail modals dynamically when the modal is shown
+            const detailModals = document.querySelectorAll('[id^="detailModal"]');
+            detailModals.forEach(modal => {
+                modal.addEventListener('show.bs.modal', () => {
+                    const imgs = modal.querySelectorAll('img[data-src]');
+                    imgs.forEach(img => {
+                        if (img.dataset.src && !img.getAttribute('src')) {
+                            img.setAttribute('src', img.dataset.src);
+
+                            // Handle skeleton transitions
+                            img.addEventListener('load', () => {
+                                img.classList.remove('tw:opacity-0');
+                                img.classList.add('tw:opacity-100');
+                                const skeleton = img.previousElementSibling;
+                                if (skeleton && skeleton.classList.contains('image-skeleton')) {
+                                    skeleton.classList.add('tw:hidden');
+                                }
+                            });
+
+                            img.addEventListener('error', () => {
+                                const skeleton = img.previousElementSibling;
+                                if (skeleton && skeleton.classList.contains('image-skeleton')) {
+                                    skeleton.innerHTML = '<span class="tw:text-xs tw:text-slate-400">Gagal memuat gambar</span>';
+                                    skeleton.classList.remove('tw:animate-pulse');
+                                }
+                            });
+                        }
+                    });
+                });
+            });
         });
     </script>
 </body>
