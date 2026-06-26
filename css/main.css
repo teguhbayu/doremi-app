@@ -361,6 +361,10 @@
   .tw\:aspect-square {
     aspect-ratio: 1 / 1 !important;
   }
+  .tw\:size-8 {
+    width: calc(var(--tw-spacing) * 8) !important;
+    height: calc(var(--tw-spacing) * 8) !important;
+  }
   .tw\:size-10 {
     width: calc(var(--tw-spacing) * 10) !important;
     height: calc(var(--tw-spacing) * 10) !important;
@@ -368,6 +372,10 @@
   .tw\:size-12 {
     width: calc(var(--tw-spacing) * 12) !important;
     height: calc(var(--tw-spacing) * 12) !important;
+  }
+  .tw\:size-fit {
+    width: fit-content !important;
+    height: fit-content !important;
   }
   .tw\:h-12 {
     height: calc(var(--tw-spacing) * 12) !important;
@@ -390,12 +398,6 @@
   .tw\:h-96 {
     height: calc(var(--tw-spacing) * 96) !important;
   }
-  .tw\:h-\[220px\] {
-    height: 220px !important;
-  }
-  .tw\:h-\[260px\] {
-    height: 260px !important;
-  }
   .tw\:h-\[320px\] {
     height: 320px !important;
   }
@@ -410,9 +412,6 @@
   }
   .tw\:max-h-40 {
     max-height: calc(var(--tw-spacing) * 40) !important;
-  }
-  .tw\:max-h-60 {
-    max-height: calc(var(--tw-spacing) * 60) !important;
   }
   .tw\:min-h-full {
     min-height: 100% !important;
