@@ -8,12 +8,18 @@ if (!isset($_SESSION['userId'])) {
     header("Location: /doremi-app/login.php");
     exit;
 }
+if ($_SESSION['userRole'] !== 'PENGURUS') {
+    header("Location: /doremi-app/dashboard/");
+    exit;
+}
+require '../../csrf.php';
 require '../../db.php';
 
 $kamars = mysqli_fetch_all(mysqli_query($db, "SELECT KamarID, NomorKamar FROM kamar WHERE IsDeleted = 0"), MYSQLI_ASSOC);
 $ruangans = mysqli_fetch_all(mysqli_query($db, "SELECT RuanganID, NamaRuangan FROM ruangan WHERE IsDeleted = 0"), MYSQLI_ASSOC);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    csrf_validate($_SERVER['PHP_SELF']);
     $nama = trim($_POST['namaBarang'] ?? '');
     $jumlah = trim($_POST['jumlahBarang'] ?? '');
     $lokasi = $_POST['lokasiBarang'] ?? '';
@@ -21,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $inventarisSchema = v::keySet(
         v::key('nama', v::stringType()->length(1, 100)),
-        v::key('jumlah', v::numericVal()->min(0)),
+        v::key('jumlah', v::numericVal()->min(0)->max(999999)),
         v::key('lokasi', v::stringType()->length(1, 50)),
         v::key('keterangan', v::stringType()->length(0, 500))
     );
@@ -35,9 +41,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $ruanganId = null;
 
     if (str_starts_with($lokasi, 'kamar:')) {
-        $kamarId = explode(':', $lokasi)[1];
+        $kamarId = (int) explode(':', $lokasi)[1];
+        $chk = mysqli_prepare($db, "SELECT KamarID FROM kamar WHERE KamarID = ? AND IsDeleted = 0 LIMIT 1");
+        mysqli_stmt_bind_param($chk, 'i', $kamarId);
+        mysqli_stmt_execute($chk);
+        if (!mysqli_fetch_assoc(mysqli_stmt_get_result($chk))) {
+            mysqli_stmt_close($chk);
+            header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Kamar tidak ditemukan!');
+            exit;
+        }
+        mysqli_stmt_close($chk);
     } elseif (str_starts_with($lokasi, 'ruangan:')) {
-        $ruanganId = explode(':', $lokasi)[1];
+        $ruanganId = (int) explode(':', $lokasi)[1];
+        $chk = mysqli_prepare($db, "SELECT RuanganID FROM ruangan WHERE RuanganID = ? AND IsDeleted = 0 LIMIT 1");
+        mysqli_stmt_bind_param($chk, 'i', $ruanganId);
+        mysqli_stmt_execute($chk);
+        if (!mysqli_fetch_assoc(mysqli_stmt_get_result($chk))) {
+            mysqli_stmt_close($chk);
+            header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Ruangan tidak ditemukan!');
+            exit;
+        }
+        mysqli_stmt_close($chk);
     }
 
     $now = date('Y-m-d H:i:s');
@@ -80,6 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
 
             <form method="POST" class="form-shell" x-data="{ nama: '', keterangan: '' }">
+                <?php echo csrf_field(); ?>
                 <div class="mb-3">
                     <label for="namaBarang" class="form-label">Nama Barang</label>
                     <input type="text" name="namaBarang" class="form-control" id="namaBarang" x-model="nama" maxlength="100" required>
@@ -89,7 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
                 <div class="mb-3">
                     <label for="jumlahBarang" class="form-label">Jumlah</label>
-                    <input type="number" name="jumlahBarang" class="form-control" id="jumlahBarang" required>
+                    <input type="number" name="jumlahBarang" class="form-control" id="jumlahBarang" min="0" max="999999" required>
                 </div>
                 <div class="mb-3">
                     <label for="lokasiBarang" class="form-label">Lokasi</label>

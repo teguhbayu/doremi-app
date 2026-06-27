@@ -3,9 +3,17 @@ session_start();
 require 'helpers.php';
 // Added MAINTENANCE to the exception (they cannot delete reports, only the creator can)
 maintenance_require_roles(['PENGURUS', 'PENGHUNI', 'SIGAP', 'SERVANDA', 'MAINTENANCE']);
+require '../../csrf.php';
+
+// Only accept POST to prevent CSRF via URL
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    maintenance_redirect('index.php');
+}
+csrf_validate('index.php');
+
 require '../../db.php';
 
-$id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+$id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
 $userId = (int)$_SESSION['userId'];
 $role = $_SESSION['userRole'];
 

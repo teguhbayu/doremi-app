@@ -4,6 +4,8 @@ require 'helpers.php';
 
 // 1. Strict Role Authorization: Only the MAINTENANCE team can execute this script
 maintenance_require_roles(['MAINTENANCE']);
+require '../../csrf.php';
+csrf_validate('index.php');
 
 require '../../db.php';
 
@@ -16,11 +18,16 @@ if (!$id) {
 }
 
 if ($action === 'claim') {
-    $stmt = mysqli_prepare($db, "UPDATE maintenance SET StatusMaintenance = 'Diproses', PetugasID = ? WHERE MaintenanceID = ? AND IsDeleted = 0");
+    // Guard: only claim tickets still in 'Diajukan' status (prevents race condition)
+    $stmt = mysqli_prepare($db, "UPDATE maintenance SET StatusMaintenance = 'Diproses', PetugasID = ? WHERE MaintenanceID = ? AND IsDeleted = 0 AND StatusMaintenance = 'Diajukan'");
     mysqli_stmt_bind_param($stmt, 'ii', $userId, $id);
 
     if (mysqli_stmt_execute($stmt)) {
+        $affected = mysqli_stmt_affected_rows($stmt);
         mysqli_stmt_close($stmt);
+        if ($affected === 0) {
+            maintenance_redirect('index.php', 'error', 'Laporan sudah diklaim oleh teknisi lain.');
+        }
         maintenance_redirect('index.php', 'success', 'Laporan berhasil di-claim! Silahkan mulai perbaikan.');
     } else {
         mysqli_stmt_close($stmt);
@@ -29,6 +36,16 @@ if ($action === 'claim') {
 }
 
 elseif ($action === 'complete') {
+    // Ownership check: only the claiming technician can mark their own ticket complete
+    $ownerStmt = mysqli_prepare($db, "SELECT MaintenanceID FROM maintenance WHERE MaintenanceID = ? AND PetugasID = ? AND StatusMaintenance = 'Diproses' AND IsDeleted = 0 LIMIT 1");
+    mysqli_stmt_bind_param($ownerStmt, 'ii', $id, $userId);
+    mysqli_stmt_execute($ownerStmt);
+    if (!mysqli_fetch_assoc(mysqli_stmt_get_result($ownerStmt))) {
+        mysqli_stmt_close($ownerStmt);
+        maintenance_redirect('index.php', 'error', 'Anda tidak memiliki wewenang untuk menyelesaikan laporan ini.');
+    }
+    mysqli_stmt_close($ownerStmt);
+
     $keterangan = trim($_POST['keterangan'] ?? '');
     $tanggalSelesai = date('Y-m-d');
 

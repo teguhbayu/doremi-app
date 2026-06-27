@@ -8,9 +8,14 @@ if (!isset($_SESSION['userId'])) {
     header("Location: /doremi-app/login.php");
     exit;
 }
+if ($_SESSION['userRole'] !== 'PENGURUS') {
+    header("Location: /doremi-app/dashboard/");
+    exit;
+}
+require '../../csrf.php';
 require '../../db.php';
 
-$ruanganTypes = ['Tempat Ibadah', 'Ruang Publik', 'Ruang Jemur', 'Lapangan Olahraga', 'Balkon', 'Kamar Mandi'];
+$ruanganTypes = ['Ruang Ibadah', 'Ruang Publik', 'Ruang Jemur', 'Lapangan Olahraga', 'Balkon', 'Kamar Mandi'];
 
 $id = $_GET['id'] ?? null;
 if (!$id) {
@@ -35,6 +40,7 @@ if (!in_array($ruangan['JenisRuangan'], $ruanganTypes, true)) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    csrf_validate($_SERVER['PHP_SELF'] . '?id=' . $id);
     $nama = trim($_POST['namaRuangan'] ?? '');
     $jenis = trim($_POST['jenisRuangan'] ?? '');
     $lantai = trim($_POST['lantaiRuangan'] ?? '');
@@ -97,6 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
 
             <form method="POST" class="form-shell" x-data="<?= htmlspecialchars(json_encode(['nama' => $ruangan['NamaRuangan'] ?? '', 'keterangan' => $ruangan['Keterangan'] ?? ''])) ?>">
+                <?php echo csrf_field(); ?>
                 <div class="mb-3">
                     <label for="namaRuangan" class="form-label">Nama Ruangan</label>
                     <input type="text" name="namaRuangan" class="form-control" id="namaRuangan" x-model="nama" maxlength="100" required>

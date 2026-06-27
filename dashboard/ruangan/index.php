@@ -5,12 +5,16 @@ if (!isset($_SESSION['userId'])) {
     header("Location: /doremi-app/login.php");
     exit;
 }
+if ($_SESSION['userRole'] !== 'PENGURUS') {
+    header("Location: /doremi-app/dashboard/");
+    exit;
+}
+require '../../csrf.php';
 require '../../db.php';
 
 $query = mysqli_query($db, "SELECT * FROM ruangan WHERE IsDeleted = 0;");
 $totalRuangan = mysqli_num_rows($query);
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -94,7 +98,11 @@ $totalRuangan = mysqli_num_rows($query);
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <a href="#" id="confirmDelete" class="btn btn-danger">Hapus</a>
+                    <form id="deleteForm" method="POST" action="delete.php" class="tw:inline">
+                        <?php echo csrf_field(); ?>
+                        <input type="hidden" name="id" id="deleteId" value="">
+                        <button type="submit" class="btn btn-danger">Hapus</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -141,8 +149,7 @@ $totalRuangan = mysqli_num_rows($query);
             deleteModal.addEventListener('show.bs.modal', event => {
                 const button = event.relatedTarget
                 const id = button.getAttribute('data-bs-id')
-                const confirmDelete = deleteModal.querySelector('#confirmDelete')
-                confirmDelete.href = `delete.php?id=${id}`
+                document.getElementById('deleteId').value = id
             })
         }
 
