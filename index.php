@@ -28,18 +28,18 @@ session_start();
                 <div
                     class="tw:max-w-7xl tw:mx-auto tw:px-4 tw:sm:px-6 tw:lg:px-8 tw:relative tw:z-10 tw:py-16 tw:sm:py-24">
                     <div class="tw:text-center">
-                        <h1
+                        <h1 id="hero-heading"
                             class="tw:tracking-[-0.06em] tw:leading-[0.98] tw:text-4xl tw:font-extrabold tw:text-gray-900 tw:sm:text-5xl tw:md:text-6xl">
                             <span class="tw:block tw:text-primary">DOREMI</span>
                             <span class="tw:block tw:text-secondary tw:mt-2">Kenyamanan & Keamanan Terpadu</span>
                         </h1>
-                        <p
+                        <p id="hero-desc"
                             class="tw:mt-3 tw:max-w-md tw:mx-auto tw:text-base tw:text-slate-500 tw:leading-[1.8] tw:sm:text-lg tw:md:mt-5 tw:md:text-xl tw:md:max-w-3xl">
                             Sistem manajemen asrama modern yang menghubungkan penghuni,
                             pengurus, keamanan (Sigap), kebersihan (Virtus), dan teknisi
                             dalam satu platform yang mudah digunakan.
                         </p>
-                        <div
+                        <div data-gsap="hero-btns"
                             class="tw:mt-8 tw:no-underline tw:max-w-md tw:mx-auto tw:sm:flex tw:sm:justify-center tw:md:mt-10 tw:gap-4">
                             <a href="login.php"
                                 class="tw:w-full tw:no-underline tw:flex tw:items-center tw:justify-center tw:px-8 tw:py-3 tw:border tw:border-transparent tw:text-base tw:font-bold tw:rounded-full tw:text-white tw:bg-primary tw:hover:bg-secondary tw:md:py-4 tw:md:text-lg tw:md:px-10 tw:shadow-lg tw:transition tw:hover:-translate-y-1">
@@ -56,7 +56,7 @@ session_start();
 
             <section class="tw:py-16 tw:bg-white tw:z-10 tw:relative">
                 <div class="tw:max-w-7xl tw:mx-auto tw:px-4 tw:sm:px-6 tw:lg:px-8">
-                    <div class="tw:text-center tw:mb-12">
+                    <div id="features-heading" class="tw:text-center tw:mb-12">
                         <h2 class="tw:text-3xl tw:font-extrabold tw:text-primary">
                             Fasilitas & Layanan Unggulan
                         </h2>
@@ -114,6 +114,56 @@ session_start();
             </section>
         </div>
     </div>
+    <script>
+    window._headerAnimated = true;
+    document.addEventListener('DOMContentLoaded', () => {
+        gsap.registerPlugin(ScrollTrigger);
+
+        const ease = 'power3.out';
+
+        /* header */
+        gsap.from('#global-header', { y: -56, opacity: 0, duration: 0.6, ease });
+
+        /* h1 spans — use getElementById-style approach via IDs we add below */
+        const heroH1Spans = document.querySelectorAll('#hero-heading span');
+        if (heroH1Spans.length) {
+            gsap.from(heroH1Spans, { y: 36, opacity: 0, duration: 0.55, stagger: 0.12, delay: 0.2, ease });
+        }
+
+        /* hero description */
+        const heroP = document.getElementById('hero-desc');
+        if (heroP) gsap.from(heroP, { y: 22, opacity: 0, duration: 0.5, delay: 0.45, ease });
+
+        /* hero buttons */
+        const heroBtns = document.querySelectorAll('[data-gsap="hero-btns"] > a');
+        if (heroBtns.length) {
+            heroBtns.forEach(btn => btn.classList.add('is-gsap-animating'));
+            gsap.fromTo(heroBtns,
+                { y: 18, opacity: 0 },
+                { y: 0, opacity: 1, duration: 0.45, stagger: 0.1, delay: 0.65, ease, clearProps: 'all',
+                  onComplete() { heroBtns.forEach(btn => btn.classList.remove('is-gsap-animating')); }
+                }
+            );
+        }
+
+        /* feature section heading */
+        const featHeading = document.getElementById('features-heading');
+        if (featHeading) {
+            gsap.from(featHeading, {
+                scrollTrigger: { trigger: featHeading, start: 'top 88%', toggleActions: 'play none none none' },
+                y: 24, opacity: 0, duration: 0.5, ease,
+            });
+        }
+
+        /* feature cards */
+        gsap.utils.toArray('.public-feature-card').forEach((card, i) => {
+            gsap.from(card, {
+                scrollTrigger: { trigger: card, start: 'top 88%', toggleActions: 'play none none none' },
+                y: 40, opacity: 0, duration: 0.55, delay: i * 0.1, ease,
+            });
+        });
+    });
+    </script>
 </body>
 
 </html>

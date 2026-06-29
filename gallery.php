@@ -77,6 +77,34 @@ session_start();
             </div>
         </div>
     </div>
+    <script>
+    window._headerAnimated = true;
+    document.addEventListener('DOMContentLoaded', () => {
+        gsap.registerPlugin(ScrollTrigger);
+
+        gsap.from('#global-header', { y: -60, opacity: 0, duration: 0.6, ease: 'power3.out' });
+
+        gsap.from('.tw\\:text-center.tw\\:mb-10', {
+            y: 28,
+            opacity: 0,
+            duration: 0.55,
+            delay: 0.2,
+            ease: 'power3.out',
+        });
+
+        gsap.utils.toArray('.tw\\:group.tw\\:relative').forEach((card, i) => {
+            gsap.from(card, {
+                scrollTrigger: { trigger: card, start: 'top 90%', toggleActions: 'play none none none' },
+                y: 36,
+                opacity: 0,
+                scale: 0.97,
+                duration: 0.5,
+                delay: (i % 3) * 0.1,
+                ease: 'power3.out',
+            });
+        });
+    });
+    </script>
 </body>
 
 </html>

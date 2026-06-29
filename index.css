@@ -907,3 +907,7 @@ a {
 ::-webkit-scrollbar-track { background: #dde7fb; }
 ::-webkit-scrollbar-thumb { background: rgba(47, 127, 240, 0.45); border-radius: 999px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(47, 127, 240, 0.7); }
+
+.is-gsap-animating {
+  transition: none !important;
+}
