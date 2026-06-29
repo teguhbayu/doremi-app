@@ -53,3 +53,12 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
         </div>
     </div>
 </header>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    /* Only animate on pages that don't already run their own header tl */
+    if (typeof _headerAnimated === 'undefined') {
+        window._headerAnimated = true;
+        gsap.from('#global-header', { y: -56, opacity: 0, duration: 0.6, ease: 'power3.out' });
+    }
+});
+</script>

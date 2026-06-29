@@ -165,7 +165,7 @@ $currentTargetValue = !empty($report['RuanganID']) ? $report['RuanganID'] : $rep
                 </div>
 
                 <div class="tw:lg:col-span-2">
-                    <form method="POST" enctype="multipart/form-data" class="tw:grid tw:grid-cols-1 tw:lg:grid-cols-2 tw:gap-4 tw:max-w-[980px] tw:p-[1.45rem] tw:rounded-[24px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.88)] tw:shadow-sm" x-data="{ targetType: '<?= $currentTargetType ?>' }">
+                    <form method="POST" enctype="multipart/form-data" class="tw:grid tw:grid-cols-1 tw:lg:grid-cols-2 tw:gap-4 tw:p-[1.45rem] tw:rounded-[24px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.88)] tw:shadow-sm" x-data="{ targetType: '<?= $currentTargetType ?>' }">
                             <div class="mb-4">
                                 <label class="form-label tw:font-semibold">Skala Prioritas / Tingkat Kerusakan</label>
                                 <select name="jenisLaporan" class="form-select" required>
@@ -228,7 +228,7 @@ $currentTargetValue = !empty($report['RuanganID']) ? $report['RuanganID'] : $rep
                                 <div class="form-text">Biarkan kosong jika tidak ingin merubah foto. Maksimal ukuran file 2MB (JPG/PNG).</div>
                             </div>
 
-                            <div class="tw:w-full tw:flex tw:justify-end tw:mt-4">
+                            <div class="tw:col-span-full tw:flex tw:justify-end tw:mt-4">
                                 <button type="submit"
                                     class="tw:bg-secondary tw:w-full tw:text-white tw:px-3 tw:py-3 tw:rounded-xl tw:justify-center tw:hover:bg-accent tw:duration-300 tw:transition-all tw:inline-flex tw:items-center tw:gap-2">
                                     <span>Simpan Perubahan</span>
