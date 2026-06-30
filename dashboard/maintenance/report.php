@@ -260,23 +260,8 @@ mysqli_free_result($res);
                 </div>
             </div>
 
-            <div class="print-only print-header-block">
-                <div style="display:flex; align-items:center; gap:14px; margin-bottom:6px;">
-                    <img src="/doremi-app/images/logo.png" alt="Logo DOREMI" style="height:48px; width:auto;">
-                    <div>
-                        <div style="font-size:18px; font-weight:800; color:#146c94; line-height:1.2;">DOREMI</div>
-                        <div style="font-size:11px; color:#64748b;">Dormitory Control Center</div>
-                    </div>
-                </div>
-                <h2 style="font-size:15px; font-weight:700; margin:0; color:#1e293b;">Laporan Maintenance</h2>
-                <p style="font-size:11px; color:#64748b; margin:2px 0 0;">Periode: <?= $rangeLabel ?> &mdash; Dicetak:
-                    <?= date('d M Y H:i') ?>
-                </p>
-                <hr style="border:none; border-top:2px solid #146c94; margin:8px 0 0;">
-            </div>
-
             <div class="tw:grid tw:grid-cols-2 tw:lg:grid-cols-4 tw:gap-5 tw:mb-8">
-                <div
+                <div data-gsap="stat-card"
                     class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.85)] tw:shadow-sm">
                     <div class="tw:flex tw:items-center tw:gap-4">
                         <div
@@ -292,7 +277,7 @@ mysqli_free_result($res);
                         </div>
                     </div>
                 </div>
-                <div
+                <div data-gsap="stat-card"
                     class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.85)] tw:shadow-sm">
                     <div class="tw:flex tw:items-center tw:gap-4">
                         <div
@@ -307,7 +292,7 @@ mysqli_free_result($res);
                         </div>
                     </div>
                 </div>
-                <div
+                <div data-gsap="stat-card"
                     class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.85)] tw:shadow-sm">
                     <div class="tw:flex tw:items-center tw:gap-4">
                         <div
@@ -323,7 +308,7 @@ mysqli_free_result($res);
                         </div>
                     </div>
                 </div>
-                <div
+                <div data-gsap="stat-card"
                     class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.85)] tw:shadow-sm">
                     <div class="tw:flex tw:items-center tw:gap-4">
                         <div
@@ -335,7 +320,7 @@ mysqli_free_result($res);
                                 class="tw:block tw:text-slate-500 tw:text-[0.72rem] tw:font-extrabold tw:tracking-[0.08em] tw:uppercase">Rata-rata
                                 Selesai</span>
                             <strong
-                                class="tw:block tw:mt-[0.3rem] tw:text-[1.9rem] tw:leading-none tw:text-slate-900 tw:font-bold"><?= $stats['avg_hari'] ?? 'â€”' ?><span
+                                class="tw:block tw:mt-[0.3rem] tw:text-[1.9rem] tw:leading-none tw:text-slate-900 tw:font-bold"><?= $stats['avg_hari'] ?? '0' ?><span
                                     class="tw:text-[13px] tw:font-normal tw:text-slate-500"><?= $stats['avg_hari'] ? ' hari' : '' ?></span></strong>
                         </div>
                     </div>
@@ -344,7 +329,7 @@ mysqli_free_result($res);
 
             <div class="tw:grid tw:grid-cols-1 tw:lg:grid-cols-2 tw:gap-6 tw:mb-6">
 
-                <div
+                <div data-gsap="panel"
                     class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.88)] tw:shadow-sm">
                     <h5 class="tw:m-0 tw:text-[1.2rem] tw:text-slate-900 tw:flex tw:items-center tw:gap-2">
                         <i class="fa-solid fa-triangle-exclamation"></i> Distribusi Jenis Laporan (Skala Prioritas)
@@ -370,7 +355,7 @@ mysqli_free_result($res);
                     </div>
                 </div>
 
-                <div
+                <div data-gsap="panel"
                     class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.88)] tw:shadow-sm">
                     <h5 class="tw:m-0 tw:text-[1.2rem] tw:text-slate-900 tw:flex tw:items-center tw:gap-2">
                         <i class="fa-solid fa-arrow-trend-up"></i> Trend Laporan Masuk
@@ -386,7 +371,7 @@ mysqli_free_result($res);
 
             <div class="tw:grid tw:grid-cols-1 tw:lg:grid-cols-2 tw:gap-6 tw:mb-6">
 
-                <div
+                <div data-gsap="panel"
                     class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.88)] tw:shadow-sm">
                     <h5 class="tw:m-0 tw:text-[1.2rem] tw:text-slate-900 tw:flex tw:items-center tw:gap-2">
                         <i class="fa-solid fa-building"></i> Top 5 Ruangan Terbanyak
@@ -398,7 +383,7 @@ mysqli_free_result($res);
                     </div>
                 </div>
 
-                <div
+                <div data-gsap="panel"
                     class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.88)] tw:shadow-sm">
                     <h5 class="tw:m-0 tw:text-[1.2rem] tw:text-slate-900 tw:flex tw:items-center tw:gap-2">
                         <i class="fa-solid fa-chart-bar"></i> Status per Jenis Laporan
@@ -413,9 +398,8 @@ mysqli_free_result($res);
             </div>
 
             <?php if ($role === 'PENGURUS' && count($petugasPerforma) > 0): ?>
-                <!-- â”€â”€ Ranking Petugas (PENGURUS only â€” full width) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
                 <div class="tw:mb-6">
-                    <div
+                    <div data-gsap="panel"
                         class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.88)] tw:shadow-sm">
                         <h5 class="tw:m-0 tw:text-[1.2rem] tw:text-slate-900 tw:flex tw:items-center tw:gap-2">
                             <i class="fa-solid fa-ranking-star"></i> Ranking Petugas Maintenance
@@ -469,7 +453,8 @@ mysqli_free_result($res);
                                                             style="font-size:12px; font-weight:700; color:<?= $rateColor ?>;"><?= $completionRate ?>%</span>
                                                     </div>
                                                 </td>
-                                                <td class="text-center"><?= $p['avg_hari'] ? $p['avg_hari'] . ' hari' : 'â€”' ?>
+                                                <td class="text-center">
+                                                    <?= $p['avg_hari'] ? $p['avg_hari'] . ' hari' : '0 hari' ?>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
@@ -535,7 +520,7 @@ mysqli_free_result($res);
                                     </td>
                                     <td><?= $r['TanggalSelesai'] ? date('d M Y', strtotime($r['TanggalSelesai'])) : '—' ?>
                                     </td>
-                                    <td><?= $r['Durasi'] !== null ? $r['Durasi'] . ' jm' : '—' ?></td>
+                                    <td><?= $r['Durasi'] !== null ? $r['Durasi'] . ' hari' : '—' ?></td>
                                     <?php if ($role === 'PENGURUS'): ?>
                                         <td><?= htmlspecialchars($r['Petugas'] ?? '—') ?></td><?php endif; ?>
                                 </tr>
@@ -544,142 +529,82 @@ mysqli_free_result($res);
                     </table>
                 </div>
             </div>
-           </div>
-    </div>
-    <?php endif; ?>
- 
-    <!-- ── Tabel Detail ───────────────────────────────────────────────────── -->
-    <div class="table-panel">
-        <div class="tw:flex tw:items-center tw:justify-between tw:flex-wrap tw:gap-3 tw:mb-4">
-            <div>
-                <h5 class="dashboard-side-panel__title tw:flex tw:items-center tw:gap-2 tw:mb-1">
-                    <i class="fa-solid fa-table-list"></i> Daftar Laporan
-                </h5>
-                <p class="dashboard-side-panel__copy tw:mb-0"><?= count($detailRows) ?> laporan ditemukan dalam periode <?= $rangeLabel ?>.</p>
-            </div>
         </div>
-        <div class="doremi-table-wrapper print-table-wrapper">
-            <table id="reportTable" class="table doremi-table text-center align-middle tw:mb-0 tw:w-full print-table">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Pelapor</th>
-                        <th>Lokasi / Target</th>
-                        <th>Jenis</th>
-                        <th>Status</th>
-                        <th>Tanggal Lapor</th>
-                        <th>Selesai</th>
-                        <th>Durasi</th>
-                        <?php if ($role === 'PENGURUS'): ?><th>Petugas</th><?php endif; ?>
-                    </tr>
-                </thead>
-                <tbody>
-                <?php foreach ($detailRows as $i => $r):
-                    $statusStyle = match($r['StatusMaintenance']) {
-                        'Selesai'  => 'background:#dcfce7; color:#16a34a;',
-                        'Diproses' => 'background:#dbeafe; color:#1d4ed8;',
-                        default    => 'background:#fef9c3; color:#854d0e;',
-                    };
-                    $jenisStyle = match($r['JenisLaporan']) {
-                        'Kerusakan Darurat / Berat' => 'background:#fee2e2; color:#dc2626;',
-                        'Kerusakan Ringan'          => 'background:#dcfce7; color:#16a34a;',
-                        default                    => 'background:#fef3c7; color:#92400e;', // Kerusakan Sedang
-                    };
-                ?>
-                    <tr>
-                        <td class="row-number-cell"></td>
-                        <td><?= htmlspecialchars($r['Pelapor']) ?></td>
-                        <td><?= htmlspecialchars($r['Lokasi']) ?></td>
-                        <td><span style="font-size:11px; font-weight:600; padding:2px 8px; border-radius:20px; <?= $jenisStyle ?>"><?= htmlspecialchars($r['JenisLaporan']) ?></span></td>
-                        <td><span style="font-size:11px; font-weight:600; padding:2px 8px; border-radius:20px; <?= $statusStyle ?>"><?= htmlspecialchars($r['StatusMaintenance']) ?></span></td>
-                        <td><?= $r['TanggalLapor'] ? date('d M Y', strtotime($r['TanggalLapor'])) : '—' ?></td>
-                        <td><?= $r['TanggalSelesai'] ? date('d M Y', strtotime($r['TanggalSelesai'])) : '—' ?></td>
-                        <td><?= $r['Durasi'] !== null ? $r['Durasi'] . ' hari' : '—' ?></td>
-                        <?php if ($role === 'PENGURUS'): ?><td><?= htmlspecialchars($r['Petugas'] ?? '—') ?></td><?php endif; ?>
-                    </tr>
-                <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div>
-    </div>
- 
-</div><!-- /dashboard-page -->
-</main>
- 
-<?php require '../../bootstrap.php'; ?>
- 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
-<script>
-(function () {
-    const primary  = '#146c94';
-    const baseOpts = { responsive: true, maintainAspectRatio: false };
-    const gridOpts = { color: 'rgba(0,0,0,0.05)' };
- 
-    // Bar Horizontal — Distribusi Jenis berdasarkan Skala Prioritas
-    new Chart(document.getElementById('chartPriority'), {
-        type: 'bar',
-        data: {
-            labels: ['Darurat\n(Prioritas Tinggi)', 'Sedang\n(Prioritas Sedang)', 'Ringan\n(Prioritas Rendah)'],
-            datasets: [{
-                label: 'Jumlah Laporan',
-                data: <?= json_encode($priorityValues) ?>,
-                backgroundColor: <?= json_encode($priorityBgColors) ?>,
-                borderRadius: 8,
-                borderSkipped: false,
-            }]
-        },
-        options: {
-            ...baseOpts,
-            indexAxis: 'y',
-            plugins: {
-                legend: { display: false },
-                tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.x} laporan` } }
-            },
-            scales: {
-                x: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 11 } }, grid: gridOpts },
-                y: { ticks: { font: { size: 11 } }, grid: { display: false } }
-            }
-        }
-    });
- 
-    // Line — Trend
-    new Chart(document.getElementById('chartTrend'), {
-        type: 'line',
-        data: {
-            labels: <?= json_encode($trendLabels) ?>,
-            datasets: [{ label: 'Laporan', data: <?= json_encode($trendValues) ?>, borderColor: primary, backgroundColor: 'rgba(20,108,148,0.08)', borderWidth: 2.5, pointRadius: 4, pointBackgroundColor: primary, fill: true, tension: 0.4 }]
-        },
-        options: { ...baseOpts, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 11 } }, grid: gridOpts }, x: { ticks: { font: { size: 11 }, maxRotation: 45, maxTicksLimit: 10 }, grid: { display: false } } } }
-    });
- 
-    // Bar Horizontal — Top Ruangan
-    new Chart(document.getElementById('chartRuangan'), {
-        type: 'bar',
-        data: {
-            labels: <?= json_encode($topRuanganLabels ?: ['Tidak ada data']) ?>,
-            datasets: [{ label: 'Laporan', data: <?= json_encode($topRuanganValues ?: [0]) ?>, backgroundColor: 'rgba(20,108,148,0.75)', borderRadius: 6, borderSkipped: false }]
-        },
-        options: { ...baseOpts, indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 11 } }, grid: gridOpts }, y: { ticks: { font: { size: 11 } }, grid: { display: false } } } }
-    });
- 
-    // Stacked Bar — Status per Jenis
-    new Chart(document.getElementById('chartStacked'), {
-        type: 'bar',
-        data: {
-            labels: ['Darurat', 'Sedang', 'Ringan'],
-            datasets: [
-                { label: 'Diajukan', data: [<?= $stackedData['Kerusakan Darurat / Berat']['Diajukan'] ?>, <?= $stackedData['Kerusakan Sedang']['Diajukan'] ?>, <?= $stackedData['Kerusakan Ringan']['Diajukan'] ?>], backgroundColor: '#f59e0b', borderRadius: 4 },
-                { label: 'Diproses', data: [<?= $stackedData['Kerusakan Darurat / Berat']['Diproses'] ?>, <?= $stackedData['Kerusakan Sedang']['Diproses'] ?>, <?= $stackedData['Kerusakan Ringan']['Diproses'] ?>], backgroundColor: '#2F7FF0', borderRadius: 4 },
-                { label: 'Selesai', data: [<?= $stackedData['Kerusakan Darurat / Berat']['Selesai'] ?>, <?= $stackedData['Kerusakan Sedang']['Selesai'] ?>, <?= $stackedData['Kerusakan Ringan']['Selesai'] ?>], backgroundColor: '#10b981', borderRadius: 4 },
-            ]
-        },
-        options: { ...baseOpts, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 12, font: { size: 11 } } } }, scales: { x: { stacked: true, ticks: { font: { size: 12 } }, grid: { display: false } }, y: { stacked: true, beginAtZero: true, ticks: { stepSize: 1, font: { size: 11 } }, grid: gridOpts } } }
-    });
-})();
-</script>
- 
-<style>
+    </main>
 
+    <?php require '../../bootstrap.php'; ?>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+    <script>
+        (function () {
+            const primary = '#146c94';
+            const baseOpts = { responsive: true, maintainAspectRatio: false };
+            const gridOpts = { color: 'rgba(0,0,0,0.05)' };
+
+            // Bar Horizontal — Distribusi Jenis berdasarkan Skala Prioritas
+            new Chart(document.getElementById('chartPriority'), {
+                type: 'bar',
+                data: {
+                    labels: ['Darurat\n(Prioritas Tinggi)', 'Sedang\n(Prioritas Sedang)', 'Ringan\n(Prioritas Rendah)'],
+                    datasets: [{
+                        label: 'Jumlah Laporan',
+                        data: <?= json_encode($priorityValues) ?>,
+                        backgroundColor: <?= json_encode($priorityBgColors) ?>,
+                        borderRadius: 8,
+                        borderSkipped: false,
+                    }]
+                },
+                options: {
+                    ...baseOpts,
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.x} laporan` } }
+                    },
+                    scales: {
+                        x: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 11 } }, grid: gridOpts },
+                        y: { ticks: { font: { size: 11 } }, grid: { display: false } }
+                    }
+                }
+            });
+
+            // Line — Trend
+            new Chart(document.getElementById('chartTrend'), {
+                type: 'line',
+                data: {
+                    labels: <?= json_encode($trendLabels) ?>,
+                    datasets: [{ label: 'Laporan', data: <?= json_encode($trendValues) ?>, borderColor: primary, backgroundColor: 'rgba(20,108,148,0.08)', borderWidth: 2.5, pointRadius: 4, pointBackgroundColor: primary, fill: true, tension: 0.4 }]
+                },
+                options: { ...baseOpts, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 11 } }, grid: gridOpts }, x: { ticks: { font: { size: 11 }, maxRotation: 45, maxTicksLimit: 10 }, grid: { display: false } } } }
+            });
+
+            // Bar Horizontal — Top Ruangan
+            new Chart(document.getElementById('chartRuangan'), {
+                type: 'bar',
+                data: {
+                    labels: <?= json_encode($topRuanganLabels ?: ['Tidak ada data']) ?>,
+                    datasets: [{ label: 'Laporan', data: <?= json_encode($topRuanganValues ?: [0]) ?>, backgroundColor: 'rgba(20,108,148,0.75)', borderRadius: 6, borderSkipped: false }]
+                },
+                options: { ...baseOpts, indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 11 } }, grid: gridOpts }, y: { ticks: { font: { size: 11 } }, grid: { display: false } } } }
+            });
+
+            // Stacked Bar — Status per Jenis
+            new Chart(document.getElementById('chartStacked'), {
+                type: 'bar',
+                data: {
+                    labels: ['Darurat', 'Sedang', 'Ringan'],
+                    datasets: [
+                        { label: 'Diajukan', data: [<?= $stackedData['Kerusakan Darurat / Berat']['Diajukan'] ?>, <?= $stackedData['Kerusakan Sedang']['Diajukan'] ?>, <?= $stackedData['Kerusakan Ringan']['Diajukan'] ?>], backgroundColor: '#f59e0b', borderRadius: 4 },
+                        { label: 'Diproses', data: [<?= $stackedData['Kerusakan Darurat / Berat']['Diproses'] ?>, <?= $stackedData['Kerusakan Sedang']['Diproses'] ?>, <?= $stackedData['Kerusakan Ringan']['Diproses'] ?>], backgroundColor: '#2F7FF0', borderRadius: 4 },
+                        { label: 'Selesai', data: [<?= $stackedData['Kerusakan Darurat / Berat']['Selesai'] ?>, <?= $stackedData['Kerusakan Sedang']['Selesai'] ?>, <?= $stackedData['Kerusakan Ringan']['Selesai'] ?>], backgroundColor: '#10b981', borderRadius: 4 },
+                    ]
+                },
+                options: { ...baseOpts, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 12, font: { size: 11 } } } }, scales: { x: { stacked: true, ticks: { font: { size: 12 } }, grid: { display: false } }, y: { stacked: true, beginAtZero: true, ticks: { stepSize: 1, font: { size: 11 } }, grid: gridOpts } } }
+            });
+        })();
+    </script>
+
+    <style>
         @media print {
 
             /* Hide navigation and controls */
@@ -713,7 +638,7 @@ mysqli_free_result($res);
 
             /* Show print-only header with logo */
             .print-only {
-                 display: none;
+                display: none;
             }
 
             .print-header-block {
