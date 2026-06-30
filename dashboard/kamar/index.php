@@ -8,20 +8,7 @@ if (!isset($_SESSION['userId'])) {
 
 require '../../db.php';
 
-$query = mysqli_query(
-    $db,
-    "SELECT
-        k.KamarID,
-        k.NomorKamar,
-        k.KapasitasPenghuni,
-        k.Lantai,
-        COUNT(p.PenghuniID) AS JumlahPenghuniAktual
-    FROM kamar k
-    LEFT JOIN penghuni p ON p.KamarID = k.KamarID AND p.IsDeleted = 0
-    WHERE k.IsDeleted = 0
-    GROUP BY k.KamarID, k.NomorKamar, k.KapasitasPenghuni, k.Lantai
-    ORDER BY k.NomorKamar ASC"
-);
+$query = mysqli_query($db, "CALL sp_getAllKamarWithOccupancy()");
 $totalKamar = mysqli_num_rows($query);
 ?>
 
@@ -29,11 +16,11 @@ $totalKamar = mysqli_num_rows($query);
 <html lang="en">
 <?php require '../../head.php'; ?>
 
-<body class="dashboard-body tw:p-0 tw:m-0 relative tw:flex">
+<body class="dashboard-body tw:p-0 tw:m-0 tw:relative tw:flex">
     <?php require '../components/sidebar.php'; ?>
 
-    <main class="dashboard-main tw:md:ml-75 tw:grow">
-        <div class="dashboard-page tw:pt-20 tw:md:pt-5 tw:px-5 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
+    <main class="tw:md:ml-75 tw:grow">
+        <div class="tw:pt-20 tw:md:pt-5 tw:px-5 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
             <?php require dirname(__DIR__) . '/components/breadcrumb.php'; ?>
             <h1 class="page-title" data-kicker="Master Kamar" data-subtitle="Monitor kapasitas, lantai, dan detail penghuni pada setiap kamar dengan layout yang lebih informatif.">
                 Kelola Kamar
@@ -41,7 +28,7 @@ $totalKamar = mysqli_num_rows($query);
 
             <div class="page-toolbar" data-note="<?= $totalKamar ?> kamar terdaftar">
                 <a href="create.php"
-                    class="page-primary-btn">
+                    class="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:min-h-12 tw:px-4 tw:py-[0.85rem] tw:rounded-2xl tw:border tw:border-transparent tw:font-extrabold tw:no-underline tw:text-white tw:bg-secondary tw:shadow-md tw:hover:bg-primary tw:transition-all tw:text-sm">
                     <i class="iconsax tw:text-2xl" icon-name="add-square"></i>
                     <span>Tambah Kamar</span>
                 </a>
@@ -52,10 +39,10 @@ $totalKamar = mysqli_num_rows($query);
                 <table id="kamarTable" class="table doremi-table text-center align-middle tw:mb-0">
                     <thead>
                         <tr>
-                            <th scope="col" class="text-center align-middle" style="width: 30%;">Nomor Kamar</th>
-                            <th scope="col" class="text-center align-middle" style="width: 30%;">Jumlah Penghuni</th>
-                            <th scope="col" class="text-center align-middle" style="width: 20%;">Lantai</th>
-                            <th scope="col" class="text-center align-middle" style="width: 20%;">Aksi</th>
+                            <th scope="col" class="text-center align-middle">Nomor Kamar</th>
+                            <th scope="col" class="text-center align-middle">Jumlah Penghuni</th>
+                            <th scope="col" class="text-center align-middle">Lantai</th>
+                            <th scope="col" class="text-center align-middle">Aksi</th>
                         </tr>
                     </thead>
 
@@ -78,15 +65,15 @@ $totalKamar = mysqli_num_rows($query);
                                 <td>Lantai <?php echo $kamar["Lantai"]; ?></td>
                                 <td>
                                     <div class="tw:inline-flex tw:justify-center tw:items-center tw:gap-1 tw:text-black">
-                                        <a href="detail.php?id=<?php echo (int) $kamar["KamarID"]; ?>" class="detail-action-btn" title="Lihat Detail Kamar">
+                                        <a href="detail.php?id=<?php echo (int) $kamar["KamarID"]; ?>" class="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:min-h-10 tw:px-[0.95rem] tw:py-[0.7rem] tw:rounded-[14px] tw:border tw:border-[rgba(22,60,122,0.18)] tw:bg-accent/40 tw:text-primary tw:font-extrabold tw:no-underline tw:hover:bg-accent/70 tw:transition-all tw:text-sm" title="Lihat Detail Kamar">
                                             <i class="iconsax tw:text-lg" icon-name="document-text-1"></i>
                                             <span>Detail</span>
                                         </a>
-                                        <a href="edit.php?id=<?php echo $kamar["KamarID"]; ?>" class="icon-action" title="Edit Kamar">
+                                        <a href="edit.php?id=<?php echo $kamar["KamarID"]; ?>" class="tw:w-9 tw:h-9 tw:inline-flex tw:items-center tw:justify-center tw:rounded-[12px] tw:bg-[rgba(47,127,240,0.08)] tw:text-primary tw:no-underline tw:hover:bg-[rgba(47,127,240,0.16)] tw:transition-all" title="Edit Kamar">
                                             <i class="iconsax tw:text-lg" icon-name="edit-2"></i>
                                         </a>
 
-                                        <button type="button" class="icon-action icon-action--danger"
+                                        <button type="button" class="tw:w-9 tw:h-9 tw:inline-flex tw:items-center tw:justify-center tw:rounded-[12px] tw:bg-[rgba(188,79,69,0.08)] tw:text-red-600 tw:no-underline tw:hover:bg-[rgba(188,79,69,0.16)] tw:transition-all"
                                             data-bs-toggle="modal" data-bs-target="#deleteModal"
                                             data-bs-id="<?php echo $kamar["KamarID"]; ?>" title="Hapus Kamar">
                                             <i class="iconsax tw:text-lg" icon-name="trash"></i>

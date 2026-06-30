@@ -11,7 +11,7 @@ require '../../db.php';
 $id = $_GET['id'] ?? null;
 
 if ($id) {
-    $stmt = mysqli_prepare($db, "UPDATE kamar SET IsDeleted = 1 WHERE KamarID = ?");
+    $stmt = mysqli_prepare($db, "CALL sp_deleteKamar(?)");
     mysqli_stmt_bind_param($stmt, "i", $id);
 
     if (mysqli_stmt_execute($stmt)) {

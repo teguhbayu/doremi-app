@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require 'helpers.php';
 maintenance_require_roles(['PENGURUS', 'PENGHUNI', 'SIGAP', 'SERVANDA', 'MAINTENANCE']);
@@ -7,7 +7,7 @@ require '../../db.php';
 
 $role = $_SESSION['userRole'];
 $userId = (int)$_SESSION['userId'];
-session_write_close(); // Lepas session lock — halaman ini hanya baca session
+session_write_close(); // Lepas session lock â€” halaman ini hanya baca session
 
 $whereClause = "WHERE m.IsDeleted = 0";
 if ($role !== 'MAINTENANCE') {
@@ -50,10 +50,10 @@ $totalReports = count($reports);
 <html lang="en">
 <?php require '../../head.php'; ?>
 
-<body class="dashboard-body tw:p-0 tw:m-0 relative tw:flex tw:bg-[#f8fafc] tw:min-h-screen">
+<body class="dashboard-body tw:p-0 tw:m-0 tw:relative tw:flex tw:min-h-screen">
     <?php require '../components/sidebar.php'; ?>
-    <main class="dashboard-main tw:md:ml-75 tw:grow">
-        <div class="dashboard-page tw:pt-20 tw:md:pt-8 tw:px-8 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
+    <main class="tw:md:ml-75 tw:grow">
+        <div class="tw:pt-20 tw:md:pt-8 tw:px-8 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
             <?php require dirname(__DIR__) . '/components/breadcrumb.php'; ?>
             <h1 class="page-title" data-kicker="Kelola Fasilitas"
                 data-subtitle="<?= htmlspecialchars($role === 'MAINTENANCE' ? 'Daftar semua laporan asrama yang diurutkan berdasarkan skala prioritas agar teknisi fokus pada kerusakan yang paling mendesak.' : 'Pantau seluruh laporan kerusakan fasilitas yang Anda ajukan beserta progres penanganannya.') ?>">
@@ -61,7 +61,7 @@ $totalReports = count($reports);
             </h1>
 
             <div class="page-toolbar" data-note="<?= $totalReports ?> laporan tercatat">
-                <a href="create.php" class="page-primary-btn">
+                <a href="create.php" class="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:min-h-12 tw:px-4 tw:py-[0.85rem] tw:rounded-2xl tw:border tw:border-transparent tw:font-extrabold tw:no-underline tw:text-white tw:bg-secondary tw:shadow-md tw:hover:bg-primary tw:transition-all tw:text-sm">
                     <i class="iconsax tw:text-xl" icon-name="add-square"></i>
                     <span>Buat Laporan</span>
                 </a>
@@ -124,7 +124,7 @@ $totalReports = count($reports);
                                     </td>
                                     <td>
                                         <div class="tw:inline-flex tw:gap-2">
-                                            <button type="button" class="detail-action-btn"
+                                            <button type="button" class="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:min-h-10 tw:px-[0.95rem] tw:py-[0.7rem] tw:rounded-[14px] tw:border tw:border-[rgba(22,60,122,0.18)] tw:bg-accent/40 tw:text-primary tw:font-extrabold tw:no-underline tw:hover:bg-accent/70 tw:transition-all tw:text-sm"
                                                     data-bs-toggle="modal" data-bs-target="#detailModal<?= $r['MaintenanceID'] ?>">
                                                 <i class="iconsax tw:text-lg" icon-name="document-text-1"></i>
                                                 <span>Detail</span>
@@ -158,10 +158,10 @@ $totalReports = count($reports);
                                                     }
                                                 ?>
                                                 <?php if ($isOwner): ?>
-                                                    <a href="edit.php?id=<?= $r['MaintenanceID'] ?>" class="icon-action">
+                                                    <a href="edit.php?id=<?= $r['MaintenanceID'] ?>" class="tw:w-9 tw:h-9 tw:inline-flex tw:items-center tw:justify-center tw:rounded-[12px] tw:bg-[rgba(47,127,240,0.08)] tw:text-primary tw:no-underline tw:hover:bg-[rgba(47,127,240,0.16)] tw:transition-all">
                                                         <i class="iconsax tw:text-lg" icon-name="edit-2"></i>
                                                     </a>
-                                                    <button type="button" class="icon-action icon-action--danger"
+                                                    <button type="button" class="tw:w-9 tw:h-9 tw:inline-flex tw:items-center tw:justify-center tw:rounded-[12px] tw:bg-[rgba(188,79,69,0.08)] tw:text-red-600 tw:no-underline tw:hover:bg-[rgba(188,79,69,0.16)] tw:transition-all"
                                                             data-bs-toggle="modal" data-bs-target="#deleteModal"
                                                             data-bs-id="<?= $r['MaintenanceID'] ?>">
                                                         <i class="iconsax tw:text-lg" icon-name="trash"></i>
@@ -196,7 +196,7 @@ $totalReports = count($reports);
                                                     </div>
                                                     <div>
                                                         <label class="tw:text-xs tw:text-slate-500">Deskripsi Masalah</label>
-                                                        <p class="tw:text-slate-700 tw:whitespace-pre-line tw:break-words" style="word-break: break-word; overflow-wrap: break-word;"><?= htmlspecialchars($r['Deskripsi']) ?></p>
+                                                        <p class="tw:text-slate-700 tw:whitespace-pre-line tw:break-words"><?= htmlspecialchars($r['Deskripsi']) ?></p>
                                                     </div>
                                                      <?php if (!empty($r['HasFotoLaporan'])): ?>
                                                         <div>
@@ -224,7 +224,7 @@ $totalReports = count($reports);
                                                             </div>
                                                             <div class="tw:mb-3">
                                                                 <label class="tw:text-xs tw:text-emerald-600">Keterangan Hasil Kerja</label>
-                                                                <p class="tw:text-emerald-950 tw:mb-0 tw:break-words" style="word-break: break-word; overflow-wrap: break-word;"><?= nl2br(htmlspecialchars($r['Keterangan'] ?? '-')) ?></p>
+                                                                <p class="tw:text-emerald-950 tw:mb-0 tw:break-words"><?= nl2br(htmlspecialchars($r['Keterangan'] ?? '-')) ?></p>
                                                             </div>
                                                              <?php if (!empty($r['HasFotoMaintenance'])): ?>
                                                                 <div>

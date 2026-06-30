@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['userId'])) {
     header("Location: /doremi-app/login.php");
@@ -179,17 +179,10 @@ if ($role === 'MAINTENANCE') {
 <html lang="en">
 <?php require '../head.php'; ?>
 
-<body class="dashboard-body tw:p-0 tw:m-0 relative tw:flex tw:bg-[#f8fafc] tw:min-h-screen tw:overflow-x-hidden">
-    <div
-        class="tw:absolute tw:top-[-10%] tw:right-[-5%] tw:w-[500px] tw:h-[500px] tw:bg-primary/5 tw:rounded-full tw:blur-[120px] tw:pointer-events-none">
-    </div>
-    <div
-        class="tw:absolute tw:bottom-[10%] tw:left-[20%] tw:w-[400px] tw:h-[400px] tw:bg-secondary/5 tw:rounded-full tw:blur-[100px] tw:pointer-events-none">
-    </div>
-
+<body class="dashboard-body tw:p-0 tw:m-0 tw:relative tw:flex tw:min-h-screen tw:overflow-x-hidden">
     <?php require 'components/sidebar.php'; ?>
-    <main class="dashboard-main tw:md:ml-75 tw:grow tw:relative tw:z-10">
-        <div class="dashboard-page tw:pt-20 tw:md:pt-8 tw:px-8 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
+    <main class="tw:md:ml-75 tw:grow tw:relative tw:z-10">
+        <div class="tw:pt-20 tw:md:pt-8 tw:px-8 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
             <h1 class="page-title" data-kicker="Dashboard Utama"
                 data-subtitle="Selamat datang kembali di dashboard DOREMI. Semua aktivitas operasional Dormitory ada di satu tempat dan mengikuti pola kerja yang sama.">
                 Halo, <?= htmlspecialchars($userName) ?>
@@ -198,47 +191,47 @@ if ($role === 'MAINTENANCE') {
             <!-- 1. BLOK STATS UNTUK PENGURUS -->
             <?php if ($role === 'PENGURUS'): ?>
                 <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:lg:grid-cols-4 tw:gap-6 tw:mb-10">
-                    <div class="dashboard-stat-card">
-                        <div class="dashboard-stat-card__row">
-                            <div class="dashboard-stat-card__icon dashboard-stat-card__icon--primary">
+                    <div data-gsap="stat-card" class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.85)] tw:shadow-sm">
+                        <div class="tw:flex tw:items-center tw:gap-4">
+                            <div class="tw:w-[3.4rem] tw:h-[3.4rem] tw:inline-flex tw:items-center tw:justify-center tw:rounded-[20px] tw:flex-shrink-0 tw:text-primary tw:bg-accent/80">
                                 <i class="iconsax tw:text-3xl" icon-name="group"></i>
                             </div>
                             <div>
-                                <span class="dashboard-stat-card__eyebrow">Penghuni</span>
-                                <strong class="dashboard-stat-card__value"><?= $activePenghuni ?></strong>
+                                <span class="tw:block tw:text-slate-500 tw:text-[0.72rem] tw:font-extrabold tw:tracking-[0.08em] tw:uppercase">Penghuni</span>
+                                <strong class="tw:block tw:mt-[0.3rem] tw:text-[1.9rem] tw:leading-none tw:text-slate-900 tw:font-bold" data-count="<?= $activePenghuni ?>">0</strong>
                             </div>
                         </div>
                     </div>
-                    <div class="dashboard-stat-card">
-                        <div class="dashboard-stat-card__row">
-                            <div class="dashboard-stat-card__icon dashboard-stat-card__icon--warning">
+                    <div data-gsap="stat-card" class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.85)] tw:shadow-sm">
+                        <div class="tw:flex tw:items-center tw:gap-4">
+                            <div class="tw:w-[3.4rem] tw:h-[3.4rem] tw:inline-flex tw:items-center tw:justify-center tw:rounded-[20px] tw:flex-shrink-0 tw:text-amber-700 tw:bg-[rgba(250,236,207,0.82)]">
                                 <i class="iconsax tw:text-3xl" icon-name="clock-1"></i>
                             </div>
                             <div>
-                                <span class="dashboard-stat-card__eyebrow">Antrean Izin</span>
-                                <strong class="dashboard-stat-card__value"><?= $pendingInOut ?></strong>
+                                <span class="tw:block tw:text-slate-500 tw:text-[0.72rem] tw:font-extrabold tw:tracking-[0.08em] tw:uppercase">Antrean Izin</span>
+                                <strong class="tw:block tw:mt-[0.3rem] tw:text-[1.9rem] tw:leading-none tw:text-slate-900 tw:font-bold" data-count="<?= $pendingInOut ?>">0</strong>
                             </div>
                         </div>
                     </div>
-                    <div class="dashboard-stat-card">
-                        <div class="dashboard-stat-card__row">
-                            <div class="dashboard-stat-card__icon dashboard-stat-card__icon--success">
+                    <div data-gsap="stat-card" class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.85)] tw:shadow-sm">
+                        <div class="tw:flex tw:items-center tw:gap-4">
+                            <div class="tw:w-[3.4rem] tw:h-[3.4rem] tw:inline-flex tw:items-center tw:justify-center tw:rounded-[20px] tw:flex-shrink-0 tw:text-emerald-800 tw:bg-[rgba(220,244,239,0.82)]">
                                 <i class="iconsax tw:text-3xl" icon-name="box-time"></i>
                             </div>
                             <div>
-                                <span class="dashboard-stat-card__eyebrow">Paket Tertunda</span>
-                                <strong class="dashboard-stat-card__value"><?= $pendingPackagePickup ?></strong>
+                                <span class="tw:block tw:text-slate-500 tw:text-[0.72rem] tw:font-extrabold tw:tracking-[0.08em] tw:uppercase">Paket Tertunda</span>
+                                <strong class="tw:block tw:mt-[0.3rem] tw:text-[1.9rem] tw:leading-none tw:text-slate-900 tw:font-bold" data-count="<?= $pendingPackagePickup ?>">0</strong>
                             </div>
                         </div>
                     </div>
-                    <div class="dashboard-stat-card">
-                        <div class="dashboard-stat-card__row">
-                            <div class="dashboard-stat-card__icon dashboard-stat-card__icon--warning">
+                    <div data-gsap="stat-card" class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.85)] tw:shadow-sm">
+                        <div class="tw:flex tw:items-center tw:gap-4">
+                            <div class="tw:w-[3.4rem] tw:h-[3.4rem] tw:inline-flex tw:items-center tw:justify-center tw:rounded-[20px] tw:flex-shrink-0 tw:text-amber-700 tw:bg-[rgba(250,236,207,0.82)]">
                                 <i class="iconsax tw:text-3xl" icon-name="setting-2"></i>
                             </div>
                             <div>
-                                <span class="dashboard-stat-card__eyebrow">Antrean Perbaikan</span>
-                                <strong class="dashboard-stat-card__value"><?= $pendingMaintenance ?></strong>
+                                <span class="tw:block tw:text-slate-500 tw:text-[0.72rem] tw:font-extrabold tw:tracking-[0.08em] tw:uppercase">Antrean Perbaikan</span>
+                                <strong class="tw:block tw:mt-[0.3rem] tw:text-[1.9rem] tw:leading-none tw:text-slate-900 tw:font-bold" data-count="<?= $pendingMaintenance ?>">0</strong>
                             </div>
                         </div>
                     </div>
@@ -247,47 +240,47 @@ if ($role === 'MAINTENANCE') {
             <!-- 2. BLOK STATS UNTUK PENGHUNI -->
             <?php elseif ($role === 'PENGHUNI'): ?>
                 <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:xl:grid-cols-4 tw:gap-6 tw:mb-10">
-                    <div class="dashboard-stat-card">
-                        <div class="dashboard-stat-card__row">
-                            <div class="dashboard-stat-card__icon dashboard-stat-card__icon--primary">
+                    <div data-gsap="stat-card" class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.85)] tw:shadow-sm">
+                        <div class="tw:flex tw:items-center tw:gap-4">
+                            <div class="tw:w-[3.4rem] tw:h-[3.4rem] tw:inline-flex tw:items-center tw:justify-center tw:rounded-[20px] tw:flex-shrink-0 tw:text-primary tw:bg-accent/80">
                                 <i class="iconsax tw:text-3xl" icon-name="box-1"></i>
                             </div>
                             <div>
-                                <span class="dashboard-stat-card__eyebrow">Paket Masuk</span>
-                                <strong class="dashboard-stat-card__value"><?= $totalPaketMasuk ?></strong>
+                                <span class="tw:block tw:text-slate-500 tw:text-[0.72rem] tw:font-extrabold tw:tracking-[0.08em] tw:uppercase">Paket Masuk</span>
+                                <strong class="tw:block tw:mt-[0.3rem] tw:text-[1.9rem] tw:leading-none tw:text-slate-900 tw:font-bold" data-count="<?= $totalPaketMasuk ?>">0</strong>
                             </div>
                         </div>
                     </div>
-                    <div class="dashboard-stat-card">
-                        <div class="dashboard-stat-card__row">
-                            <div class="dashboard-stat-card__icon dashboard-stat-card__icon--warning">
+                    <div data-gsap="stat-card" class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.85)] tw:shadow-sm">
+                        <div class="tw:flex tw:items-center tw:gap-4">
+                            <div class="tw:w-[3.4rem] tw:h-[3.4rem] tw:inline-flex tw:items-center tw:justify-center tw:rounded-[20px] tw:flex-shrink-0 tw:text-amber-700 tw:bg-[rgba(250,236,207,0.82)]">
                                 <i class="iconsax tw:text-3xl" icon-name="box-time"></i>
                             </div>
                             <div>
-                                <span class="dashboard-stat-card__eyebrow">Belum Diambil</span>
-                                <strong class="dashboard-stat-card__value"><?= $paketBelumDiambil ?></strong>
+                                <span class="tw:block tw:text-slate-500 tw:text-[0.72rem] tw:font-extrabold tw:tracking-[0.08em] tw:uppercase">Belum Diambil</span>
+                                <strong class="tw:block tw:mt-[0.3rem] tw:text-[1.9rem] tw:leading-none tw:text-slate-900 tw:font-bold" data-count="<?= $paketBelumDiambil ?>">0</strong>
                             </div>
                         </div>
                     </div>
-                    <div class="dashboard-stat-card">
-                        <div class="dashboard-stat-card__row">
-                            <div class="dashboard-stat-card__icon dashboard-stat-card__icon--danger">
+                    <div data-gsap="stat-card" class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.85)] tw:shadow-sm">
+                        <div class="tw:flex tw:items-center tw:gap-4">
+                            <div class="tw:w-[3.4rem] tw:h-[3.4rem] tw:inline-flex tw:items-center tw:justify-center tw:rounded-[20px] tw:flex-shrink-0 tw:text-red-700 tw:bg-[rgba(245,221,218,0.82)]">
                                 <i class="iconsax tw:text-3xl" icon-name="danger"></i>
                             </div>
                             <div>
-                                <span class="dashboard-stat-card__eyebrow">Izin Aktif</span>
-                                <strong class="dashboard-stat-card__value"><?= $izinAktif ?></strong>
+                                <span class="tw:block tw:text-slate-500 tw:text-[0.72rem] tw:font-extrabold tw:tracking-[0.08em] tw:uppercase">Izin Aktif</span>
+                                <strong class="tw:block tw:mt-[0.3rem] tw:text-[1.9rem] tw:leading-none tw:text-slate-900 tw:font-bold" data-count="<?= $izinAktif ?>">0</strong>
                             </div>
                         </div>
                     </div>
-                    <div class="dashboard-stat-card">
-                        <div class="dashboard-stat-card__row">
-                            <div class="dashboard-stat-card__icon dashboard-stat-card__icon--success">
+                    <div data-gsap="stat-card" class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.85)] tw:shadow-sm">
+                        <div class="tw:flex tw:items-center tw:gap-4">
+                            <div class="tw:w-[3.4rem] tw:h-[3.4rem] tw:inline-flex tw:items-center tw:justify-center tw:rounded-[20px] tw:flex-shrink-0 tw:text-emerald-800 tw:bg-[rgba(220,244,239,0.82)]">
                                 <i class="iconsax tw:text-3xl" icon-name="setting-2"></i>
                             </div>
                             <div>
-                                <span class="dashboard-stat-card__eyebrow">Laporan Disetujui</span>
-                                <strong class="dashboard-stat-card__value"><?= $diprosesAtauSelesai ?></strong>
+                                <span class="tw:block tw:text-slate-500 tw:text-[0.72rem] tw:font-extrabold tw:tracking-[0.08em] tw:uppercase">Laporan Disetujui</span>
+                                <strong class="tw:block tw:mt-[0.3rem] tw:text-[1.9rem] tw:leading-none tw:text-slate-900 tw:font-bold" data-count="<?= $diprosesAtauSelesai ?>">0</strong>
                             </div>
                         </div>
                     </div>
@@ -296,48 +289,48 @@ if ($role === 'MAINTENANCE') {
             <!-- 3. BLOK STATS UNTUK MAINTENANCE TEAM -->
             <?php elseif ($role === 'MAINTENANCE'): ?>
                 <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:lg:grid-cols-4 tw:gap-6 tw:mb-10">
-                    <div class="dashboard-stat-card">
-                        <div class="dashboard-stat-card__row">
-                            <div class="dashboard-stat-card__icon dashboard-stat-card__icon--warning">
+                    <div data-gsap="stat-card" class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.85)] tw:shadow-sm">
+                        <div class="tw:flex tw:items-center tw:gap-4">
+                            <div class="tw:w-[3.4rem] tw:h-[3.4rem] tw:inline-flex tw:items-center tw:justify-center tw:rounded-[20px] tw:flex-shrink-0 tw:text-amber-700 tw:bg-[rgba(250,236,207,0.82)]">
                                 <i class="iconsax tw:text-3xl" icon-name="clock-1"></i>
                             </div>
                             <div>
-                                <span class="dashboard-stat-card__eyebrow">Antrean Tugas</span>
-                                <strong class="dashboard-stat-card__value"><?= $pendingTasks ?></strong>
+                                <span class="tw:block tw:text-slate-500 tw:text-[0.72rem] tw:font-extrabold tw:tracking-[0.08em] tw:uppercase">Antrean Tugas</span>
+                                <strong class="tw:block tw:mt-[0.3rem] tw:text-[1.9rem] tw:leading-none tw:text-slate-900 tw:font-bold" data-count="<?= $pendingTasks ?>">0</strong>
                             </div>
                         </div>
                     </div>
-                    <div class="dashboard-stat-card">
-                        <div class="dashboard-stat-card__row">
-                            <div class="dashboard-stat-card__icon dashboard-stat-card__icon--primary">
+                    <div data-gsap="stat-card" class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.85)] tw:shadow-sm">
+                        <div class="tw:flex tw:items-center tw:gap-4">
+                            <div class="tw:w-[3.4rem] tw:h-[3.4rem] tw:inline-flex tw:items-center tw:justify-center tw:rounded-[20px] tw:flex-shrink-0 tw:text-primary tw:bg-accent/80">
                                 <i class="iconsax tw:text-3xl" icon-name="setting-2"></i>
                             </div>
                             <div>
-                                <span class="dashboard-stat-card__eyebrow">Sedang Diproses</span>
-                                <strong class="dashboard-stat-card__value"><?= $myOngoingTasks ?></strong>
+                                <span class="tw:block tw:text-slate-500 tw:text-[0.72rem] tw:font-extrabold tw:tracking-[0.08em] tw:uppercase">Sedang Diproses</span>
+                                <strong class="tw:block tw:mt-[0.3rem] tw:text-[1.9rem] tw:leading-none tw:text-slate-900 tw:font-bold" data-count="<?= $myOngoingTasks ?>">0</strong>
                             </div>
                         </div>
                     </div>
-                    <div class="dashboard-stat-card">
-                        <div class="dashboard-stat-card__row">
-                            <div class="dashboard-stat-card__icon dashboard-stat-card__icon--success">
+                    <div data-gsap="stat-card" class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.85)] tw:shadow-sm">
+                        <div class="tw:flex tw:items-center tw:gap-4">
+                            <div class="tw:w-[3.4rem] tw:h-[3.4rem] tw:inline-flex tw:items-center tw:justify-center tw:rounded-[20px] tw:flex-shrink-0 tw:text-emerald-800 tw:bg-[rgba(220,244,239,0.82)]">
                                 <i class="iconsax tw:text-3xl" icon-name="tick-circle"></i>
                             </div>
                             <div>
-                                <span class="dashboard-stat-card__eyebrow">Selesai Diperbaiki</span>
-                                <strong class="dashboard-stat-card__value"><?= $myCompletedTasks ?></strong>
+                                <span class="tw:block tw:text-slate-500 tw:text-[0.72rem] tw:font-extrabold tw:tracking-[0.08em] tw:uppercase">Selesai Diperbaiki</span>
+                                <strong class="tw:block tw:mt-[0.3rem] tw:text-[1.9rem] tw:leading-none tw:text-slate-900 tw:font-bold" data-count="<?= $myCompletedTasks ?>">0</strong>
                             </div>
                         </div>
                     </div>
-                    <div class="dashboard-stat-card">
-                        <div class="dashboard-stat-card__row">
+                    <div data-gsap="stat-card" class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.85)] tw:shadow-sm">
+                        <div class="tw:flex tw:items-center tw:gap-4">
                             <!-- Berwarna merah jika ada tugas skala darurat aktif yang harus diselesaikan segera -->
-                            <div class="dashboard-stat-card__icon <?= $activeEmergencyTasks > 0 ? 'dashboard-stat-card__icon--danger' : 'tw:bg-slate-100 tw:text-slate-500' ?>">
+                            <div class="tw:w-[3.4rem] tw:h-[3.4rem] tw:inline-flex tw:items-center tw:justify-center tw:rounded-[20px] tw:flex-shrink-0 <?= $activeEmergencyTasks > 0 ? 'tw:text-red-700 tw:bg-[rgba(245,221,218,0.82)]' : 'tw:bg-slate-100 tw:text-slate-500' ?>">
                                 <i class="iconsax tw:text-3xl" icon-name="danger"></i>
                             </div>
                             <div>
-                                <span class="dashboard-stat-card__eyebrow">Darurat Aktif</span>
-                                <strong class="dashboard-stat-card__value <?= $activeEmergencyTasks > 0 ? 'tw:text-red-600' : '' ?>"><?= $activeEmergencyTasks ?></strong>
+                                <span class="tw:block tw:text-slate-500 tw:text-[0.72rem] tw:font-extrabold tw:tracking-[0.08em] tw:uppercase">Darurat Aktif</span>
+                                <strong class="tw:block tw:mt-[0.3rem] tw:text-[1.9rem] tw:leading-none tw:text-slate-900 tw:font-bold <?= $activeEmergencyTasks > 0 ? 'tw:text-red-600' : '' ?>" data-count="<?= $activeEmergencyTasks ?>">0</strong>
                             </div>
                         </div>
                     </div>
@@ -347,31 +340,31 @@ if ($role === 'MAINTENANCE') {
             <!-- BAGIAN PANEL INFORMASI MENYESUAIKAN ROLE -->
             <?php if ($role === 'PENGURUS'): ?>
                 <div class="tw:grid tw:grid-cols-1 tw:lg:grid-cols-2 tw:gap-8">
-                    <div class="dashboard-side-panel">
-                        <h5 class="dashboard-side-panel__title">Ringkasan Pending</h5>
-                        <p class="dashboard-side-panel__copy">Fokus utama pengurus hari ini ada di permintaan izin keluar, distribusi paket, dan laporan maintenance yang masih menunggu tindakan.</p>
-                        <div class="dashboard-info-list">
-                            <div class="dashboard-info-item">
-                                <span class="dashboard-info-item__label">Permintaan izin keluar</span>
+                    <div data-gsap="panel" class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.88)] tw:shadow-sm">
+                        <h5 class="tw:m-0 tw:text-[1.2rem] tw:text-slate-900">Ringkasan Pending</h5>
+                        <p class="tw:m-0 tw:text-slate-500 tw:leading-[1.75] tw:text-sm">Fokus utama pengurus hari ini ada di permintaan izin keluar, distribusi paket, dan laporan maintenance yang masih menunggu tindakan.</p>
+                        <div class="tw:grid tw:gap-[0.85rem]">
+                            <div class="tw:p-4 tw:rounded-[18px] tw:bg-[rgba(255,255,255,0.80)] tw:border tw:border-[rgba(22,60,122,0.08)]">
+                                <span class="tw:block tw:mb-[0.3rem] tw:text-slate-500 tw:text-xs tw:font-bold">Permintaan izin keluar</span>
                                 <strong><?= $pendingInOut ?> permintaan</strong>
                                 <p>Perlu konfirmasi dari petugas SIGAP agar tidak menumpuk.</p>
                             </div>
-                            <div class="dashboard-info-item">
-                                <span class="dashboard-info-item__label">Paket belum diambil</span>
+                            <div class="tw:p-4 tw:rounded-[18px] tw:bg-[rgba(255,255,255,0.80)] tw:border tw:border-[rgba(22,60,122,0.08)]">
+                                <span class="tw:block tw:mb-[0.3rem] tw:text-slate-500 tw:text-xs tw:font-bold">Paket belum diambil</span>
                                 <strong><?= $pendingPackagePickup ?> paket</strong>
                                 <p>Pantau paket yang masih menunggu diambil penghuni.</p>
                             </div>
-                            <div class="dashboard-info-item">
-                                <span class="dashboard-info-item__label">Laporan maintenance baru</span>
+                            <div class="tw:p-4 tw:rounded-[18px] tw:bg-[rgba(255,255,255,0.80)] tw:border tw:border-[rgba(22,60,122,0.08)]">
+                                <span class="tw:block tw:mb-[0.3rem] tw:text-slate-500 tw:text-xs tw:font-bold">Laporan maintenance baru</span>
                                 <strong><?= $pendingMaintenance ?> laporan</strong>
                                 <p>Prioritaskan laporan yang masih berstatus diajukan.</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="dashboard-side-panel">
-                        <h5 class="dashboard-side-panel__title">Distribusi Gender Penghuni</h5>
-                        <p class="dashboard-side-panel__copy">Ringkasan komposisi penghuni aktif untuk pemantauan cepat di level pengurus.</p>
+                    <div data-gsap="panel" class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.88)] tw:shadow-sm">
+                        <h5 class="tw:m-0 tw:text-[1.2rem] tw:text-slate-900">Distribusi Gender Penghuni</h5>
+                        <p class="tw:m-0 tw:text-slate-500 tw:leading-[1.75] tw:text-sm">Ringkasan komposisi penghuni aktif untuk pemantauan cepat di level pengurus.</p>
                         <div class="tw:h-[320px] tw:flex tw:justify-center">
                             <canvas id="genderChart"></canvas>
                         </div>
@@ -405,53 +398,53 @@ if ($role === 'MAINTENANCE') {
 
             <?php elseif ($role === 'PENGHUNI'): ?>
                 <div class="tw:grid tw:grid-cols-1 tw:lg:grid-cols-2 tw:gap-8">
-                    <div class="dashboard-side-panel">
-                        <h5 class="dashboard-side-panel__title">Ringkasan Paket</h5>
-                        <p class="dashboard-side-panel__copy">Pantau paket yang baru datang, yang belum diambil, dan kasus tertukar tanpa harus masuk ke menu paket dulu.</p>
-                        <div class="dashboard-info-list">
-                            <div class="dashboard-info-item">
-                                <span class="dashboard-info-item__label">Belum diambil</span>
+                    <div data-gsap="panel" class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.88)] tw:shadow-sm">
+                        <h5 class="tw:m-0 tw:text-[1.2rem] tw:text-slate-900">Ringkasan Paket</h5>
+                        <p class="tw:m-0 tw:text-slate-500 tw:leading-[1.75] tw:text-sm">Pantau paket yang baru datang, yang belum diambil, dan kasus tertukar tanpa harus masuk ke menu paket dulu.</p>
+                        <div class="tw:grid tw:gap-[0.85rem]">
+                            <div class="tw:p-4 tw:rounded-[18px] tw:bg-[rgba(255,255,255,0.80)] tw:border tw:border-[rgba(22,60,122,0.08)]">
+                                <span class="tw:block tw:mb-[0.3rem] tw:text-slate-500 tw:text-xs tw:font-bold">Belum diambil</span>
                                 <strong><?= $paketBelumDiambil ?> paket</strong>
                                 <p>Segera cek menu paket bila ada kiriman baru yang belum Anda ambil.</p>
                             </div>
-                            <div class="dashboard-info-item">
-                                <span class="dashboard-info-item__label">Sudah diambil</span>
+                            <div class="tw:p-4 tw:rounded-[18px] tw:bg-[rgba(255,255,255,0.80)] tw:border tw:border-[rgba(22,60,122,0.08)]">
+                                <span class="tw:block tw:mb-[0.3rem] tw:text-slate-500 tw:text-xs tw:font-bold">Sudah diambil</span>
                                 <strong><?= $paketSudahDiambil ?> paket</strong>
                                 <p>Riwayat pengambilan paket Anda sudah tercatat.</p>
                             </div>
-                            <div class="dashboard-info-item">
-                                <span class="dashboard-info-item__label">Tertukar</span>
+                            <div class="tw:p-4 tw:rounded-[18px] tw:bg-[rgba(255,255,255,0.80)] tw:border tw:border-[rgba(22,60,122,0.08)]">
+                                <span class="tw:block tw:mb-[0.3rem] tw:text-slate-500 tw:text-xs tw:font-bold">Tertukar</span>
                                 <strong><?= $paketTertukar ?> paket</strong>
                                 <p>Hubungi petugas SIGAP jika ada paket yang ditandai tertukar.</p>
                             </div>
                         </div>
-                        <div class="page-summary-actions">
-                            <a href="/doremi-app/dashboard/paket/" class="page-secondary-btn">Buka Menu Paket</a>
+                        <div class="tw:inline-flex tw:items-center tw:gap-3 tw:flex-wrap tw:mt-4">
+                            <a href="/doremi-app/dashboard/paket/" class="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:min-h-12 tw:px-4 tw:py-[0.85rem] tw:rounded-2xl tw:border tw:border-[rgba(22,60,122,0.12)] tw:font-extrabold tw:no-underline tw:text-slate-900 tw:bg-[rgba(255,255,255,0.82)] tw:hover:bg-gray-50 tw:transition-all tw:text-sm">Buka Menu Paket</a>
                         </div>
                     </div>
 
-                    <div class="dashboard-side-panel">
-                        <h5 class="dashboard-side-panel__title">Status Laporan Kerusakan</h5>
-                        <p class="dashboard-side-panel__copy">Lihat progres laporan yang Anda kirim, mulai dari diajukan sampai selesai dikerjakan.</p>
-                        <div class="dashboard-info-list">
-                            <div class="dashboard-info-item">
-                                <span class="dashboard-info-item__label">Diajukan</span>
+                    <div data-gsap="panel" class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.88)] tw:shadow-sm">
+                        <h5 class="tw:m-0 tw:text-[1.2rem] tw:text-slate-900">Status Laporan Kerusakan</h5>
+                        <p class="tw:m-0 tw:text-slate-500 tw:leading-[1.75] tw:text-sm">Lihat progres laporan yang Anda kirim, mulai dari diajukan sampai selesai dikerjakan.</p>
+                        <div class="tw:grid tw:gap-[0.85rem]">
+                            <div class="tw:p-4 tw:rounded-[18px] tw:bg-[rgba(255,255,255,0.80)] tw:border tw:border-[rgba(22,60,122,0.08)]">
+                                <span class="tw:block tw:mb-[0.3rem] tw:text-slate-500 tw:text-xs tw:font-bold">Diajukan</span>
                                 <strong><?= $maintenanceSummary['Diajukan'] ?> laporan</strong>
                                 <p>Masih menunggu diproses oleh unit maintenance.</p>
                             </div>
-                            <div class="dashboard-info-item">
-                                <span class="dashboard-info-item__label">Diproses</span>
+                            <div class="tw:p-4 tw:rounded-[18px] tw:bg-[rgba(255,255,255,0.80)] tw:border tw:border-[rgba(22,60,122,0.08)]">
+                                <span class="tw:block tw:mb-[0.3rem] tw:text-slate-500 tw:text-xs tw:font-bold">Diproses</span>
                                 <strong><?= $maintenanceSummary['Diproses'] ?> laporan</strong>
                                 <p>Sudah diterima dan sedang dikerjakan.</p>
                             </div>
-                            <div class="dashboard-info-item">
-                                <span class="dashboard-info-item__label">Selesai</span>
+                            <div class="tw:p-4 tw:rounded-[18px] tw:bg-[rgba(255,255,255,0.80)] tw:border tw:border-[rgba(22,60,122,0.08)]">
+                                <span class="tw:block tw:mb-[0.3rem] tw:text-slate-500 tw:text-xs tw:font-bold">Selesai</span>
                                 <strong><?= $maintenanceSummary['Selesai'] ?> laporan</strong>
                                 <p>Perbaikan telah diselesaikan oleh teknisi.</p>
                             </div>
                         </div>
-                        <div class="page-summary-actions">
-                            <a href="/doremi-app/dashboard/maintenance/" class="page-secondary-btn">Kelola Semua Pekerjaan</a>
+                        <div class="tw:inline-flex tw:items-center tw:gap-3 tw:flex-wrap tw:mt-4">
+                            <a href="/doremi-app/dashboard/maintenance/" class="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:min-h-12 tw:px-4 tw:py-[0.85rem] tw:rounded-2xl tw:border tw:border-[rgba(22,60,122,0.12)] tw:font-extrabold tw:no-underline tw:text-slate-900 tw:bg-[rgba(255,255,255,0.82)] tw:hover:bg-gray-50 tw:transition-all tw:text-sm">Kelola Semua Pekerjaan</a>
                         </div>
                     </div>
                 </div>
@@ -462,71 +455,60 @@ if ($role === 'MAINTENANCE') {
                 <!-- Baris 1: Laporan Darurat Aktif -->
                 <?php if ($activeEmergencyTasks > 0): ?>
                 <div class="tw:mb-8">
-                    <!-- Header Alert Banner -->
-                    <div style="background: linear-gradient(135deg, #7f1d1d, #bc4f45); border-radius: 16px 16px 0 0; padding: 16px 24px; display: flex; align-items: center; gap: 14px;">
-                        <div style="width:40px; height:40px; border-radius:50%; background:rgba(255,255,255,0.15); display:flex; align-items:center; justify-content:center; flex-shrink:0; animation: pulse-ring 1.5s ease-in-out infinite;">
-                            <i class="fa-solid fa-triangle-exclamation" style="color:#fff; font-size:18px;"></i>
+                    <div class="tw:rounded-t-2xl tw:p-[16px_24px] tw:flex tw:items-center tw:gap-[14px] tw:bg-[linear-gradient(135deg,#7f1d1d,#bc4f45)]">
+                        <div class="tw:w-10 tw:h-10 tw:rounded-full tw:bg-[rgba(255,255,255,0.15)] tw:flex tw:items-center tw:justify-center tw:flex-shrink-0 tw:animate-pulse">
+                            <i class="fa-solid fa-triangle-exclamation tw:text-white tw:text-[18px]"></i>
                         </div>
-                        <div style="flex:1;">
-                            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-                                <span style="color:#fff; font-size:15px; font-weight:800; letter-spacing:-0.01em;">Laporan Darurat Aktif</span>
-                                <span style="background:rgba(255,255,255,0.22); color:#fff; font-size:11px; font-weight:700; padding:2px 10px; border-radius:20px;"><?= $activeEmergencyTasks ?> laporan</span>
+                        <div class="tw:flex-1">
+                            <div class="tw:flex tw:items-center tw:gap-[10px] tw:flex-wrap">
+                                <span class="tw:text-white tw:text-[15px] tw:font-extrabold tw:tracking-[-0.01em]">Laporan Darurat Aktif</span>
+                                <span class="tw:bg-[rgba(255,255,255,0.22)] tw:text-white tw:text-[11px] tw:font-bold tw:px-[10px] tw:py-[2px] tw:rounded-full"><?= $activeEmergencyTasks ?> laporan</span>
                             </div>
-                            <p style="color:rgba(255,255,255,0.78); font-size:12px; margin:3px 0 0;">Laporan bertingkat kerusakan darurat / berat yang belum selesai. Tangani segera sesuai protokol prioritas OSHA.</p>
+                            <p class="tw:text-[rgba(255,255,255,0.78)] tw:text-xs tw:mt-[3px] tw:m-0">Laporan bertingkat kerusakan darurat / berat yang belum selesai. Tangani segera sesuai protokol prioritas OSHA.</p>
                         </div>
-                        <a href="/doremi-app/dashboard/maintenance/" style="background:rgba(255,255,255,0.18); color:#fff; border:1.5px solid rgba(255,255,255,0.3); font-size:12px; font-weight:700; padding:8px 16px; border-radius:10px; text-decoration:none; white-space:nowrap; flex-shrink:0;">Lihat Semua &rarr;</a>
+                        <a href="/doremi-app/dashboard/maintenance/" class="tw:bg-[rgba(255,255,255,0.18)] tw:text-white tw:border tw:border-[rgba(255,255,255,0.3)] tw:text-xs tw:font-bold tw:px-4 tw:py-2 tw:rounded-[10px] tw:no-underline tw:whitespace-nowrap tw:flex-shrink-0">Lihat Semua &rarr;</a>
                     </div>
 
-                    <!-- List Laporan -->
-                    <div style="border: 1.5px solid #fca5a5; border-top:0; border-radius: 0 0 16px 16px; background:#fff; overflow:hidden;">
+                    <div class="tw:border tw:border-red-300 tw:border-t-0 tw:rounded-b-2xl tw:bg-white tw:overflow-hidden">
                         <?php foreach ($emergencyList as $idx => $em): ?>
                             <?php
                                 $emLokasi = !empty($em['NamaRuangan'])
-                                    ? 'Ruangan ' . htmlspecialchars($em['NamaRuangan']) . ' · Lantai ' . htmlspecialchars($em['LantaiRuangan'])
+                                    ? 'Ruangan ' . htmlspecialchars($em['NamaRuangan']) . ' Â· Lantai ' . htmlspecialchars($em['LantaiRuangan'])
                                     : (!empty($em['NamaBarang']) ? 'Inventaris: ' . htmlspecialchars($em['NamaBarang']) : 'Lokasi tidak diketahui');
                                 $emPelapor = htmlspecialchars($em['NamaPenghuni'] ?? $em['NamaReporterPetugas'] ?? 'Staff');
                                 $emStatus = $em['StatusMaintenance'];
                                 $emStatusColor = $emStatus === 'Diproses' ? '#2F7FF0' : '#f59e0b';
                                 $emStatusBg   = $emStatus === 'Diproses' ? '#eff6ff' : '#fffbeb';
                             ?>
-                            <div style="display:flex; align-items:flex-start; gap:14px; padding:16px 24px; <?= $idx < count($emergencyList) - 1 ? 'border-bottom:1px solid #fee2e2;' : '' ?>">
-                                <!-- Nomor urut -->
-                                <div style="width:28px; height:28px; border-radius:50%; background:#fee2e2; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px;">
-                                    <span style="font-size:11px; font-weight:800; color:#dc2626;"><?= $idx + 1 ?></span>
+                            <div class="tw:flex tw:items-start tw:gap-[14px] tw:p-[16px_24px] <?= $idx < count($emergencyList) - 1 ? 'tw:border-b tw:border-red-100' : '' ?>">
+                                <div class="tw:w-7 tw:h-7 tw:rounded-full tw:bg-red-100 tw:flex tw:items-center tw:justify-center tw:flex-shrink-0 tw:mt-[2px]">
+                                    <span class="tw:text-[11px] tw:font-extrabold tw:text-red-600"><?= $idx + 1 ?></span>
                                 </div>
-                                <!-- Konten -->
-                                <div style="flex:1; min-width:0;">
-                                    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:4px;">
-                                        <span style="font-size:13px; font-weight:700; color:#1e293b;"><?= $emLokasi ?></span>
+                                <div class="tw:flex-1 tw:min-w-0">
+                                    <div class="tw:flex tw:items-center tw:gap-2 tw:flex-wrap tw:mb-1">
+                                        <span class="tw:text-[13px] tw:font-bold tw:text-slate-900"><?= $emLokasi ?></span>
                                         <span style="font-size:11px; font-weight:600; color:<?= $emStatusColor ?>; background:<?= $emStatusBg ?>; padding:2px 9px; border-radius:20px; border:1px solid <?= $emStatusColor ?>33;"><?= htmlspecialchars($emStatus) ?></span>
                                     </div>
-                                    <p style="font-size:12px; color:#475569; margin:0 0 6px; line-height:1.5; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;"><?= htmlspecialchars($em['Deskripsi']) ?></p>
-                                    <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-                                        <span style="font-size:11px; color:#94a3b8;"><i class="fa-solid fa-user" style="margin-right:4px;"></i><?= $emPelapor ?></span>
-                                        <span style="font-size:11px; color:#94a3b8;"><i class="fa-solid fa-calendar-days" style="margin-right:4px;"></i><?= date('d M Y', strtotime($em['TanggalLapor'])) ?></span>
+                                    <p class="tw:text-xs tw:text-slate-600 tw:m-0 tw:mb-[6px] tw:leading-[1.5] tw:line-clamp-2"><?= htmlspecialchars($em['Deskripsi']) ?></p>
+                                    <div class="tw:flex tw:items-center tw:gap-3 tw:flex-wrap">
+                                        <span class="tw:text-[11px] tw:text-slate-400"><i class="fa-solid fa-user tw:mr-1"></i><?= $emPelapor ?></span>
+                                        <span class="tw:text-[11px] tw:text-slate-400"><i class="fa-solid fa-calendar-days tw:mr-1"></i><?= date('d M Y', strtotime($em['TanggalLapor'])) ?></span>
                                     </div>
                                 </div>
-                                <!-- CTA -->
-                                <a href="/doremi-app/dashboard/maintenance/" style="font-size:11px; font-weight:700; color:#dc2626; background:#fee2e2; padding:6px 12px; border-radius:8px; text-decoration:none; white-space:nowrap; flex-shrink:0; margin-top:2px;">Proses &rarr;</a>
+                                <a href="/doremi-app/dashboard/maintenance/" class="tw:text-[11px] tw:font-bold tw:text-red-600 tw:bg-red-100 tw:px-3 tw:py-[6px] tw:rounded-lg tw:no-underline tw:whitespace-nowrap tw:flex-shrink-0 tw:mt-[2px]">Proses &rarr;</a>
                             </div>
                         <?php endforeach; ?>
                     </div>
                 </div>
-                <style>
-                    @keyframes pulse-ring {
-                        0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.35); }
-                        50%       { box-shadow: 0 0 0 8px rgba(255,255,255,0); }
-                    }
-                </style>
                 <?php else: ?>
                 <div class="tw:mb-8">
-                    <div style="border:1.5px solid #d1fae5; border-radius:16px; background:#f0fdf4; padding:20px 24px; display:flex; align-items:center; gap:14px;">
-                        <div style="width:40px; height:40px; border-radius:50%; background:#bbf7d0; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                            <i class="fa-solid fa-shield-halved" style="color:#15803d; font-size:18px;"></i>
+                    <div class="tw:border tw:border-emerald-200 tw:rounded-2xl tw:bg-green-50 tw:p-[20px_24px] tw:flex tw:items-center tw:gap-[14px]">
+                        <div class="tw:w-10 tw:h-10 tw:rounded-full tw:bg-emerald-200 tw:flex tw:items-center tw:justify-center tw:flex-shrink-0">
+                            <i class="fa-solid fa-shield-halved tw:text-green-700 tw:text-[18px]"></i>
                         </div>
                         <div>
-                            <span style="font-size:14px; font-weight:800; color:#14532d;">Tidak Ada Laporan Darurat</span>
-                            <p style="font-size:12px; color:#16a34a; margin:3px 0 0;">Saat ini tidak ada laporan dengan skala prioritas darurat yang aktif. Kondisi asrama aman terkendali.</p>
+                            <span class="tw:text-sm tw:font-extrabold tw:text-green-900">Tidak Ada Laporan Darurat</span>
+                            <p class="tw:text-xs tw:text-green-600 tw:mt-[3px] tw:m-0">Saat ini tidak ada laporan dengan skala prioritas darurat yang aktif. Kondisi asrama aman terkendali.</p>
                         </div>
                     </div>
                 </div>
@@ -536,11 +518,11 @@ if ($role === 'MAINTENANCE') {
                 <div class="tw:grid tw:grid-cols-1 tw:lg:grid-cols-2 tw:gap-8 tw:mb-8">
 
                     <!-- Panel Kiri: Tugas Aktif (beautified) -->
-                    <div class="dashboard-side-panel">
-                        <h5 class="dashboard-side-panel__title tw:flex tw:items-center tw:gap-2">
+                    <div data-gsap="panel" class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.88)] tw:shadow-sm">
+                        <h5 class="tw:m-0 tw:text-[1.2rem] tw:text-slate-900 tw:flex tw:items-center tw:gap-2">
                             <i class="fa-solid fa-list-check"></i> Pekerjaan Aktif Saya
                         </h5>
-                        <p class="dashboard-side-panel__copy">Laporan yang saat ini sedang Anda tangani. Selesaikan sebelum mengambil tugas baru.</p>
+                        <p class="tw:m-0 tw:text-slate-500 tw:leading-[1.75] tw:text-sm">Laporan yang saat ini sedang Anda tangani. Selesaikan sebelum mengambil tugas baru.</p>
 
                         <div class="tw:flex tw:flex-col tw:gap-3 tw:mt-4">
                             <?php if (count($myTasks) > 0): ?>
@@ -557,62 +539,62 @@ if ($role === 'MAINTENANCE') {
                                             default      => 'fa-solid fa-circle-question',
                                         };
                                         $lokasi = !empty($task['NamaRuangan'])
-                                            ? 'Ruangan ' . htmlspecialchars($task['NamaRuangan']) . ' · Lantai ' . htmlspecialchars($task['LantaiRuangan'])
-                                            : (!empty($task['NamaBarang']) ? 'Inventaris: ' . htmlspecialchars($task['NamaBarang']) : '—');
+                                            ? 'Ruangan ' . htmlspecialchars($task['NamaRuangan']) . ' Â· Lantai ' . htmlspecialchars($task['LantaiRuangan'])
+                                            : (!empty($task['NamaBarang']) ? 'Inventaris: ' . htmlspecialchars($task['NamaBarang']) : 'â€”');
                                     ?>
-                                    <div style="border:1px solid #e2e8f0; border-left:4px solid <?= $jenisColor ?>; border-radius:12px; padding:14px 16px; background:#fff; display:flex; gap:12px; align-items:flex-start;">
-                                        <div style="width:36px; height:36px; border-radius:8px; background:<?= $jenisColor ?>18; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                                            <i class="<?= $jenisIcon ?>" style="color:<?= $jenisColor ?>; font-size:18px;"></i>
+                                    <div class="tw:border tw:border-slate-200 tw:border-l-4 tw:rounded-xl tw:p-[14px_16px] tw:bg-white tw:flex tw:gap-3 tw:items-start" style="border-left-color:<?= $jenisColor ?>">
+                                        <div class="tw:w-9 tw:h-9 tw:rounded-lg tw:flex tw:items-center tw:justify-center tw:flex-shrink-0" style="background:<?= $jenisColor ?>18;">
+                                            <i class="<?= $jenisIcon ?> tw:text-[18px]" style="color:<?= $jenisColor ?>;"></i>
                                         </div>
-                                        <div style="flex:1; min-width:0;">
-                                            <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap;">
-                                                <span style="font-size:13px; font-weight:600; color:#1e293b;"><?= $lokasi ?></span>
-                                                <span style="font-size:11px; font-weight:500; color:<?= $jenisColor ?>; background:<?= $jenisColor ?>18; padding:2px 8px; border-radius:20px; white-space:nowrap;"><?= htmlspecialchars($task['JenisLaporan']) ?></span>
+                                        <div class="tw:flex-1 tw:min-w-0">
+                                            <div class="tw:flex tw:items-center tw:justify-between tw:gap-2 tw:flex-wrap">
+                                                <span class="tw:text-[13px] tw:font-semibold tw:text-slate-900"><?= $lokasi ?></span>
+                                                <span class="tw:text-[11px] tw:font-medium tw:px-2 tw:py-[2px] tw:rounded-full tw:whitespace-nowrap" style="color:<?= $jenisColor ?>; background:<?= $jenisColor ?>18;"><?= htmlspecialchars($task['JenisLaporan']) ?></span>
                                             </div>
-                                            <p style="margin:4px 0 0; font-size:12px; color:#64748b; line-height:1.5; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">
+                                            <p class="tw:mt-1 tw:m-0 tw:text-xs tw:text-slate-500 tw:leading-[1.5] tw:line-clamp-2">
                                                 <?= htmlspecialchars($task['Deskripsi']) ?>
                                             </p>
-                                            <div style="margin-top:8px; display:flex; align-items:center; gap:6px;">
-                                                <i class="fa-solid fa-user" style="font-size:11px; color:#94a3b8;"></i>
-                                                <span style="font-size:11px; color:#94a3b8;"><?= htmlspecialchars($task['NamaPenghuni'] ?? $task['NamaReporterPetugas'] ?? 'Staff') ?></span>
-                                                <span style="color:#cbd5e1; margin:0 2px;">·</span>
-                                                <i class="fa-solid fa-calendar-days" style="font-size:11px; color:#94a3b8;"></i>
-                                                <span style="font-size:11px; color:#94a3b8;"><?= date('d M Y', strtotime($task['TanggalLapor'])) ?></span>
+                                            <div class="tw:mt-2 tw:flex tw:items-center tw:gap-[6px]">
+                                                <i class="fa-solid fa-user tw:text-[11px] tw:text-slate-400"></i>
+                                                <span class="tw:text-[11px] tw:text-slate-400"><?= htmlspecialchars($task['NamaPenghuni'] ?? $task['NamaReporterPetugas'] ?? 'Staff') ?></span>
+                                                <span class="tw:text-slate-300 tw:mx-[2px]">Â·</span>
+                                                <i class="fa-solid fa-calendar-days tw:text-[11px] tw:text-slate-400"></i>
+                                                <span class="tw:text-[11px] tw:text-slate-400"><?= date('d M Y', strtotime($task['TanggalLapor'])) ?></span>
                                             </div>
                                         </div>
                                     </div>
                                 <?php endforeach; ?>
                             <?php else: ?>
-                                <div style="text-align:center; padding:32px 16px; color:#94a3b8;">
-                                    <i class="fa-regular fa-face-smile-beam fa-2x tw:block tw:mb-3" style="color:#19a7ce;"></i>
-                                    <p style="font-size:14px; font-weight:500; color:#475569; margin:0 0 4px;">Tidak ada tugas aktif</p>
-                                    <p style="font-size:12px; color:#94a3b8; margin:0;">Anda bebas dari pekerjaan yang sedang diproses saat ini.</p>
+                                <div class="tw:text-center tw:p-[32px_16px] tw:text-slate-400">
+                                    <i class="fa-regular fa-face-smile-beam fa-2x tw:block tw:mb-3 tw:text-secondary"></i>
+                                    <p class="tw:text-sm tw:font-medium tw:text-slate-600 tw:m-0 tw:mb-1">Tidak ada tugas aktif</p>
+                                    <p class="tw:text-xs tw:text-slate-400 tw:m-0">Anda bebas dari pekerjaan yang sedang diproses saat ini.</p>
                                 </div>
                             <?php endif; ?>
                         </div>
 
-                        <div class="page-summary-actions">
-                            <a href="/doremi-app/dashboard/maintenance/" class="page-secondary-btn">Buka Seluruh Laporan</a>
+                        <div class="tw:inline-flex tw:items-center tw:gap-3 tw:flex-wrap tw:mt-4">
+                            <a href="/doremi-app/dashboard/maintenance/" class="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:min-h-12 tw:px-4 tw:py-[0.85rem] tw:rounded-2xl tw:border tw:border-[rgba(22,60,122,0.12)] tw:font-extrabold tw:no-underline tw:text-slate-900 tw:bg-[rgba(255,255,255,0.82)] tw:hover:bg-gray-50 tw:transition-all tw:text-sm">Buka Seluruh Laporan</a>
                         </div>
                     </div>
 
                     <!-- Panel Kanan: Protokol Keselamatan Kerja -->
-                    <div class="dashboard-side-panel">
-                        <h5 class="dashboard-side-panel__title tw:flex tw:items-center tw:gap-2">
+                    <div data-gsap="panel" class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.88)] tw:shadow-sm">
+                        <h5 class="tw:m-0 tw:text-[1.2rem] tw:text-slate-900 tw:flex tw:items-center tw:gap-2">
                             <i class="fa-solid fa-shield-halved"></i> Protokol Keselamatan &amp; Kerja
                         </h5>
-                        <p class="dashboard-side-panel__copy">Demi menjaga keselamatan kerja Anda dan penghuni asrama, mohon selalu patuhi instruksi OSHA berikut:</p>
+                        <p class="tw:m-0 tw:text-slate-500 tw:leading-[1.75] tw:text-sm">Demi menjaga keselamatan kerja Anda dan penghuni asrama, mohon selalu patuhi instruksi OSHA berikut:</p>
 
-                        <div class="dashboard-guide-list">
-                            <div class="dashboard-guide-item" style="border-left-color: #bc4f45;">
+                        <div class="tw:grid tw:gap-[0.85rem]">
+                            <div class="tw:p-4 tw:rounded-[18px] tw:bg-[rgba(245,221,218,0.55)] tw:border tw:border-l-4 tw:border-[rgba(188,79,69,0.20)] tw:border-l-red-500">
                                 <strong>1. Selesaikan Darurat Terlebih Dahulu</strong>
                                 <p class="tw:text-xs">Prioritaskan kerusakan yang berpotensi mencederai penghuni asrama atau merusak bangunan secara parah (seperti kebocoran gas atau korsleting listrik).</p>
                             </div>
-                            <div class="dashboard-guide-item" style="border-left-color: #d48d2f;">
+                            <div class="tw:p-4 tw:rounded-[18px] tw:bg-[rgba(250,236,207,0.55)] tw:border tw:border-l-4 tw:border-[rgba(212,141,47,0.20)] tw:border-l-amber-500">
                                 <strong>2. Gunakan APD Lengkap</strong>
                                 <p class="tw:text-xs">Pastikan Anda menggunakan alat pelindung diri (sarung tangan tebal, kacamata pelindung, masker) saat bersentuhan dengan zat kimia atau kelistrikan.</p>
                             </div>
-                            <div class="dashboard-guide-item" style="border-left-color: #2f7ff0;">
+                            <div class="tw:p-4 tw:rounded-[18px] tw:bg-[rgba(219,234,254,0.55)] tw:border tw:border-l-4 tw:border-[rgba(47,127,240,0.20)] tw:border-l-blue-400">
                                 <strong>3. Foto Hasil Perbaikan</strong>
                                 <p class="tw:text-xs">Kredibilitas tim pemeliharaan dihargai tinggi. Jangan lupa memotret hasil akhir pengerjaan sebelum mengubah status menjadi 'Selesai'.</p>
                             </div>
@@ -622,14 +604,31 @@ if ($role === 'MAINTENANCE') {
                 </div>
 
             <?php else: ?>
-                <div class="dashboard-side-panel">
-                    <h5 class="dashboard-side-panel__title">Navigasi Cepat</h5>
-                    <p class="dashboard-side-panel__copy">Gunakan menu di samping untuk membuka modul yang sesuai dengan peran Anda.</p>
+                <div class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.88)] tw:shadow-sm">
+                    <h5 class="tw:m-0 tw:text-[1.2rem] tw:text-slate-900">Navigasi Cepat</h5>
+                    <p class="tw:m-0 tw:text-slate-500 tw:leading-[1.75] tw:text-sm">Gunakan menu di samping untuk membuka modul yang sesuai dengan peran Anda.</p>
                 </div>
             <?php endif; ?>
         </div>
     </main>
     <?php require '../bootstrap.php'; ?>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        /* number counter for stat cards */
+        document.querySelectorAll('[data-count]').forEach(el => {
+            const target = parseInt(el.dataset.count, 10) || 0;
+            if (target === 0) { el.textContent = '0'; return; }
+            gsap.to({ val: 0 }, {
+                val: target,
+                duration: 1,
+                delay: 0.4,
+                ease: 'power2.out',
+                onUpdate() { el.textContent = Math.round(this.targets()[0].val); },
+                onComplete() { el.textContent = target; },
+            });
+        });
+    });
+    </script>
 </body>
 
 </html>

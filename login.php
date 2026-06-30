@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    $stmt = mysqli_prepare($db, "SELECT PetugasID, NamaPetugas, Password, Jabatan FROM petugas WHERE Email = ? AND IsDeleted = 0 LIMIT 1");
+    $stmt = mysqli_prepare($db, "CALL sp_getPetugasByEmail(?)");
     mysqli_stmt_bind_param($stmt, 's', $email);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    $stmt = mysqli_prepare($db, "SELECT PenghuniID, NamaPenghuni, Password FROM penghuni WHERE Email = ? AND IsDeleted = 0 LIMIT 1");
+    $stmt = mysqli_prepare($db, "CALL sp_getPenghuniByEmail(?)");
     mysqli_stmt_bind_param($stmt, 's', $email);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
@@ -156,6 +156,26 @@ $login_url = $client->createAuthUrl();
         </div>
     </main>
     <?php require 'validation_alert.php' ?>
+    <script>
+    window._headerAnimated = true;
+    document.addEventListener('DOMContentLoaded', () => {
+        const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+
+        tl.from('#global-header', { y: -60, opacity: 0, duration: 0.55 })
+          .from('.auth-preview', { x: -50, opacity: 0, duration: 0.65 }, '-=0.2')
+          .from('.auth-card', { x: 50, opacity: 0, duration: 0.65 }, '<')
+          .from('.auth-preview .eyebrow', { y: 16, opacity: 0, duration: 0.4 }, '-=0.3')
+          .from('.auth-preview h1', { y: 20, opacity: 0, duration: 0.4 }, '-=0.3')
+          .from('.auth-preview p', { y: 16, opacity: 0, duration: 0.4 }, '-=0.25')
+          .from('.auth-preview__list article', { y: 16, opacity: 0, duration: 0.35, stagger: 0.1 }, '-=0.2')
+          .from('.auth-card .eyebrow', { y: 12, opacity: 0, duration: 0.35 }, '-=0.4')
+          .from('.auth-card h2', { y: 12, opacity: 0, duration: 0.35 }, '-=0.25')
+          .from('.auth-field', { y: 12, opacity: 0, duration: 0.3, stagger: 0.08 }, '-=0.2')
+          .from('.auth-submit', { y: 10, opacity: 0, duration: 0.3 }, '-=0.1')
+          .from('.auth-divider', { opacity: 0, duration: 0.3 }, '-=0.1')
+          .from('.auth-google', { y: 10, opacity: 0, duration: 0.3 }, '-=0.15');
+    });
+    </script>
 </body>
 
 </html>

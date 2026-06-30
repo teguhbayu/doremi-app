@@ -16,9 +16,10 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
         rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chart.js/3.9.1/chart.min.js"></script>
 
-    <link rel="stylesheet" href="/doremi-app/css/styles.css?v=<?= filemtime(__DIR__ . '/css/styles.css') ?>" />
     <link href="https://iconsax.gitlab.io/i/icons.css" rel="stylesheet">
     <link rel="Doremi icon" href="/doremi-app/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://cdn.datatables.net/2.3.4/css/dataTables.dataTables.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
 </head>

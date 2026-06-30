@@ -8,75 +8,103 @@ session_start();
 
 <body class="public-body">
     <?php include 'header.php'; ?>
-    <div class="public-main tw:pt-16 tw:flex-1 tw:h-full tw:w-full tw:relative tw:overflow-y-auto tw:overflow-x-hidden">
-        <div id="gallery-container" class="public-gallery-shell tw:min-h-full tw:bg-background tw:pt-8 tw:pb-16">
+    <div class="tw:pt-16 tw:flex-1 tw:h-full tw:w-full tw:relative tw:overflow-y-auto tw:overflow-x-hidden">
+        <div id="gallery-container" class="tw:min-h-full tw:bg-background tw:pt-8 tw:pb-16">
             <div class="tw:max-w-7xl tw:mx-auto tw:px-4 tw:sm:px-6 tw:lg:px-8">
-                <div class="public-section-heading tw:text-center tw:mb-10">
+                <div class="tw:text-center tw:mb-10">
                     <h2 class="tw:text-3xl tw:font-extrabold tw:text-primary">Galeri DOREMI</h2>
-                    <p class="public-section-copy tw:mt-4 tw:text-lg tw:text-gray-500">
+                    <p class="tw:mt-4 tw:text-lg tw:text-slate-500 tw:leading-[1.8]">
                         Intip kenyamanan fasilitas asrama kami.
                     </p>
                 </div>
 
-                <div class="public-gallery-grid tw:grid tw:grid-cols-1 tw:sm:grid-cols-2 tw:md:grid-cols-3 tw:gap-6">
+                <div class="tw:grid tw:grid-cols-1 tw:sm:grid-cols-2 tw:md:grid-cols-3 tw:gap-6">
                     <div
-                        class="public-gallery-card tw:group tw:relative tw:overflow-hidden tw:rounded-2xl tw:shadow-md tw:hover:shadow-xl tw:transition-all tw:duration-300">
+                        class="tw:group tw:relative tw:overflow-hidden tw:rounded-2xl tw:shadow-md tw:hover:shadow-xl tw:transition-all tw:duration-300">
                         <img src="images/kamar.png" alt="Kamar"
-                            class="public-gallery-card__image tw:w-full tw:h-64 tw:object-cover tw:transform tw:group-hover:scale-105 tw:transition-transform tw:duration-500" />
+                            class="tw:w-full tw:h-64 tw:object-cover tw:transform tw:group-hover:scale-105 tw:transition-transform tw:duration-500" />
                         <div
-                            class="public-gallery-card__overlay tw:absolute tw:inset-0 tw:bg-gradient-to-t tw:from-primary/80 tw:to-transparent tw:opacity-0 tw:group-hover:opacity-100 tw:transition-opacity tw:flex tw:items-end tw:p-4">
-                            <span class="public-gallery-card__title tw:text-white tw:font-medium tw:text-lg">Kamar</span>
+                            class="tw:absolute tw:inset-0 tw:bg-gradient-to-t tw:from-primary/80 tw:to-transparent tw:opacity-0 tw:group-hover:opacity-100 tw:transition-opacity tw:flex tw:items-end tw:p-4">
+                            <span class="tw:text-white tw:font-medium tw:text-lg tw:tracking-[-0.03em]">Kamar</span>
                         </div>
                     </div>
                     <div
-                        class="public-gallery-card tw:group tw:relative tw:overflow-hidden tw:rounded-2xl tw:shadow-md tw:hover:shadow-xl tw:transition-all tw:duration-300">
+                        class="tw:group tw:relative tw:overflow-hidden tw:rounded-2xl tw:shadow-md tw:hover:shadow-xl tw:transition-all tw:duration-300">
                         <img src="images/badminton.png" alt="Ruang Belajar"
-                            class="public-gallery-card__image tw:w-full tw:h-64 tw:object-cover tw:transform tw:group-hover:scale-105 tw:transition-transform tw:duration-500" />
+                            class="tw:w-full tw:h-64 tw:object-cover tw:transform tw:group-hover:scale-105 tw:transition-transform tw:duration-500" />
                         <div
-                            class="public-gallery-card__overlay tw:absolute tw:inset-0 tw:bg-gradient-to-t tw:from-primary/80 tw:to-transparent tw:opacity-0 tw:group-hover:opacity-100 tw:transition-opacity tw:flex tw:items-end tw:p-4">
-                            <span class="public-gallery-card__title tw:text-white tw:font-medium tw:text-lg">Lapangan Badminton</span>
+                            class="tw:absolute tw:inset-0 tw:bg-gradient-to-t tw:from-primary/80 tw:to-transparent tw:opacity-0 tw:group-hover:opacity-100 tw:transition-opacity tw:flex tw:items-end tw:p-4">
+                            <span class="tw:text-white tw:font-medium tw:text-lg tw:tracking-[-0.03em]">Lapangan Badminton</span>
                         </div>
                     </div>
                     <div
-                        class="public-gallery-card tw:group tw:relative tw:overflow-hidden tw:rounded-2xl tw:shadow-md tw:hover:shadow-xl tw:transition-all tw:duration-300">
+                        class="tw:group tw:relative tw:overflow-hidden tw:rounded-2xl tw:shadow-md tw:hover:shadow-xl tw:transition-all tw:duration-300">
                         <img src="images/basket.png" alt="Lobby"
-                            class="public-gallery-card__image tw:w-full tw:h-64 tw:object-cover tw:transform tw:group-hover:scale-105 tw:transition-transform tw:duration-500" />
+                            class="tw:w-full tw:h-64 tw:object-cover tw:transform tw:group-hover:scale-105 tw:transition-transform tw:duration-500" />
                         <div
-                            class="public-gallery-card__overlay tw:absolute tw:inset-0 tw:bg-gradient-to-t tw:from-primary/80 tw:to-transparent tw:opacity-0 tw:group-hover:opacity-100 tw:transition-opacity tw:flex tw:items-end tw:p-4">
-                            <span class="public-gallery-card__title tw:text-white tw:font-medium tw:text-lg">Lapangan Basket</span>
+                            class="tw:absolute tw:inset-0 tw:bg-gradient-to-t tw:from-primary/80 tw:to-transparent tw:opacity-0 tw:group-hover:opacity-100 tw:transition-opacity tw:flex tw:items-end tw:p-4">
+                            <span class="tw:text-white tw:font-medium tw:text-lg tw:tracking-[-0.03em]">Lapangan Basket</span>
                         </div>
                     </div>
                     <div
-                        class="public-gallery-card tw:group tw:relative tw:overflow-hidden tw:rounded-2xl tw:shadow-md tw:hover:shadow-xl tw:transition-all tw:duration-300">
+                        class="tw:group tw:relative tw:overflow-hidden tw:rounded-2xl tw:shadow-md tw:hover:shadow-xl tw:transition-all tw:duration-300">
                         <img src="images/kantin.png" alt="Parkir"
-                            class="public-gallery-card__image tw:w-full tw:h-64 tw:object-cover tw:transform tw:group-hover:scale-105 tw:transition-transform tw:duration-500" />
+                            class="tw:w-full tw:h-64 tw:object-cover tw:transform tw:group-hover:scale-105 tw:transition-transform tw:duration-500" />
                         <div
-                            class="public-gallery-card__overlay tw:absolute tw:inset-0 tw:bg-gradient-to-t tw:from-primary/80 tw:to-transparent tw:opacity-0 tw:group-hover:opacity-100 tw:transition-opacity tw:flex tw:items-end tw:p-4">
-                            <span class="public-gallery-card__title tw:text-white tw:font-medium tw:text-lg">Kantin</span>
+                            class="tw:absolute tw:inset-0 tw:bg-gradient-to-t tw:from-primary/80 tw:to-transparent tw:opacity-0 tw:group-hover:opacity-100 tw:transition-opacity tw:flex tw:items-end tw:p-4">
+                            <span class="tw:text-white tw:font-medium tw:text-lg tw:tracking-[-0.03em]">Kantin</span>
                         </div>
                     </div>
                     <div
-                        class="public-gallery-card tw:group tw:relative tw:overflow-hidden tw:rounded-2xl tw:shadow-md tw:hover:shadow-xl tw:transition-all tw:duration-300">
+                        class="tw:group tw:relative tw:overflow-hidden tw:rounded-2xl tw:shadow-md tw:hover:shadow-xl tw:transition-all tw:duration-300">
                         <img src="images/market.png" alt="Pantry"
-                            class="public-gallery-card__image tw:w-full tw:h-64 tw:object-cover tw:transform tw:group-hover:scale-105 tw:transition-transform tw:duration-500" />
+                            class="tw:w-full tw:h-64 tw:object-cover tw:transform tw:group-hover:scale-105 tw:transition-transform tw:duration-500" />
                         <div
-                            class="public-gallery-card__overlay tw:absolute tw:inset-0 tw:bg-gradient-to-t tw:from-primary/80 tw:to-transparent tw:opacity-0 tw:group-hover:opacity-100 tw:transition-opacity tw:flex tw:items-end tw:p-4">
-                            <span class="public-gallery-card__title tw:text-white tw:font-medium tw:text-lg">Mini Market</span>
+                            class="tw:absolute tw:inset-0 tw:bg-gradient-to-t tw:from-primary/80 tw:to-transparent tw:opacity-0 tw:group-hover:opacity-100 tw:transition-opacity tw:flex tw:items-end tw:p-4">
+                            <span class="tw:text-white tw:font-medium tw:text-lg tw:tracking-[-0.03em]">Mini Market</span>
                         </div>
                     </div>
                     <div
-                        class="public-gallery-card tw:group tw:relative tw:overflow-hidden tw:rounded-2xl tw:shadow-md tw:hover:shadow-xl tw:transition-all tw:duration-300">
+                        class="tw:group tw:relative tw:overflow-hidden tw:rounded-2xl tw:shadow-md tw:hover:shadow-xl tw:transition-all tw:duration-300">
                         <img src="images/organisasi.png" alt="Taman"
-                            class="public-gallery-card__image tw:w-full tw:h-64 tw:object-cover tw:transform tw:group-hover:scale-105 tw:transition-transform tw:duration-500" />
+                            class="tw:w-full tw:h-64 tw:object-cover tw:transform tw:group-hover:scale-105 tw:transition-transform tw:duration-500" />
                         <div
-                            class="public-gallery-card__overlay tw:absolute tw:inset-0 tw:bg-gradient-to-t tw:from-primary/80 tw:to-transparent tw:opacity-0 tw:group-hover:opacity-100 tw:transition-opacity tw:flex tw:items-end tw:p-4">
-                            <span class="public-gallery-card__title tw:text-white tw:font-medium tw:text-lg">Ruang Organisasi</span>
+                            class="tw:absolute tw:inset-0 tw:bg-gradient-to-t tw:from-primary/80 tw:to-transparent tw:opacity-0 tw:group-hover:opacity-100 tw:transition-opacity tw:flex tw:items-end tw:p-4">
+                            <span class="tw:text-white tw:font-medium tw:text-lg tw:tracking-[-0.03em]">Ruang Organisasi</span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <script>
+    window._headerAnimated = true;
+    document.addEventListener('DOMContentLoaded', () => {
+        gsap.registerPlugin(ScrollTrigger);
+
+        gsap.from('#global-header', { y: -60, opacity: 0, duration: 0.6, ease: 'power3.out' });
+
+        gsap.from('.tw\\:text-center.tw\\:mb-10', {
+            y: 28,
+            opacity: 0,
+            duration: 0.55,
+            delay: 0.2,
+            ease: 'power3.out',
+        });
+
+        gsap.utils.toArray('.tw\\:group.tw\\:relative').forEach((card, i) => {
+            gsap.from(card, {
+                scrollTrigger: { trigger: card, start: 'top 90%', toggleActions: 'play none none none' },
+                y: 36,
+                opacity: 0,
+                scale: 0.97,
+                duration: 0.5,
+                delay: (i % 3) * 0.1,
+                ease: 'power3.out',
+            });
+        });
+    });
+    </script>
 </body>
 
 </html>

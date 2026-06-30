@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require 'helpers.php';
 // Memastikan semua peran yang diizinkan bisa membuat laporan baru
@@ -86,11 +86,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="en">
 <?php require '../../head.php'; ?>
 
-<body class="dashboard-body tw:p-0 tw:m-0 relative tw:flex tw:bg-[#f8fafc] tw:min-h-screen">
+<body class="dashboard-body tw:p-0 tw:m-0 tw:relative tw:flex tw:min-h-screen">
     <?php require '../components/sidebar.php'; ?>
 
-    <main class="dashboard-main tw:md:ml-75 tw:grow">
-        <div class="dashboard-page tw:pt-20 tw:md:pt-8 tw:px-8 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
+    <main class="tw:md:ml-75 tw:grow">
+        <div class="tw:pt-20 tw:md:pt-8 tw:px-8 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
             
             <?php require dirname(__DIR__) . '/components/breadcrumb.php'; ?>
 
@@ -109,10 +109,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                
                 <div class="tw:lg:col-span-2">
-                    <form action="create.php" method="POST" enctype="multipart/form-data" class="form-shell" style="max-width: 100%;">
+                    <form action="create.php" method="POST" enctype="multipart/form-data" class="tw:grid tw:grid-cols-1 tw:lg:grid-cols-2 tw:gap-4 tw:p-[1.45rem] tw:rounded-[24px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.88)] tw:shadow-sm">
+                        
                         <?php echo csrf_field(); ?>
                         
-                        <div class="mb-3 form-shell__full">
+                        <div class="mb-3 tw:col-span-full">
                             <label for="skala_prioritas" class="form-label">Skala Prioritas (Berbasis Kriteria OSHA)</label>
                             <select name="skala_prioritas" id="skala_prioritas" class="form-select" required onchange="verifyPriority()">
                                 <option value="" disabled selected>-- Pilih Kategori Kerusakan --</option>
@@ -126,7 +127,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
 
                         
-                        <div class="mb-3 form-shell__full">
+                        <div class="mb-3 tw:col-span-full">
                             <label class="form-label">Target Lokasi Laporan</label>
                             <div class="tw:flex tw:gap-4 tw:mt-1 tw:mb-3">
                                 <div class="form-check">
@@ -164,7 +165,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
 
                         
-                        <div class="mb-3 form-shell__full">
+                        <div class="mb-3 tw:col-span-full">
                             <label for="deskripsi" class="form-label">Deskripsi Masalah</label>
                             <textarea name="deskripsi" id="deskripsi" maxlength="1000" class="form-control" rows="4" required 
                                       placeholder="Jelaskan kronologi dan letak kerusakan..." oninput="updateCharCount(this)"></textarea>
@@ -174,43 +175,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
 
                         
-                        <div class="mb-4 form-shell__full">
+                        <div class="mb-4 tw:col-span-full">
                             <label for="foto_laporan" class="form-label">Foto Masalah / Kerusakan</label>
                             <input type="file" name="foto_laporan" id="foto_laporan" class="form-control" accept="image/png,image/jpeg,image/webp">
                             <div class="form-text">Format file didukung: JPG, PNG, atau WEBP (Maksimal 2MB).</div>
                         </div>
 
                         
-                        <div class="tw:w-full tw:flex tw:justify-end tw:gap-3 form-shell__full">
-                            <a href="index.php" class="page-secondary-btn">Batal</a>
-                            <button type="submit" class="page-primary-btn">Kirim Laporan</button>
+                        <div class="tw:w-full tw:flex tw:justify-end tw:gap-3 tw:col-span-full">
+                            <a href="index.php" class="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:min-h-12 tw:px-4 tw:py-[0.85rem] tw:rounded-2xl tw:border tw:border-[rgba(22,60,122,0.12)] tw:font-extrabold tw:no-underline tw:text-slate-900 tw:bg-[rgba(255,255,255,0.82)] tw:hover:bg-gray-50 tw:transition-all tw:text-sm">Batal</a>
+                            <button type="submit" class="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:min-h-12 tw:px-4 tw:py-[0.85rem] tw:rounded-2xl tw:border tw:border-transparent tw:font-extrabold tw:no-underline tw:text-white tw:bg-secondary tw:shadow-md tw:hover:bg-primary tw:transition-all tw:text-sm">Kirim Laporan</button>
                         </div>
                     </form>
                 </div>
 
                 
                 <div class="tw:lg:col-span-1">
-                    <div class="dashboard-side-panel">
-                        <h5 class="dashboard-side-panel__title tw:flex tw:items-center tw:gap-2 tw:mb-3">
+                    <div class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.88)] tw:shadow-sm">
+                        <h5 class="tw:m-0 tw:text-[1.2rem] tw:text-slate-900 tw:flex tw:items-center tw:gap-2 tw:mb-3">
                             <i class="iconsax tw:text-lg" icon-name="info-circle"></i>
                             <span>Panduan OSHA</span>
                         </h5>
-                        <p class="dashboard-side-panel__copy tw:mb-4">
+                        <p class="tw:m-0 tw:text-slate-500 tw:leading-[1.75] tw:text-sm tw:mb-4">
                             Gunakan panduan standar OSHA berikut untuk menentukan skala prioritas secara objektif, demi kelancaran prioritas pengerjaan oleh tim teknisi.
                         </p>
-                        <div class="dashboard-guide-list">
-                            <div class="dashboard-guide-item dashboard-guide-item--danger">
+                        <div class="tw:grid tw:gap-[0.85rem]">
+                            <div class="tw:p-4 tw:rounded-[18px] tw:bg-[rgba(245,221,218,0.55)] tw:border tw:border-l-4 tw:border-[rgba(188,79,69,0.20)] tw:border-l-red-500">
                                 <strong class="tw:text-red-700">Darurat <i>(Imminent Danger)</i></strong>
                                 <p class="tw:text-xs">Kondisi bahaya nyata yang mengancam keselamatan fisik segera (misal: korsleting aktif, kebocoran gas, kebakaran, banjir besar).</p>
                             </div>
-                            <div class="dashboard-guide-item dashboard-guide-item--warning">
+                            <div class="tw:p-4 tw:rounded-[18px] tw:bg-[rgba(250,236,207,0.55)] tw:border tw:border-l-4 tw:border-[rgba(212,141,47,0.20)] tw:border-l-amber-500">
                                 <strong class="tw:text-amber-700">Sedang <i>(Serious Hazard)</i></strong>
                                 <p class="tw:text-xs">Mengganggu fungsi hidup harian atau keamanan mendesak (air mati total, kunci pintu luar rusak, toilet mampet).</p>
                             </div>
                             
-                            <div class="dashboard-guide-item" style="border-left-color: #166534; background-color: #f0fdf4;">
-                                <strong style="color: #166534;">Ringan <i>(Other-than-Serious)</i></strong>
-                                <p class="tw:text-xs" style="color: #15803d;">Kerusakan minor/kosmetik yang tidak mengancam keselamatan fisik (keran menetes, engsel longgar, lampu redup).</p>
+                            <div class="tw:p-4 tw:rounded-[18px] tw:bg-green-50 tw:border tw:border-l-4 tw:border-[rgba(22,101,52,0.20)] tw:border-l-green-700">
+                                <strong class="tw:text-green-700">Ringan <i>(Other-than-Serious)</i></strong>
+                                <p class="tw:text-xs tw:text-green-600">Kerusakan minor/kosmetik yang tidak mengancam keselamatan fisik (keran menetes, engsel longgar, lampu redup).</p>
                             </div>
                         </div>
                     </div>
@@ -239,7 +240,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (category === 'imminent') {
                 helper.classList.remove('tw:hidden');
                 helper.setAttribute('style', 'background-color: #fef2f2; color: #7f1d1d; border-color: #fee2e2; font-weight: 600;');
-                helper.innerHTML = "<strong>⚠️ Peringatan Darurat:</strong> Kondisi ini harus merupakan ancaman keselamatan fisik segera. Laporan palsu atau penyalahgunaan kategori ini dapat dikenakan sanksi administratif.";
+                helper.innerHTML = "<strong>âš ï¸ Peringatan Darurat:</strong> Kondisi ini harus merupakan ancaman keselamatan fisik segera. Laporan palsu atau penyalahgunaan kategori ini dapat dikenakan sanksi administratif.";
                 
                 // Konfirmasi Pengguna untuk Mencegah Abuse
                 const confirmCheck = confirm("Peringatan: Kategori 'Darurat' hanya untuk kondisi berbahaya yang mengancam keselamatan fisik penghuni segera (seperti korsleting aktif, kebocoran gas, atau banjir bandang). Apakah kerusakan ini benar-benar darurat?");

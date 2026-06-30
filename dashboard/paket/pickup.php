@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require 'helpers.php';
 paket_require_roles(['PENGHUNI']);
@@ -129,17 +129,17 @@ $statusMeta = paket_status_meta($paket['Status'] ?? 'Belum Diambil');
 <html lang="en">
 <?php require '../../head.php'; ?>
 
-<body class="dashboard-body tw:p-0 tw:m-0 relative tw:flex tw:bg-[#f8fafc] tw:min-h-screen">
+<body class="dashboard-body tw:p-0 tw:m-0 tw:relative tw:flex tw:min-h-screen">
     <?php require '../components/sidebar.php'; ?>
-    <main class="dashboard-main tw:md:ml-75 tw:grow">
-        <div class="dashboard-page tw:pt-20 tw:md:pt-8 tw:px-8 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
+    <main class="tw:md:ml-75 tw:grow">
+        <div class="tw:pt-20 tw:md:pt-8 tw:px-8 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
             <?php require dirname(__DIR__) . '/components/breadcrumb.php'; ?>
             <h1 class="page-title" data-kicker="Pengambilan Paket" data-subtitle="Lengkapi status, bukti foto, dan catatan pengambilan agar riwayat paket penghuni tercatat rapi dan siap direview SIGAP.">
                 <?= $isLocked ? 'Detail Pengambilan Paket' : 'Catat Pengambilan Paket' ?>
             </h1>
 
             <div class="page-toolbar" data-note="<?= $isLocked ? 'Catatan pengambilan sudah final' : 'Pencatatan pengambilan pertama' ?>">
-                <a href="index.php" class="page-secondary-btn">
+                <a href="index.php" class="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:min-h-12 tw:px-4 tw:py-[0.85rem] tw:rounded-2xl tw:border tw:border-[rgba(22,60,122,0.12)] tw:font-extrabold tw:no-underline tw:text-slate-900 tw:bg-[rgba(255,255,255,0.82)] tw:hover:bg-gray-50 tw:transition-all tw:text-sm">
                     <i class="iconsax tw:text-xl" icon-name="arrow-left-2"></i>
                     <span>Kembali</span>
                 </a>
@@ -147,38 +147,38 @@ $statusMeta = paket_status_meta($paket['Status'] ?? 'Belum Diambil');
 
             <div class="tw:grid tw:grid-cols-1 tw:lg:grid-cols-3 tw:gap-8">
                 <div class="tw:lg:col-span-1">
-                    <div class="dashboard-side-panel tw:h-full">
-                        <h5 class="dashboard-side-panel__title">Informasi Paket</h5>
-                        <div class="dashboard-info-list">
-                            <div class="dashboard-info-item">
-                                <span class="dashboard-info-item__label">Tipe Kiriman</span>
+                    <div class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.88)] tw:shadow-sm tw:h-full">
+                        <h5 class="tw:m-0 tw:text-[1.2rem] tw:text-slate-900">Informasi Paket</h5>
+                        <div class="tw:grid tw:gap-[0.85rem]">
+                            <div class="tw:p-4 tw:rounded-[18px] tw:bg-[rgba(255,255,255,0.80)] tw:border tw:border-[rgba(22,60,122,0.08)]">
+                                <span class="tw:block tw:mb-[0.3rem] tw:text-slate-500 tw:text-xs tw:font-bold">Tipe Kiriman</span>
                                 <strong><?= htmlspecialchars(paket_type_label($paket['JenisPaket'] ?? null)) ?></strong>
                             </div>
-                            <div class="dashboard-info-item">
-                                <span class="dashboard-info-item__label">Pengirim</span>
+                            <div class="tw:p-4 tw:rounded-[18px] tw:bg-[rgba(255,255,255,0.80)] tw:border tw:border-[rgba(22,60,122,0.08)]">
+                                <span class="tw:block tw:mb-[0.3rem] tw:text-slate-500 tw:text-xs tw:font-bold">Pengirim</span>
                                 <strong><?= htmlspecialchars($paket['NamaPengirim']) ?></strong>
                                 <p><?= htmlspecialchars($paket['Kurir']) ?></p>
                             </div>
-                            <div class="dashboard-info-item">
-                                <span class="dashboard-info-item__label">Waktu Sampai</span>
+                            <div class="tw:p-4 tw:rounded-[18px] tw:bg-[rgba(255,255,255,0.80)] tw:border tw:border-[rgba(22,60,122,0.08)]">
+                                <span class="tw:block tw:mb-[0.3rem] tw:text-slate-500 tw:text-xs tw:font-bold">Waktu Sampai</span>
                                 <strong><?= $paket['WaktuSampai'] ? date('d M Y H:i', strtotime($paket['WaktuSampai'])) : '-' ?></strong>
                                 <p>Pencatat: <?= htmlspecialchars($paket['NamaPetugasPaket']) ?></p>
                             </div>
-                            <div class="dashboard-info-item">
-                                <span class="dashboard-info-item__label">Penghuni</span>
+                            <div class="tw:p-4 tw:rounded-[18px] tw:bg-[rgba(255,255,255,0.80)] tw:border tw:border-[rgba(22,60,122,0.08)]">
+                                <span class="tw:block tw:mb-[0.3rem] tw:text-slate-500 tw:text-xs tw:font-bold">Penghuni</span>
                                 <strong><?= htmlspecialchars($paket['NamaPenghuni']) ?></strong>
                                 <p><?= htmlspecialchars($paket['Nim']) ?><?= !empty($paket['NomorKamar']) ? ' | Kamar ' . htmlspecialchars($paket['NomorKamar']) : '' ?></p>
                             </div>
-                            <div class="dashboard-info-item">
-                                <span class="dashboard-info-item__label">Status Saat Ini</span>
+                            <div class="tw:p-4 tw:rounded-[18px] tw:bg-[rgba(255,255,255,0.80)] tw:border tw:border-[rgba(22,60,122,0.08)]">
+                                <span class="tw:block tw:mb-[0.3rem] tw:text-slate-500 tw:text-xs tw:font-bold">Status Saat Ini</span>
                                 <span class="badge <?= htmlspecialchars($statusMeta['class']) ?>">
                                     <?= htmlspecialchars($statusMeta['label']) ?>
                                 </span>
                                 <p><?= !empty($paket['WaktuPengambilan']) ? date('d M Y H:i', strtotime($paket['WaktuPengambilan'])) : 'Belum ada waktu pengambilan tercatat' ?></p>
                             </div>
                             <?php if (!empty($paket['FotoPengambilan'])): ?>
-                                <div class="dashboard-info-item">
-                                    <span class="dashboard-info-item__label">Foto Pengambilan</span>
+                                <div class="tw:p-4 tw:rounded-[18px] tw:bg-[rgba(255,255,255,0.80)] tw:border tw:border-[rgba(22,60,122,0.08)]">
+                                    <span class="tw:block tw:mb-[0.3rem] tw:text-slate-500 tw:text-xs tw:font-bold">Foto Pengambilan</span>
                                     <a href="<?= htmlspecialchars(paket_photo_url($paket['FotoPengambilan'])) ?>" target="_blank"
                                         rel="noopener noreferrer" class="tw:block">
                                         <img src="<?= htmlspecialchars(paket_photo_url($paket['FotoPengambilan'])) ?>"
@@ -193,24 +193,24 @@ $statusMeta = paket_status_meta($paket['Status'] ?? 'Belum Diambil');
 
                 <div class="tw:lg:col-span-2">
                     <?php if ($isLocked): ?>
-                        <div class="dashboard-empty-state">
+                        <div class="tw:p-[1.15rem_1.2rem] tw:rounded-[22px] tw:border tw:border-dashed tw:border-[rgba(22,60,122,0.18)] tw:bg-[rgba(47,127,240,0.04)] tw:text-slate-500 tw:leading-[1.7]">
                             Catatan pengambilan paket ini sudah final. Status, foto, dan keterangan tidak bisa diubah lagi dari akun penghuni.
                         </div>
                     <?php else: ?>
-                        <form method="POST" enctype="multipart/form-data" class="form-shell">
-                                <div class="mb-3 form-shell__full">
+                        <form method="POST" enctype="multipart/form-data" class="tw:grid tw:grid-cols-1 tw:lg:grid-cols-2 tw:gap-4 tw:p-[1.45rem] tw:rounded-[24px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.88)] tw:shadow-sm">
+                                <div class="mb-3 tw:col-span-full">
                                     <label class="form-label">Status Paket</label>
                                     <input type="text" class="form-control" value="Sudah Diambil" disabled>
                                     <span class="form-hint">Status akan langsung disimpan sebagai <strong>Sudah Diambil</strong> setelah formulir dikirim.</span>
                                 </div>
 
-                                <div class="mb-3 form-shell__full">
+                                <div class="mb-3 tw:col-span-full">
                                     <label class="form-label">Waktu Pengambilan</label>
                                     <input type="text" class="form-control"
                                         value="Akan diisi otomatis saat data disimpan" disabled>
                                 </div>
 
-                                <div class="mb-3 form-shell__full">
+                                <div class="mb-3 tw:col-span-full">
                                     <label for="fotoPengambilan" class="form-label">Foto Pengambilan</label>
                                     <input type="file" name="fotoPengambilan" class="form-control" id="fotoPengambilan"
                                         accept="image/png,image/jpeg,image/webp" <?= $fotoWajib ? 'required' : '' ?>>
@@ -220,13 +220,13 @@ $statusMeta = paket_status_meta($paket['Status'] ?? 'Belum Diambil');
                                     </div>
                                 </div>
 
-                                <div class="mb-3 form-shell__full">
+                                <div class="mb-3 tw:col-span-full">
                                     <label for="keterangan" class="form-label">Keterangan <span class="tw:text-gray-400 tw:text-sm">(opsional)</span></label>
                                     <textarea name="keterangan" class="form-control" id="keterangan" rows="4"
                                         placeholder="Tambahkan catatan pengambilan paket jika diperlukan."><?= htmlspecialchars($keteranganValue) ?></textarea>
                                 </div>
 
-                                <div class="tw:w-full tw:flex tw:justify-end tw:mt-2">
+                                <div class="tw:col-span-full tw:flex tw:justify-end tw:mt-2">
                                     <button type="submit"
                                         class="tw:bg-secondary tw:w-full tw:text-white tw:px-3 tw:py-3 tw:rounded-xl tw:justify-center tw:hover:bg-accent tw:duration-300 tw:transition-all tw:inline-flex tw:items-center tw:gap-2">
                                         <span>Simpan Pengambilan</span>

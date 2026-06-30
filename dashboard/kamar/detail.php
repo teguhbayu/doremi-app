@@ -14,20 +14,7 @@ if (!$id) {
     exit;
 }
 
-$kamarStmt = mysqli_prepare(
-    $db,
-    "SELECT
-        k.KamarID,
-        k.NomorKamar,
-        k.KapasitasPenghuni,
-        k.Lantai,
-        COUNT(p.PenghuniID) AS JumlahPenghuniAktual
-    FROM kamar k
-    LEFT JOIN penghuni p ON p.KamarID = k.KamarID AND p.IsDeleted = 0
-    WHERE k.KamarID = ? AND k.IsDeleted = 0
-    GROUP BY k.KamarID, k.NomorKamar, k.KapasitasPenghuni, k.Lantai
-    LIMIT 1"
-);
+$kamarStmt = mysqli_prepare($db, "CALL sp_getKamarDetailWithOccupancy(?)");
 mysqli_stmt_bind_param($kamarStmt, 'i', $id);
 mysqli_stmt_execute($kamarStmt);
 $kamarResult = mysqli_stmt_get_result($kamarStmt);
@@ -39,13 +26,7 @@ if (!$kamar) {
     exit;
 }
 
-$penghuniStmt = mysqli_prepare(
-    $db,
-    "SELECT PenghuniID, NamaPenghuni, Nim, JenisKelamin, NoHP, Email
-     FROM penghuni
-     WHERE KamarID = ? AND IsDeleted = 0
-     ORDER BY NamaPenghuni ASC"
-);
+$penghuniStmt = mysqli_prepare($db, "CALL sp_getPenghuniByKamarId(?)");
 mysqli_stmt_bind_param($penghuniStmt, 'i', $id);
 mysqli_stmt_execute($penghuniStmt);
 $penghuniResult = mysqli_stmt_get_result($penghuniStmt);
@@ -59,11 +40,11 @@ $sisaKapasitas = max(0, (int) $kamar['KapasitasPenghuni'] - (int) $kamar['Jumlah
 <html lang="en">
 <?php require '../../head.php'; ?>
 
-<body class="dashboard-body tw:p-0 tw:m-0 relative tw:flex tw:bg-[#f8fafc] tw:min-h-screen">
+<body class="dashboard-body tw:p-0 tw:m-0 tw:relative tw:flex tw:min-h-screen">
     <?php require '../components/sidebar.php'; ?>
 
-    <main class="dashboard-main tw:md:ml-75 tw:grow">
-        <div class="dashboard-page tw:pt-20 tw:md:pt-8 tw:px-8 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
+    <main class="tw:md:ml-75 tw:grow">
+        <div class="tw:pt-20 tw:md:pt-8 tw:px-8 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
             <?php require dirname(__DIR__) . '/components/breadcrumb.php'; ?>
             <div class="tw:flex tw:flex-col tw:gap-4 tw:md:flex-row tw:md:items-center tw:md:justify-between tw:mb-8">
                 <div>
@@ -138,11 +119,11 @@ $sisaKapasitas = max(0, (int) $kamar['KapasitasPenghuni'] - (int) $kamar['Jumlah
                         <table id="penghuniKamarTable" class="table doremi-table text-center align-middle tw:mb-0 tw:w-full">
                             <thead>
                                 <tr>
-                                    <th scope="col" class="text-center align-middle" style="width: 20%;">NIM</th>
-                                    <th scope="col" class="text-center align-middle" style="width: 25%;">Nama</th>
-                                    <th scope="col" class="text-center align-middle" style="width: 15%;">Jenis Kelamin</th>
-                                    <th scope="col" class="text-center align-middle" style="width: 15%;">No. HP</th>
-                                    <th scope="col" class="text-center align-middle" style="width: 15%;">Aksi</th>
+                                    <th scope="col" class="text-center align-middle">NIM</th>
+                                    <th scope="col" class="text-center align-middle">Nama</th>
+                                    <th scope="col" class="text-center align-middle">Jenis Kelamin</th>
+                                    <th scope="col" class="text-center align-middle">No. HP</th>
+                                    <th scope="col" class="text-center align-middle">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>

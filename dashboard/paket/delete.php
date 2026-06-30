@@ -9,7 +9,7 @@ if (!$paketId) {
     paket_redirect('/doremi-app/dashboard/paket/', 'error', 'Data paket tidak valid.');
 }
 
-$stmt = mysqli_prepare($db, "SELECT COUNT(*) AS total FROM pengambilanpaket WHERE PaketID = ?");
+$stmt = mysqli_prepare($db, "CALL sp_countPackagePickupByPaketId(?)");
 mysqli_stmt_bind_param($stmt, 'i', $paketId);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
@@ -20,7 +20,7 @@ if (($pengambilan['total'] ?? 0) > 0) {
     paket_redirect('/doremi-app/dashboard/paket/', 'error', 'Paket yang sudah memiliki catatan pengambilan tidak dapat dihapus.');
 }
 
-$stmt = mysqli_prepare($db, "DELETE FROM paket WHERE PaketID = ?");
+$stmt = mysqli_prepare($db, "CALL sp_deletePaket(?)");
 mysqli_stmt_bind_param($stmt, 'i', $paketId);
 mysqli_stmt_execute($stmt);
 $affectedRows = mysqli_stmt_affected_rows($stmt);
