@@ -47,13 +47,18 @@ if ($action === 'create_request') {
     $waktuKeluar = $today . ' ' . $waktuKeluarTime . ':00';
     $waktuMasuk = $today . ' ' . $waktuMasukTime . ':00';
 
-    $activeQuery = mysqli_query($db, "SELECT COUNT(*) as count FROM inoutpenghuni WHERE PenghuniID = $userId AND Status IN ('Pending', 'Keluar')");
-    if (mysqli_fetch_assoc($activeQuery)['count'] > 0) {
+    $stmt = mysqli_prepare($db, "CALL sp_countActiveInOutRequests(?)");
+    mysqli_stmt_bind_param($stmt, 'i', $userId);
+    mysqli_stmt_execute($stmt);
+    $activeQuery = mysqli_stmt_get_result($stmt);
+    $count = mysqli_fetch_assoc($activeQuery)['count'];
+    mysqli_stmt_close($stmt);
+    if ($count > 0) {
         header("Location: index.php?status=error&message=Anda masih memiliki izin keluar yang aktif!");
         exit;
     }
 
-    $stmt = mysqli_prepare($db, "INSERT INTO inoutpenghuni (PenghuniID, Keperluan, Status, WaktuKeluar, WaktuMasuk) VALUES (?, ?, 'Pending', ?, ?)");
+    $stmt = mysqli_prepare($db, "CALL sp_createInOutRequest(?, ?, ?, ?)");
     mysqli_stmt_bind_param($stmt, 'isss', $userId, $keperluan, $waktuKeluar, $waktuMasuk);
 
     if (mysqli_stmt_execute($stmt)) {
@@ -73,8 +78,8 @@ elseif ($action === 'confirm_exit') {
         exit;
     }
     
-    $stmt = mysqli_prepare($db, "UPDATE inoutpenghuni SET Status = 'Keluar', WaktuKeluar = ?, PetugasID = ? WHERE InOutID = ?");
-    mysqli_stmt_bind_param($stmt, 'sii', $now, $userId, $id);
+    $stmt = mysqli_prepare($db, "CALL sp_confirmInOutExit(?, ?, ?)");
+    mysqli_stmt_bind_param($stmt, 'isi', $id, $now, $userId);
 
     if (mysqli_stmt_execute($stmt)) {
         header("Location: index.php?status=success&message=Konfirmasi keluar berhasil!");
@@ -92,19 +97,4 @@ elseif ($action === 'confirm_entry') {
         header("Location: index.php?status=error&message=Data izin masuk tidak valid!");
         exit;
     }
-    
-    $stmt = mysqli_prepare($db, "UPDATE inoutpenghuni SET Status = 'Masuk', WaktuMasuk = ? WHERE InOutID = ?");
-    mysqli_stmt_bind_param($stmt, 'si', $now, $id);
-
-    if (mysqli_stmt_execute($stmt)) {
-        header("Location: index.php?status=success&message=Konfirmasi masuk berhasil!");
-    } else {
-        header("Location: index.php?status=error&message=Gagal konfirmasi masuk!");
-    }
-    mysqli_stmt_close($stmt);
-}
-
-else {
-    header("Location: index.php");
-}
 exit;

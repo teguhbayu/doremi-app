@@ -19,21 +19,21 @@ if (!$type || !$id) {
 $photoData = null;
 
 if ($type === 'maintenance_laporan') {
-    $stmt = mysqli_prepare($db, "SELECT FotoLaporan FROM maintenance WHERE MaintenanceID = ?");
+    $stmt = mysqli_prepare($db, "CALL sp_getFotoLaporanFromMaintenance(?)");
     mysqli_stmt_bind_param($stmt, "i", $id);
     mysqli_stmt_execute($stmt);
     mysqli_stmt_bind_result($stmt, $photoData);
     mysqli_stmt_fetch($stmt);
     mysqli_stmt_close($stmt);
 } elseif ($type === 'maintenance_perbaikan') {
-    $stmt = mysqli_prepare($db, "SELECT FotoMaintenance FROM maintenance WHERE MaintenanceID = ?");
+    $stmt = mysqli_prepare($db, "CALL sp_getFotoMaintenanceFromMaintenance(?)");
     mysqli_stmt_bind_param($stmt, "i", $id);
     mysqli_stmt_execute($stmt);
     mysqli_stmt_bind_result($stmt, $photoData);
     mysqli_stmt_fetch($stmt);
     mysqli_stmt_close($stmt);
 } elseif ($type === 'paket_pengambilan') {
-    $stmt = mysqli_prepare($db, "SELECT FotoPengambilan FROM pengambilanpaket WHERE PaketID = ?");
+    $stmt = mysqli_prepare($db, "CALL sp_getFotoPengambilanFromPengambilanPaket(?)");
     mysqli_stmt_bind_param($stmt, "i", $id);
     mysqli_stmt_execute($stmt);
     mysqli_stmt_bind_result($stmt, $photoData);

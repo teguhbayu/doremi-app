@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require 'helpers.php';
 paket_require_roles(['SIGAP']);
@@ -11,11 +11,7 @@ if (!$paketId) {
 
 $stmt = mysqli_prepare(
     $db,
-    "SELECT pk.*, pt.NamaPetugas
-     FROM paket pk
-     JOIN petugas pt ON pk.PetugasID = pt.PetugasID
-     WHERE pk.PaketID = ?
-     LIMIT 1"
+    "CALL sp_getPaketDetail(?)"
 );
 mysqli_stmt_bind_param($stmt, 'i', $paketId);
 mysqli_stmt_execute($stmt);
@@ -29,11 +25,7 @@ if (!$paket) {
 
 $penghuniQuery = mysqli_query(
     $db,
-    "SELECT p.PenghuniID, p.NamaPenghuni, p.Nim, k.NomorKamar
-     FROM penghuni p
-     LEFT JOIN kamar k ON p.KamarID = k.KamarID
-     WHERE p.IsDeleted = 0
-     ORDER BY p.NamaPenghuni"
+    "CALL sp_getActivePenghuniForSelect()"
 );
 $penghuniList = mysqli_fetch_all($penghuniQuery, MYSQLI_ASSOC);
 $selectedPenghuniLabel = '';
@@ -62,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         paket_redirect($_SERVER['PHP_SELF'] . '?id=' . $paketId, 'error', 'Data paket tidak valid.');
     }
 
-    $stmt = mysqli_prepare($db, "SELECT PenghuniID FROM penghuni WHERE PenghuniID = ? AND IsDeleted = 0 LIMIT 1");
+    $stmt = mysqli_prepare($db, "CALL sp_checkPenghuniExist(?)");
     mysqli_stmt_bind_param($stmt, 'i', $penghuniId);
     mysqli_stmt_execute($stmt);
     $penghuniResult = mysqli_stmt_get_result($stmt);
@@ -73,8 +65,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         paket_redirect($_SERVER['PHP_SELF'] . '?id=' . $paketId, 'error', 'Penghuni tujuan tidak ditemukan.');
     }
 
-    $stmt = mysqli_prepare($db, "UPDATE paket SET NamaPengirim = ?, Kurir = ?, JenisPaket = ?, WaktuSampai = ?, PenghuniID = ? WHERE PaketID = ?");
-    mysqli_stmt_bind_param($stmt, 'ssssii', $namaPengirim, $kurir, $jenisPaket, $waktuSampai, $penghuniId, $paketId);
+    $stmt = mysqli_prepare($db, "CALL sp_updatePaket(?, ?, ?, ?, ?, ?)");
+    mysqli_stmt_bind_param($stmt, 'issssi', $paketId, $namaPengirim, $kurir, $jenisPaket, $waktuSampai, $penghuniId);
 
     if (!mysqli_stmt_execute($stmt)) {
         mysqli_stmt_close($stmt);

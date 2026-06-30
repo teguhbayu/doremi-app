@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 require '../../vendor/autoload.php';
 
 use Respect\Validation\Validator as v;
@@ -126,15 +126,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    $now = date('Y-m-d H:i:s');
-
     if ($isChangingPassword) {
         $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-        $stmt = mysqli_prepare($db, "UPDATE penghuni SET KamarID = ?, NamaPenghuni = ?, Nim = ?, JenisKelamin = ?, NoHP = ?, Email = ?, Password = ?, Alamat = ?, UpdateAt = ? WHERE PenghuniID = ?");
-        mysqli_stmt_bind_param($stmt, 'issssssssi', $kamarId, $nama, $nim, $jk, $no, $email, $hashedPassword, $alamat, $now, $id);
+        $stmt = mysqli_prepare($db, "CALL sp_updatePenghuniWithPassword(?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        mysqli_stmt_bind_param($stmt, 'iisssssss', $id, $kamarId, $nama, $nim, $jk, $no, $email, $hashedPassword, $alamat);
     } else {
-        $stmt = mysqli_prepare($db, "UPDATE penghuni SET KamarID = ?, NamaPenghuni = ?, Nim = ?, JenisKelamin = ?, NoHP = ?, Email = ?, Alamat = ?, UpdateAt = ? WHERE PenghuniID = ?");
-        mysqli_stmt_bind_param($stmt, 'isssssssi', $kamarId, $nama, $nim, $jk, $no, $email, $alamat, $now, $id);
+        $stmt = mysqli_prepare($db, "CALL sp_updatePenghuniWithoutPassword(?, ?, ?, ?, ?, ?, ?, ?)");
+        mysqli_stmt_bind_param($stmt, 'iissssss', $id, $kamarId, $nama, $nim, $jk, $no, $email, $alamat);
     }
 
     if (!mysqli_stmt_execute($stmt)) {

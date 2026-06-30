@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 
 if (!isset($_SESSION['userId'])) {
@@ -14,20 +14,7 @@ if (!$id) {
     exit;
 }
 
-$kamarStmt = mysqli_prepare(
-    $db,
-    "SELECT
-        k.KamarID,
-        k.NomorKamar,
-        k.KapasitasPenghuni,
-        k.Lantai,
-        COUNT(p.PenghuniID) AS JumlahPenghuniAktual
-    FROM kamar k
-    LEFT JOIN penghuni p ON p.KamarID = k.KamarID AND p.IsDeleted = 0
-    WHERE k.KamarID = ? AND k.IsDeleted = 0
-    GROUP BY k.KamarID, k.NomorKamar, k.KapasitasPenghuni, k.Lantai
-    LIMIT 1"
-);
+$kamarStmt = mysqli_prepare($db, "CALL sp_getKamarDetailWithOccupancy(?)");
 mysqli_stmt_bind_param($kamarStmt, 'i', $id);
 mysqli_stmt_execute($kamarStmt);
 $kamarResult = mysqli_stmt_get_result($kamarStmt);
@@ -39,13 +26,7 @@ if (!$kamar) {
     exit;
 }
 
-$penghuniStmt = mysqli_prepare(
-    $db,
-    "SELECT PenghuniID, NamaPenghuni, Nim, JenisKelamin, NoHP, Email
-     FROM penghuni
-     WHERE KamarID = ? AND IsDeleted = 0
-     ORDER BY NamaPenghuni ASC"
-);
+$penghuniStmt = mysqli_prepare($db, "CALL sp_getPenghuniByKamarId(?)");
 mysqli_stmt_bind_param($penghuniStmt, 'i', $id);
 mysqli_stmt_execute($penghuniStmt);
 $penghuniResult = mysqli_stmt_get_result($penghuniStmt);

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 
 if (!isset($_SESSION['userId'])) {
@@ -8,20 +8,7 @@ if (!isset($_SESSION['userId'])) {
 
 require '../../db.php';
 
-$query = mysqli_query(
-    $db,
-    "SELECT
-        k.KamarID,
-        k.NomorKamar,
-        k.KapasitasPenghuni,
-        k.Lantai,
-        COUNT(p.PenghuniID) AS JumlahPenghuniAktual
-    FROM kamar k
-    LEFT JOIN penghuni p ON p.KamarID = k.KamarID AND p.IsDeleted = 0
-    WHERE k.IsDeleted = 0
-    GROUP BY k.KamarID, k.NomorKamar, k.KapasitasPenghuni, k.Lantai
-    ORDER BY k.NomorKamar ASC"
-);
+$query = mysqli_query($db, "CALL sp_getAllKamarWithOccupancy()");
 $totalKamar = mysqli_num_rows($query);
 ?>
 
