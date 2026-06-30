@@ -544,87 +544,141 @@ mysqli_free_result($res);
                     </table>
                 </div>
             </div>
-
-        </div><!-- /dashboard-page -->
-    </main>
-
-    <?php require '../../bootstrap.php'; ?>
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
-    <script>
-        (function () {
-            const primary = '#146c94';
-            const baseOpts = { responsive: true, maintainAspectRatio: false };
-            const gridOpts = { color: 'rgba(0,0,0,0.05)' };
-
-            // Bar Horizontal â€” Distribusi Jenis berdasarkan Skala Prioritas
-            new Chart(document.getElementById('chartPriority'), {
-                type: 'bar',
-                data: {
-                    labels: ['Darurat\n(Prioritas Tinggi)', 'Sedang\n(Prioritas Sedang)', 'Ringan\n(Prioritas Rendah)'],
-                    datasets: [{
-                        label: 'Jumlah Laporan',
-                        data: <?= json_encode($priorityValues) ?>,
-                        backgroundColor: <?= json_encode($priorityBgColors) ?>,
-                        borderRadius: 8,
-                        borderSkipped: false,
-                    }]
-                },
-                options: {
-                    ...baseOpts,
-                    indexAxis: 'y',
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.x} laporan` } }
-                    },
-                    scales: {
-                        x: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 11 } }, grid: gridOpts },
-                        y: { ticks: { font: { size: 11 } }, grid: { display: false } }
-                    }
-                }
-            });
-
-            // Line â€” Trend
-            new Chart(document.getElementById('chartTrend'), {
-                type: 'line',
-                data: {
-                    labels: <?= json_encode($trendLabels) ?>,
-                    datasets: [{ label: 'Laporan', data: <?= json_encode($trendValues) ?>, borderColor: primary, backgroundColor: 'rgba(20,108,148,0.08)', borderWidth: 2.5, pointRadius: 4, pointBackgroundColor: primary, fill: true, tension: 0.4 }]
-                },
-                options: { ...baseOpts, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 11 } }, grid: gridOpts }, x: { ticks: { font: { size: 11 }, maxRotation: 45, maxTicksLimit: 10 }, grid: { display: false } } } }
-            });
-
-            // Bar Horizontal â€” Top Ruangan
-            new Chart(document.getElementById('chartRuangan'), {
-                type: 'bar',
-                data: {
-                    labels: <?= json_encode($topRuanganLabels ?: ['Tidak ada data']) ?>,
-                    datasets: [{ label: 'Laporan', data: <?= json_encode($topRuanganValues ?: [0]) ?>, backgroundColor: 'rgba(20,108,148,0.75)', borderRadius: 6, borderSkipped: false }]
-                },
-                options: { ...baseOpts, indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 11 } }, grid: gridOpts }, y: { ticks: { font: { size: 11 } }, grid: { display: false } } } }
-            });
-
-            // Stacked Bar â€” Status per Jenis
-            new Chart(document.getElementById('chartStacked'), {
-                type: 'bar',
-                data: {
-                    labels: ['Darurat', 'Sedang', 'Ringan'],
-                    datasets: [
-                        { label: 'Diajukan', data: [<?= $stackedData['Kerusakan Darurat / Berat']['Diajukan'] ?>, <?= $stackedData['Kerusakan Sedang']['Diajukan'] ?>, <?= $stackedData['Kerusakan Ringan']['Diajukan'] ?>], backgroundColor: '#f59e0b', borderRadius: 4 },
-                        { label: 'Diproses', data: [<?= $stackedData['Kerusakan Darurat / Berat']['Diproses'] ?>, <?= $stackedData['Kerusakan Sedang']['Diproses'] ?>, <?= $stackedData['Kerusakan Ringan']['Diproses'] ?>], backgroundColor: '#2F7FF0', borderRadius: 4 },
-                        { label: 'Selesai', data: [<?= $stackedData['Kerusakan Darurat / Berat']['Selesai'] ?>, <?= $stackedData['Kerusakan Sedang']['Selesai'] ?>, <?= $stackedData['Kerusakan Ringan']['Selesai'] ?>], backgroundColor: '#10b981', borderRadius: 4 },
-                    ]
-                },
-                options: { ...baseOpts, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 12, font: { size: 11 } } } }, scales: { x: { stacked: true, ticks: { font: { size: 12 } }, grid: { display: false } }, y: { stacked: true, beginAtZero: true, ticks: { stepSize: 1, font: { size: 11 } }, grid: gridOpts } } }
-            });
-        })();
-    </script>
-
-    <style>
-        /* â”€â”€ Print-only elements (hidden on screen) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-        .print-only {
-            display: none;
+           </div>
+    </div>
+    <?php endif; ?>
+ 
+    <!-- ── Tabel Detail ───────────────────────────────────────────────────── -->
+    <div class="table-panel">
+        <div class="tw:flex tw:items-center tw:justify-between tw:flex-wrap tw:gap-3 tw:mb-4">
+            <div>
+                <h5 class="dashboard-side-panel__title tw:flex tw:items-center tw:gap-2 tw:mb-1">
+                    <i class="fa-solid fa-table-list"></i> Daftar Laporan
+                </h5>
+                <p class="dashboard-side-panel__copy tw:mb-0"><?= count($detailRows) ?> laporan ditemukan dalam periode <?= $rangeLabel ?>.</p>
+            </div>
+        </div>
+        <div class="doremi-table-wrapper print-table-wrapper">
+            <table id="reportTable" class="table doremi-table text-center align-middle tw:mb-0 tw:w-full print-table">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Pelapor</th>
+                        <th>Lokasi / Target</th>
+                        <th>Jenis</th>
+                        <th>Status</th>
+                        <th>Tanggal Lapor</th>
+                        <th>Selesai</th>
+                        <th>Durasi</th>
+                        <?php if ($role === 'PENGURUS'): ?><th>Petugas</th><?php endif; ?>
+                    </tr>
+                </thead>
+                <tbody>
+                <?php foreach ($detailRows as $i => $r):
+                    $statusStyle = match($r['StatusMaintenance']) {
+                        'Selesai'  => 'background:#dcfce7; color:#16a34a;',
+                        'Diproses' => 'background:#dbeafe; color:#1d4ed8;',
+                        default    => 'background:#fef9c3; color:#854d0e;',
+                    };
+                    $jenisStyle = match($r['JenisLaporan']) {
+                        'Kerusakan Darurat / Berat' => 'background:#fee2e2; color:#dc2626;',
+                        'Kerusakan Ringan'          => 'background:#dcfce7; color:#16a34a;',
+                        default                    => 'background:#fef3c7; color:#92400e;', // Kerusakan Sedang
+                    };
+                ?>
+                    <tr>
+                        <td class="row-number-cell"></td>
+                        <td><?= htmlspecialchars($r['Pelapor']) ?></td>
+                        <td><?= htmlspecialchars($r['Lokasi']) ?></td>
+                        <td><span style="font-size:11px; font-weight:600; padding:2px 8px; border-radius:20px; <?= $jenisStyle ?>"><?= htmlspecialchars($r['JenisLaporan']) ?></span></td>
+                        <td><span style="font-size:11px; font-weight:600; padding:2px 8px; border-radius:20px; <?= $statusStyle ?>"><?= htmlspecialchars($r['StatusMaintenance']) ?></span></td>
+                        <td><?= $r['TanggalLapor'] ? date('d M Y', strtotime($r['TanggalLapor'])) : '—' ?></td>
+                        <td><?= $r['TanggalSelesai'] ? date('d M Y', strtotime($r['TanggalSelesai'])) : '—' ?></td>
+                        <td><?= $r['Durasi'] !== null ? $r['Durasi'] . ' hari' : '—' ?></td>
+                        <?php if ($role === 'PENGURUS'): ?><td><?= htmlspecialchars($r['Petugas'] ?? '—') ?></td><?php endif; ?>
+                    </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+ 
+</div><!-- /dashboard-page -->
+</main>
+ 
+<?php require '../../bootstrap.php'; ?>
+ 
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+<script>
+(function () {
+    const primary  = '#146c94';
+    const baseOpts = { responsive: true, maintainAspectRatio: false };
+    const gridOpts = { color: 'rgba(0,0,0,0.05)' };
+ 
+    // Bar Horizontal — Distribusi Jenis berdasarkan Skala Prioritas
+    new Chart(document.getElementById('chartPriority'), {
+        type: 'bar',
+        data: {
+            labels: ['Darurat\n(Prioritas Tinggi)', 'Sedang\n(Prioritas Sedang)', 'Ringan\n(Prioritas Rendah)'],
+            datasets: [{
+                label: 'Jumlah Laporan',
+                data: <?= json_encode($priorityValues) ?>,
+                backgroundColor: <?= json_encode($priorityBgColors) ?>,
+                borderRadius: 8,
+                borderSkipped: false,
+            }]
+        },
+        options: {
+            ...baseOpts,
+            indexAxis: 'y',
+            plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.x} laporan` } }
+            },
+            scales: {
+                x: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 11 } }, grid: gridOpts },
+                y: { ticks: { font: { size: 11 } }, grid: { display: false } }
+            }
         }
+    });
+ 
+    // Line — Trend
+    new Chart(document.getElementById('chartTrend'), {
+        type: 'line',
+        data: {
+            labels: <?= json_encode($trendLabels) ?>,
+            datasets: [{ label: 'Laporan', data: <?= json_encode($trendValues) ?>, borderColor: primary, backgroundColor: 'rgba(20,108,148,0.08)', borderWidth: 2.5, pointRadius: 4, pointBackgroundColor: primary, fill: true, tension: 0.4 }]
+        },
+        options: { ...baseOpts, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 11 } }, grid: gridOpts }, x: { ticks: { font: { size: 11 }, maxRotation: 45, maxTicksLimit: 10 }, grid: { display: false } } } }
+    });
+ 
+    // Bar Horizontal — Top Ruangan
+    new Chart(document.getElementById('chartRuangan'), {
+        type: 'bar',
+        data: {
+            labels: <?= json_encode($topRuanganLabels ?: ['Tidak ada data']) ?>,
+            datasets: [{ label: 'Laporan', data: <?= json_encode($topRuanganValues ?: [0]) ?>, backgroundColor: 'rgba(20,108,148,0.75)', borderRadius: 6, borderSkipped: false }]
+        },
+        options: { ...baseOpts, indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 11 } }, grid: gridOpts }, y: { ticks: { font: { size: 11 } }, grid: { display: false } } } }
+    });
+ 
+    // Stacked Bar — Status per Jenis
+    new Chart(document.getElementById('chartStacked'), {
+        type: 'bar',
+        data: {
+            labels: ['Darurat', 'Sedang', 'Ringan'],
+            datasets: [
+                { label: 'Diajukan', data: [<?= $stackedData['Kerusakan Darurat / Berat']['Diajukan'] ?>, <?= $stackedData['Kerusakan Sedang']['Diajukan'] ?>, <?= $stackedData['Kerusakan Ringan']['Diajukan'] ?>], backgroundColor: '#f59e0b', borderRadius: 4 },
+                { label: 'Diproses', data: [<?= $stackedData['Kerusakan Darurat / Berat']['Diproses'] ?>, <?= $stackedData['Kerusakan Sedang']['Diproses'] ?>, <?= $stackedData['Kerusakan Ringan']['Diproses'] ?>], backgroundColor: '#2F7FF0', borderRadius: 4 },
+                { label: 'Selesai', data: [<?= $stackedData['Kerusakan Darurat / Berat']['Selesai'] ?>, <?= $stackedData['Kerusakan Sedang']['Selesai'] ?>, <?= $stackedData['Kerusakan Ringan']['Selesai'] ?>], backgroundColor: '#10b981', borderRadius: 4 },
+            ]
+        },
+        options: { ...baseOpts, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 12, font: { size: 11 } } } }, scales: { x: { stacked: true, ticks: { font: { size: 12 } }, grid: { display: false } }, y: { stacked: true, beginAtZero: true, ticks: { stepSize: 1, font: { size: 11 } }, grid: gridOpts } } }
+    });
+})();
+</script>
+ 
+<style>
 
         @media print {
 
@@ -659,7 +713,7 @@ mysqli_free_result($res);
 
             /* Show print-only header with logo */
             .print-only {
-                display: block !important;
+                 display: none;
             }
 
             .print-header-block {

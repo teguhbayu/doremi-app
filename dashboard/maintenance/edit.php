@@ -3,6 +3,7 @@ session_start();
 require 'helpers.php';
 // Allowed the MAINTENANCE role to edit their submitted tickets
 maintenance_require_roles(['PENGURUS', 'PENGHUNI', 'SIGAP', 'SERVANDA', 'MAINTENANCE']);
+require '../../csrf.php';
 require '../../db.php';
 
 use Respect\Validation\Validator as v;
@@ -53,6 +54,7 @@ $inventarisQuery = mysqli_query($db, "SELECT InventarisID, NamaBarang FROM inven
 $inventarisList = mysqli_fetch_all($inventarisQuery, MYSQLI_ASSOC);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    csrf_validate($_SERVER['PHP_SELF'] . '?id=' . $id);
     $jenisLaporan = trim($_POST['jenisLaporan'] ?? '');
     $targetType = trim($_POST['targetType'] ?? '');
     $targetValue = trim($_POST['targetValue'] ?? '');
@@ -81,8 +83,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($targetType === 'ruangan') {
         $ruanganId = (int)$targetValue;
+        // Validate that the ruangan actually exists
+        $chk = mysqli_prepare($db, "SELECT RuanganID FROM ruangan WHERE RuanganID = ? AND IsDeleted = 0 LIMIT 1");
+        mysqli_stmt_bind_param($chk, 'i', $ruanganId);
+        mysqli_stmt_execute($chk);
+        if (!mysqli_fetch_assoc(mysqli_stmt_get_result($chk))) {
+            mysqli_stmt_close($chk);
+            maintenance_redirect($_SERVER['PHP_SELF'] . '?id=' . $id, 'error', 'Ruangan yang dipilih tidak ditemukan.');
+        }
+        mysqli_stmt_close($chk);
     } else {
         $inventarisId = (int)$targetValue;
+        // Validate that the inventaris actually exists
+        $chk = mysqli_prepare($db, "SELECT InventarisID FROM inventaris WHERE InventarisID = ? AND IsDeleted = 0 LIMIT 1");
+        mysqli_stmt_bind_param($chk, 'i', $inventarisId);
+        mysqli_stmt_execute($chk);
+        if (!mysqli_fetch_assoc(mysqli_stmt_get_result($chk))) {
+            mysqli_stmt_close($chk);
+            maintenance_redirect($_SERVER['PHP_SELF'] . '?id=' . $id, 'error', 'Inventaris yang dipilih tidak ditemukan.');
+        }
+        mysqli_stmt_close($chk);
     }
 
     try {
@@ -166,7 +186,9 @@ $currentTargetValue = !empty($report['RuanganID']) ? $report['RuanganID'] : $rep
 
                 <div class="tw:lg:col-span-2">
                     <form method="POST" enctype="multipart/form-data" class="tw:grid tw:grid-cols-1 tw:lg:grid-cols-2 tw:gap-4 tw:p-[1.45rem] tw:rounded-[24px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.88)] tw:shadow-sm" x-data="{ targetType: '<?= $currentTargetType ?>' }">
-                            <div class="mb-4">
+                            <?php echo csrf_field(); ?>
+                            
+                      <div class="mb-4">
                                 <label class="form-label tw:font-semibold">Skala Prioritas / Tingkat Kerusakan</label>
                                 <select name="jenisLaporan" class="form-select" required>
                                     <option value="Kerusakan Ringan" <?= $report['JenisLaporan'] === 'Kerusakan Ringan' ? 'selected' : '' ?>>Kerusakan Ringan (Low Priority)</option>

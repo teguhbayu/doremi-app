@@ -3,6 +3,7 @@ session_start();
 require 'helpers.php';
 // Memastikan semua peran yang diizinkan bisa membuat laporan baru
 maintenance_require_roles(['PENGURUS', 'PENGHUNI', 'SIGAP', 'SERVANDA', 'MAINTENANCE']);
+require '../../csrf.php';
 require '../../db.php';
 
 $role = $_SESSION['userRole'];
@@ -18,6 +19,7 @@ $inventory = mysqli_fetch_all($inventoryQuery, MYSQLI_ASSOC);
 
 // 3. Memproses Form Saat Disubmit
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    csrf_validate('create.php');
     $jenisLaporan = mysqli_real_escape_string($db, trim($_POST['skala_prioritas'] ?? ''));
     $deskripsi = mysqli_real_escape_string($db, trim($_POST['deskripsi'] ?? ''));
     $targetTipe = $_POST['target_tipe'] ?? 'ruangan';
@@ -42,18 +44,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $petugasId = $userId;
     }
 
-    // Mengonversi Foto Laporan ke Base64 (jika ada file diunggah)
-    $fotoBase64 = "";
-    if (isset($_FILES['foto_laporan']) && $_FILES['foto_laporan']['error'] === UPLOAD_ERR_OK) {
-        $fileSize = $_FILES['foto_laporan']['size'];
-        if ($fileSize > 2 * 1024 * 1024) { // Batasan 2MB
-            maintenance_redirect('create.php', 'error', 'Ukuran foto laporan maksimal 2MB.');
-        }
-
-        $path = $_FILES['foto_laporan']['tmp_name'];
-        $type = pathinfo($_FILES['foto_laporan']['name'], PATHINFO_EXTENSION);
-        $data = file_get_contents($path);
-        $fotoBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+    // Mengonversi Foto Laporan ke Base64 dengan validasi MIME type via helpers.php
+    try {
+        $fotoBase64 = maintenance_store_photo($_FILES['foto_laporan'] ?? []);
+    } catch (RuntimeException $e) {
+        maintenance_redirect('create.php', 'error', $e->getMessage());
     }
 
     // Menyisipkan Data Laporan Baru ke Database
@@ -99,9 +94,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             <?php require dirname(__DIR__) . '/components/breadcrumb.php'; ?>
 
-            <h1 class="page-title tw:mb-6" data-kicker="Form Laporan" data-subtitle="Buat laporan kerusakan baru secara terperinci agar segera ditindaklanjuti oleh tim pemeliharaan asrama.">
+            <h1 class="page-title" data-kicker="Form Laporan" data-subtitle="Buat laporan kerusakan baru secara terperinci agar segera ditindaklanjuti oleh tim pemeliharaan asrama.">
                 Ajukan Laporan Maintenance
             </h1>
+            <div class="page-toolbar" data-note="Form laporan maintenance baru">
+                <a href="index.php" class="page-secondary-btn">
+                    <i class="iconsax" icon-name="arrow-left-2"></i>
+                    <span>Kembali ke daftar</span>
+                </a>
+            </div>
 
             
             <div class="tw:grid tw:grid-cols-1 tw:lg:grid-cols-3 tw:gap-8">
@@ -110,6 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="tw:lg:col-span-2">
                     <form action="create.php" method="POST" enctype="multipart/form-data" class="tw:grid tw:grid-cols-1 tw:lg:grid-cols-2 tw:gap-4 tw:p-[1.45rem] tw:rounded-[24px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.88)] tw:shadow-sm">
                         
+                        <?php echo csrf_field(); ?>
                         
                         <div class="mb-3 tw:col-span-full">
                             <label for="skala_prioritas" class="form-label">Skala Prioritas (Berbasis Kriteria OSHA)</label>
@@ -165,10 +167,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         
                         <div class="mb-3 tw:col-span-full">
                             <label for="deskripsi" class="form-label">Deskripsi Masalah</label>
-                            <textarea name="deskripsi" id="deskripsi" maxlength="500" class="form-control" rows="4" required 
+                            <textarea name="deskripsi" id="deskripsi" maxlength="1000" class="form-control" rows="4" required 
                                       placeholder="Jelaskan kronologi dan letak kerusakan..." oninput="updateCharCount(this)"></textarea>
                             <div class="tw:text-xs tw:text-gray-500 tw:text-right tw:mt-1">
-                                <span id="charCount">0</span> / 500 karakter
+                                <span id="charCount">0</span> / 1000 karakter
                             </div>
                         </div>
 

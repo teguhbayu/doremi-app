@@ -5,10 +5,22 @@ if (!isset($_SESSION['userId'])) {
     header("Location: /doremi-app/login.php");
     exit;
 }
+if ($_SESSION['userRole'] !== 'PENGURUS') {
+    header("Location: /doremi-app/dashboard/");
+    exit;
+}
+require '../../csrf.php';
+
+// Only accept POST to prevent CSRF via URL
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header("Location: /doremi-app/dashboard/ruangan/");
+    exit;
+}
+csrf_validate('/doremi-app/dashboard/ruangan/');
 
 require '../../db.php';
 
-$id = $_GET['id'] ?? null;
+$id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
 
 if ($id) {
     $stmt = mysqli_prepare($db, "CALL sp_deleteRuangan(?)");

@@ -5,18 +5,22 @@ if (!isset($_SESSION['userId'])) {
     header("Location: /doremi-app/login.php");
     exit;
 }
+if ($_SESSION['userRole'] !== 'PENGURUS') {
+    header("Location: /doremi-app/dashboard/");
+    exit;
+}
+require '../../csrf.php';
 require '../../db.php';
 
 $query = mysqli_query($db, "CALL sp_getAllRuangan()");
 $totalRuangan = mysqli_num_rows($query);
 ?>
 
-
 <!DOCTYPE html>
 <html lang="en">
 <?php require '../../head.php'; ?>
 
-<body class="dashboard-body tw:p-0 tw:m-0 tw:relative tw:flex">
+<body class="dashboard-body tw:p-0 tw:m-0 relative tw:flex">
     <?php require '../components/sidebar.php'; ?>
     <main class="tw:md:ml-75 tw:grow">
         <div class="tw:pt-20 tw:md:pt-5 tw:px-5 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
@@ -94,7 +98,11 @@ $totalRuangan = mysqli_num_rows($query);
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <a href="#" id="confirmDelete" class="btn btn-danger">Hapus</a>
+                    <form id="deleteForm" method="POST" action="delete.php" class="tw:inline">
+                        <?php echo csrf_field(); ?>
+                        <input type="hidden" name="id" id="deleteId" value="">
+                        <button type="submit" class="btn btn-danger">Hapus</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -141,8 +149,7 @@ $totalRuangan = mysqli_num_rows($query);
             deleteModal.addEventListener('show.bs.modal', event => {
                 const button = event.relatedTarget
                 const id = button.getAttribute('data-bs-id')
-                const confirmDelete = deleteModal.querySelector('#confirmDelete')
-                confirmDelete.href = `delete.php?id=${id}`
+                document.getElementById('deleteId').value = id
             })
         }
 

@@ -2,6 +2,7 @@
 session_start();
 require 'helpers.php';
 maintenance_require_roles(['PENGURUS', 'PENGHUNI', 'SIGAP', 'SERVANDA', 'MAINTENANCE']);
+require '../../csrf.php';
 require '../../db.php';
 
 $role = $_SESSION['userRole'];
@@ -133,6 +134,7 @@ $totalReports = count($reports);
                                             <?php if ($role === 'MAINTENANCE'): ?>
                                                 <?php if ($r['StatusMaintenance'] === 'Diajukan'): ?>
                                                     <form action="process.php" method="POST" class="tw:inline">
+                                                        <?php echo csrf_field(); ?>
                                                         <input type="hidden" name="action" value="claim">
                                                         <input type="hidden" name="id" value="<?= $r['MaintenanceID'] ?>">
                                                         <button type="submit" class="btn btn-sm btn-info text-white tw:rounded-lg">Proses</button>
@@ -257,6 +259,7 @@ $totalReports = count($reports);
                                                 </div>
                                                 <form action="process.php" method="POST" enctype="multipart/form-data">
                                                     <div class="modal-body">
+                                                        <?php echo csrf_field(); ?>
                                                         <input type="hidden" name="action" value="complete">
                                                         <input type="hidden" name="id" value="<?= $r['MaintenanceID'] ?>">
                                                         
@@ -301,7 +304,11 @@ $totalReports = count($reports);
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary tw:rounded-lg" data-bs-dismiss="modal">Batal</button>
-                    <a href="#" id="confirmDelete" class="btn btn-danger tw:rounded-lg">Hapus</a>
+                    <form id="deleteForm" method="POST" action="delete.php" class="tw:inline">
+                        <?php echo csrf_field(); ?>
+                        <input type="hidden" name="id" id="deleteId" value="">
+                        <button type="submit" class="btn btn-danger tw:rounded-lg">Hapus</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -344,8 +351,7 @@ $totalReports = count($reports);
                 deleteModal.addEventListener('show.bs.modal', event => {
                     const button = event.relatedTarget;
                     const id = button.getAttribute('data-bs-id');
-                    const confirmDelete = deleteModal.querySelector('#confirmDelete');
-                    confirmDelete.href = `delete.php?id=${id}`;
+                    document.getElementById('deleteId').value = id;
                 });
             }
 
