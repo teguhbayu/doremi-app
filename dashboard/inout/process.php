@@ -97,4 +97,19 @@ elseif ($action === 'confirm_entry') {
         header("Location: index.php?status=error&message=Data izin masuk tidak valid!");
         exit;
     }
+
+    $stmt = mysqli_prepare($db, "CALL sp_confirmInOutEntry(?, ?)");
+    mysqli_stmt_bind_param($stmt, 'is', $id, $now);
+
+    if (mysqli_stmt_execute($stmt)) {
+        header("Location: index.php?status=success&message=Konfirmasi masuk berhasil!");
+    } else {
+        header("Location: index.php?status=error&message=Gagal konfirmasi masuk!");
+    }
+    mysqli_stmt_close($stmt);
+}
+
+else {
+    header("Location: index.php");
+}
 exit;
