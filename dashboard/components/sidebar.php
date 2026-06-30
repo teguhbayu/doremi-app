@@ -12,6 +12,8 @@ switch ($_SESSION["userRole"]) {
             ["title" => "Inventaris", "target" => "/doremi-app/dashboard/inventaris/", "icon" => "archive-book"],
             ["title" => "Lapor Kerusakan", "target" => "/doremi-app/dashboard/maintenance/", "icon" => "setting-2"],
             ["title" => "Laporan Maintenance", "target" => "/doremi-app/dashboard/maintenance/report.php", "icon" => "fa-solid fa-chart-bar"],
+            ["title" => "Laporan Izin Keluar", "target" => "/doremi-app/dashboard/inout/report.php", "icon" => "fa-solid fa-chart-line"],
+            ["title" => "Laporan Paket", "target" => "/doremi-app/dashboard/paket/report.php", "icon" => "fa-solid fa-chart-column"],
         ];
         break;
     case "PENGHUNI":
@@ -26,7 +28,9 @@ switch ($_SESSION["userRole"]) {
         $menus = [
             ["title" => "Home", "target" => "/doremi-app/dashboard/", "icon" => "home-2"],
             ["title" => "Konfirmasi In/Out", "target" => "/doremi-app/dashboard/inout/", "icon" => "shield-tick"],
+            ["title" => "Laporan Izin Keluar", "target" => "/doremi-app/dashboard/inout/report.php", "icon" => "fa-solid fa-chart-line"],
             ["title" => "Paket", "target" => "/doremi-app/dashboard/paket/", "icon" => "box"],
+            ["title" => "Laporan Paket", "target" => "/doremi-app/dashboard/paket/report.php", "icon" => "fa-solid fa-chart-column"],
             ["title" => "Lapor Kerusakan", "target" => "/doremi-app/dashboard/maintenance/", "icon" => "setting-2"],
         ];
         break;
