@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
       opacity: 0,
       duration: 0.6,
       ease: 'power3.out',
+      clearProps: 'transform,opacity',
     });
   }
 
@@ -22,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
       opacity: 0,
       duration: 0.45,
       ease: 'power2.out',
+      clearProps: 'transform,opacity',
     });
   }
 
@@ -34,6 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
       duration: 0.5,
       delay: 0.15,
       ease: 'power3.out',
+      clearProps: 'transform,opacity',
     });
   }
 
@@ -47,6 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
       stagger: 0.08,
       delay: 0.2,
       ease: 'power3.out',
+      clearProps: 'transform,opacity',
     });
   }
 
@@ -60,6 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
       stagger: 0.1,
       delay: 0.35,
       ease: 'power3.out',
+      clearProps: 'transform,opacity',
     });
   }
 
@@ -72,6 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
       duration: 0.6,
       delay: 0.3,
       ease: 'power3.out',
+      clearProps: 'transform,opacity',
     });
   }
 
@@ -88,6 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
       stagger: 0.1,
       delay: 0.3,
       ease: 'power3.out',
+      clearProps: 'transform,opacity',
     });
   }
 
@@ -101,6 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
       stagger: 0.06,
       delay: 0.1,
       ease: 'power2.out',
+      clearProps: 'transform,opacity',
     });
   }
 
@@ -112,6 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
       opacity: 0,
       duration: 0.5,
       ease: 'back.out(1.4)',
+      clearProps: 'transform,opacity',
     });
   }
 
@@ -128,6 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
       duration: 0.45,
       delay: i * 0.04,
       ease: 'power2.out',
+      clearProps: 'transform,opacity',
     });
   });
 
@@ -143,6 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
       opacity: 0,
       duration: 0.4,
       ease: 'power2.out',
+      clearProps: 'transform,opacity',
     });
   });
 
