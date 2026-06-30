@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 
 if (!isset($_SESSION['userId'])) {
@@ -7,7 +7,7 @@ if (!isset($_SESSION['userId'])) {
 }
 require '../../db.php';
 
-$query = mysqli_query($db, "SELECT * FROM ruangan WHERE IsDeleted = 0;");
+$query = mysqli_query($db, "CALL sp_getAllRuangan()");
 $totalRuangan = mysqli_num_rows($query);
 ?>
 

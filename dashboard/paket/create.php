@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require 'helpers.php';
 paket_require_roles(['SIGAP']);
@@ -6,11 +6,7 @@ require '../../db.php';
 
 $penghuniQuery = mysqli_query(
     $db,
-    "SELECT p.PenghuniID, p.NamaPenghuni, p.Nim, k.NomorKamar
-     FROM penghuni p
-     LEFT JOIN kamar k ON p.KamarID = k.KamarID
-     WHERE p.IsDeleted = 0
-     ORDER BY p.NamaPenghuni"
+    "CALL sp_getActivePenghuniForSelect()"
 );
 $penghuniList = mysqli_fetch_all($penghuniQuery, MYSQLI_ASSOC);
 
@@ -32,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         paket_redirect($_SERVER['PHP_SELF'], 'error', 'Data paket tidak valid.');
     }
 
-    $stmt = mysqli_prepare($db, "SELECT PenghuniID FROM penghuni WHERE PenghuniID = ? AND IsDeleted = 0 LIMIT 1");
+    $stmt = mysqli_prepare($db, "CALL sp_checkPenghuniExist(?)");
     mysqli_stmt_bind_param($stmt, 'i', $penghuniId);
     mysqli_stmt_execute($stmt);
     $penghuniResult = mysqli_stmt_get_result($stmt);
@@ -45,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $petugasId = (int) $_SESSION['userId'];
 
-    $stmt = mysqli_prepare($db, "INSERT INTO paket (PetugasID, NamaPengirim, Kurir, JenisPaket, WaktuSampai, PenghuniID) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt = mysqli_prepare($db, "CALL sp_createPaket(?, ?, ?, ?, ?, ?)");
     mysqli_stmt_bind_param($stmt, 'issssi', $petugasId, $namaPengirim, $kurir, $jenisPaket, $waktuSampai, $penghuniId);
 
     if (!mysqli_stmt_execute($stmt)) {

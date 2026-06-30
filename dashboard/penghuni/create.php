@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 require '../../vendor/autoload.php';
 
 use Respect\Validation\Validator as v;
@@ -144,11 +144,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($restoredDeletedPenghuniId !== null) {
         $restoreStmt = mysqli_prepare(
             $db,
-            "UPDATE penghuni
-             SET KamarID = ?, NamaPenghuni = ?, Nim = ?, JenisKelamin = ?, NoHP = ?, Email = ?, Password = ?, Alamat = ?, IsDeleted = 0, UpdateAt = NOW()
-             WHERE PenghuniID = ?"
+            "CALL sp_restorePenghuni(?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
-        mysqli_stmt_bind_param($restoreStmt, 'isssssssi', $kamarId, $nama, $nim, $jk, $no, $email, $hashedPassword, $alamat, $restoredDeletedPenghuniId);
+        mysqli_stmt_bind_param($restoreStmt, 'iisssssss', $restoredDeletedPenghuniId, $kamarId, $nama, $nim, $jk, $no, $email, $hashedPassword, $alamat);
 
         if (!mysqli_stmt_execute($restoreStmt)) {
             $_SESSION['form_data'] = $formData;
@@ -166,8 +164,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $now = date('Y-m-d H:i:s');
 
-    $stmt = mysqli_prepare($db, "INSERT INTO penghuni (KamarID, NamaPenghuni, Nim, JenisKelamin, NoHP, Email, Password, Alamat, UpdateAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    mysqli_stmt_bind_param($stmt, 'issssssss', $kamarId, $nama, $nim, $jk, $no, $email, $hashedPassword, $alamat, $now);
+    $stmt = mysqli_prepare($db, "CALL sp_createPenghuni(?, ?, ?, ?, ?, ?, ?, ?)");
+    mysqli_stmt_bind_param($stmt, 'isssssss', $kamarId, $nama, $nim, $jk, $no, $email, $hashedPassword, $alamat);
 
     if (!mysqli_stmt_execute($stmt)) {
         $_SESSION['form_data'] = $formData;
