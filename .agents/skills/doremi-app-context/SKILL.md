@@ -17,12 +17,26 @@ As of **June 30, 2026**, the database layer has been migrated away from inline q
 ## Tech Stack
 
 - **Backend**: PHP (native, no framework)
-- **Frontend**: Tailwind CSS 4.0 with `tw` prefix (check files already worked on to confirm conventions) + Bootstrap (for components like forms, tables, modals) + Alpine.js when reactivity is needed
+- **Frontend**: Tailwind CSS 4.0 with `tw` prefix + Bootstrap (for components like forms, tables, modals) + Alpine.js when reactivity is needed
 - **Database**: MySQL 8.0, accessed via `mysqli_*` functions — **but only by calling stored procedures**, not raw SQL (see below)
 - **DB connection**: `$db` variable from `require_once 'db.php'`
 - **Validation**: `Respect\Validation` (`use Respect\Validation\Validator as v;`)
 - **Passwords**: `password_hash($pass, PASSWORD_BCRYPT)` / `password_verify()`
 - **Auth**: PHP Sessions
+
+---
+
+## CSS / Styling Rules
+
+**All CSS edits must be made in `index.css` only.** This file is the Tailwind CSS v4 source and is compiled by the Tailwind CLI into `css/main.css`. Never edit `css/main.css` directly — it is a generated file and any manual changes will be overwritten on the next build.
+
+- Source file: `index.css` (project root)
+- Compiled output: `css/main.css` (do not touch)
+- Tailwind config is embedded in `index.css` via `@theme { ... }` — add new design tokens there
+- All Tailwind utilities are prefixed with `tw:` (e.g. `tw:flex`, `tw:text-sm`)
+- The `important` modifier is active globally, so all `tw:*` utilities emit `!important`
+- Bootstrap CSS is loaded separately from CDN (`head.php`) — override Bootstrap variables via `:root { --bs-... }` inside `index.css`
+- After editing `index.css`, run the Tailwind CLI to regenerate `css/main.css` before testing
 
 ---
 

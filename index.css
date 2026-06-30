@@ -731,6 +731,25 @@ a {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
+   Bootstrap modal z-index — must clear dashboard sidebar (z-60) and topbar (z-55).
+   Also overrides Bootstrap's CSS variables so both the compiled class rules and
+   any variable-based rules stay consistent.
+───────────────────────────────────────────────────────────────────────────── */
+
+:root {
+  --bs-zindex-modal-backdrop: 1080;
+  --bs-zindex-modal: 1090;
+}
+
+.modal-backdrop {
+  z-index: 1080;
+}
+
+.modal {
+  z-index: 1090;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
    DataTables overrides
 ───────────────────────────────────────────────────────────────────────────── */
 
