@@ -12,15 +12,14 @@ if (isset($_SESSION['userId'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = mysqli_real_escape_string($db, htmlspecialchars(trim($_POST['email'] ?? "")));
-    $password = mysqli_real_escape_string($db, htmlspecialchars(trim($_POST['password'] ?? "")));
-
+    $email = trim($_POST['email'] ?? "");
+    $password = trim($_POST['password'] ?? "");
 
     if (!v::length(5)->email()->validate($email)) {
         header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Email atau Password Tidak Valid!');
         exit;
     }
-    if (!v::alnum()->length(5)->validate($password)) {
+    if (!v::length(5)->validate($password)) {
         header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Email atau Password Tidak Valid!');
         exit;
     }

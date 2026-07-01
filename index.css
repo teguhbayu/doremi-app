@@ -226,6 +226,23 @@ a {
   font-size: 1.2rem;
 }
 
+.dashboard-sidebar__title {
+  display: flex;
+  align-items: center;
+  padding: 1rem 0.4rem 0.35rem;
+  margin-top: 0.35rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.56);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.dashboard-sidebar__title i {
+  display: none;
+}
+
 .dashboard-sidebar__link:hover {
   background: rgba(255, 255, 255, 0.08);
   color: #fff;
