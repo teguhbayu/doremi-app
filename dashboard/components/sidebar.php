@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 $menus = [];
 
 switch ($_SESSION["userRole"]) {
@@ -11,9 +11,11 @@ switch ($_SESSION["userRole"]) {
             ["title" => "Ruangan", "target" => "/doremi-app/dashboard/ruangan/", "icon" => "buildings-1"],
             ["title" => "Inventaris", "target" => "/doremi-app/dashboard/inventaris/", "icon" => "archive-book"],
             ["title" => "Lapor Kerusakan", "target" => "/doremi-app/dashboard/maintenance/", "icon" => "setting-2"],
-            ["title" => "Laporan Maintenance", "target" => "/doremi-app/dashboard/maintenance/report.php", "icon" => "fa-solid fa-chart-bar"],
-            ["title" => "Laporan Izin Keluar", "target" => "/doremi-app/dashboard/inout/report.php", "icon" => "fa-solid fa-chart-line"],
-            ["title" => "Laporan Paket", "target" => "/doremi-app/dashboard/paket/report.php", "icon" => "fa-solid fa-chart-column"],
+            ["title" => "Laporan", "target" => "#", "icon" => "fa-solid fa-file-lines", "children" => [
+                ["title" => "Laporan Maintenance", "target" => "/doremi-app/dashboard/maintenance/report.php", "icon" => "fa-solid fa-chart-bar"],
+                ["title" => "Laporan Izin Keluar", "target" => "/doremi-app/dashboard/inout/report.php", "icon" => "fa-solid fa-chart-line"],
+                ["title" => "Laporan Paket", "target" => "/doremi-app/dashboard/paket/report.php", "icon" => "fa-solid fa-chart-column"]
+            ]],
         ];
         break;
     case "PENGHUNI":
@@ -110,17 +112,45 @@ switch ($_SESSION["userRole"]) {
 
                     foreach ($menus as $idx => $menu) {
                         $isActive = ($idx === $bestMatchIndex);
-                        ?>
-                        <a @click="sidebarOpen = false" class="dashboard-sidebar__link <?= $isActive ? 'is-active' : '' ?>"
-                            href="<?= htmlspecialchars($menu["target"]) ?>">
-                            <?php if (str_starts_with($menu["icon"], 'fa-')) { ?>
-                                <i class="<?= htmlspecialchars($menu["icon"]) ?>"></i>
+                        if (isset($menu['children']) && is_array($menu['children'])) {
+                ?>
+                <div class="dashboard-sidebar__submenu">
+                    <div class="dashboard-sidebar__title <?= $isActive ? 'is-active' : '' ?>">
+                        <?php if (str_starts_with($menu["icon"], 'fa-')) { ?>
+                            <i class="<?= htmlspecialchars($menu["icon"]) ?>"></i>
+                        <?php } else { ?>
+                            <i class="iconsax" icon-name="<?= htmlspecialchars($menu["icon"]) ?>"></i>
+                        <?php } ?>
+                        <span><?= htmlspecialchars($menu["title"]) ?></span>
+                    </div>
+                    <?php foreach ($menu['children'] as $cIdx => $child) { ?>
+                        <a @click="sidebarOpen = false" class="dashboard-sidebar__link"
+                            href="<?= htmlspecialchars($child["target"]) ?>">
+                            <?php if (str_starts_with($child["icon"], 'fa-')) { ?>
+                                <i class="<?= htmlspecialchars($child["icon"]) ?>"></i>
                             <?php } else { ?>
-                                <i class="iconsax" icon-name="<?= htmlspecialchars($menu["icon"]) ?>"></i>
+                                <i class="iconsax" icon-name="<?= htmlspecialchars($child["icon"]) ?>"></i>
                             <?php } ?>
-                            <span><?= htmlspecialchars($menu["title"]) ?></span>
+                            <span><?= htmlspecialchars($child["title"]) ?></span>
                         </a>
                     <?php } ?>
+                </div>
+                <?php
+                        } else {
+                ?>
+                <a @click="sidebarOpen = false" class="dashboard-sidebar__link <?= $isActive ? 'is-active' : '' ?>"
+                    href="<?= htmlspecialchars($menu["target"]) ?>">
+                    <?php if (str_starts_with($menu["icon"], 'fa-')) { ?>
+                        <i class="<?= htmlspecialchars($menu["icon"]) ?>"></i>
+                    <?php } else { ?>
+                        <i class="iconsax" icon-name="<?= htmlspecialchars($menu["icon"]) ?>"></i>
+                    <?php } ?>
+                    <span><?= htmlspecialchars($menu["title"]) ?></span>
+                </a>
+                <?php
+                        }
+                    }
+                ?>
                 </nav>
             </div>
 
