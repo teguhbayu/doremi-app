@@ -473,7 +473,7 @@ if ($role === 'MAINTENANCE') {
                         <?php foreach ($emergencyList as $idx => $em): ?>
                             <?php
                                 $emLokasi = !empty($em['NamaRuangan'])
-                                    ? 'Ruangan ' . htmlspecialchars($em['NamaRuangan']) . ' Â· Lantai ' . htmlspecialchars($em['LantaiRuangan'])
+                                    ? 'Ruangan ' . htmlspecialchars($em['NamaRuangan']) . ' Lantai ' . htmlspecialchars($em['LantaiRuangan'])
                                     : (!empty($em['NamaBarang']) ? 'Inventaris: ' . htmlspecialchars($em['NamaBarang']) : 'Lokasi tidak diketahui');
                                 $emPelapor = htmlspecialchars($em['NamaPenghuni'] ?? $em['NamaReporterPetugas'] ?? 'Staff');
                                 $emStatus = $em['StatusMaintenance'];
@@ -539,8 +539,8 @@ if ($role === 'MAINTENANCE') {
                                             default      => 'fa-solid fa-circle-question',
                                         };
                                         $lokasi = !empty($task['NamaRuangan'])
-                                            ? 'Ruangan ' . htmlspecialchars($task['NamaRuangan']) . ' Â· Lantai ' . htmlspecialchars($task['LantaiRuangan'])
-                                            : (!empty($task['NamaBarang']) ? 'Inventaris: ' . htmlspecialchars($task['NamaBarang']) : 'â€”');
+                                            ? 'Ruangan ' . htmlspecialchars($task['NamaRuangan']) . ' Lantai ' . htmlspecialchars($task['LantaiRuangan'])
+                                            : (!empty($task['NamaBarang']) ? 'Inventaris: ' . htmlspecialchars($task['NamaBarang']) : '-');
                                     ?>
                                     <div class="tw:border tw:border-slate-200 tw:border-l-4 tw:rounded-xl tw:p-[14px_16px] tw:bg-white tw:flex tw:gap-3 tw:items-start" style="border-left-color:<?= $jenisColor ?>">
                                         <div class="tw:w-9 tw:h-9 tw:rounded-lg tw:flex tw:items-center tw:justify-center tw:flex-shrink-0" style="background:<?= $jenisColor ?>18;">
@@ -557,7 +557,7 @@ if ($role === 'MAINTENANCE') {
                                             <div class="tw:mt-2 tw:flex tw:items-center tw:gap-[6px]">
                                                 <i class="fa-solid fa-user tw:text-[11px] tw:text-slate-400"></i>
                                                 <span class="tw:text-[11px] tw:text-slate-400"><?= htmlspecialchars($task['NamaPenghuni'] ?? $task['NamaReporterPetugas'] ?? 'Staff') ?></span>
-                                                <span class="tw:text-slate-300 tw:mx-[2px]">Â·</span>
+                                                <span class="tw:text-slate-300 tw:mx-[2px]">·</span>
                                                 <i class="fa-solid fa-calendar-days tw:text-[11px] tw:text-slate-400"></i>
                                                 <span class="tw:text-[11px] tw:text-slate-400"><?= date('d M Y', strtotime($task['TanggalLapor'])) ?></span>
                                             </div>

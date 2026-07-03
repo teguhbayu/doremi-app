@@ -680,7 +680,6 @@ mysqli_free_result($res);
                 margin-bottom: 10px !important;
             }
 
-            /* â”€â”€ Table PDF fixes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
             .print-table-wrapper {
                 overflow: visible !important;
                 /* prevent horizontal cutoff */

@@ -7,7 +7,7 @@ require '../../db.php';
 
 $role = $_SESSION['userRole'];
 $userId = (int)$_SESSION['userId'];
-session_write_close(); // Lepas session lock â€” halaman ini hanya baca session
+session_write_close(); // Lepas session lock halaman ini hanya baca session
 
 $whereClause = "WHERE m.IsDeleted = 0";
 if ($role !== 'MAINTENANCE') {
