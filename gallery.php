@@ -73,6 +73,60 @@ session_start();
                             <span class="tw:text-white tw:font-medium tw:text-lg tw:tracking-[-0.03em]">Ruang Organisasi</span>
                         </div>
                     </div>
+                    <div
+                        class="tw:group tw:relative tw:overflow-hidden tw:rounded-2xl tw:shadow-md tw:hover:shadow-xl tw:transition-all tw:duration-300">
+                        <img src="images/pantry.png" alt="Pantry"
+                            class="tw:w-full tw:h-64 tw:object-cover tw:transform tw:group-hover:scale-105 tw:transition-transform tw:duration-500" />
+                        <div
+                            class="tw:absolute tw:inset-0 tw:bg-gradient-to-t tw:from-primary/80 tw:to-transparent tw:opacity-0 tw:group-hover:opacity-100 tw:transition-opacity tw:flex tw:items-end tw:p-4">
+                            <span class="tw:text-white tw:font-medium tw:text-lg tw:tracking-[-0.03em]">Pantry</span>
+                        </div>
+                    </div>
+                    <div
+                        class="tw:group tw:relative tw:overflow-hidden tw:rounded-2xl tw:shadow-md tw:hover:shadow-xl tw:transition-all tw:duration-300">
+                        <img src="images/toilet.png" alt="Toilet"
+                            class="tw:w-full tw:h-64 tw:object-cover tw:transform tw:group-hover:scale-105 tw:transition-transform tw:duration-500" />
+                        <div
+                            class="tw:absolute tw:inset-0 tw:bg-gradient-to-t tw:from-primary/80 tw:to-transparent tw:opacity-0 tw:group-hover:opacity-100 tw:transition-opacity tw:flex tw:items-end tw:p-4">
+                            <span class="tw:text-white tw:font-medium tw:text-lg tw:tracking-[-0.03em]">Toilet</span>
+                        </div>
+                    </div>
+                    <div
+                        class="tw:group tw:relative tw:overflow-hidden tw:rounded-2xl tw:shadow-md tw:hover:shadow-xl tw:transition-all tw:duration-300">
+                        <img src="images/balkon.png" alt="Balkon"
+                            class="tw:w-full tw:h-64 tw:object-cover tw:transform tw:group-hover:scale-105 tw:transition-transform tw:duration-500" />
+                        <div
+                            class="tw:absolute tw:inset-0 tw:bg-gradient-to-t tw:from-primary/80 tw:to-transparent tw:opacity-0 tw:group-hover:opacity-100 tw:transition-opacity tw:flex tw:items-end tw:p-4">
+                            <span class="tw:text-white tw:font-medium tw:text-lg tw:tracking-[-0.03em]">Balkon</span>
+                        </div>
+                    </div>
+                    <div
+                        class="tw:group tw:relative tw:overflow-hidden tw:rounded-2xl tw:shadow-md tw:hover:shadow-xl tw:transition-all tw:duration-300">
+                        <img src="images/musholla.png" alt="Musholla"
+                            class="tw:w-full tw:h-64 tw:object-cover tw:transform tw:group-hover:scale-105 tw:transition-transform tw:duration-500" />
+                        <div
+                            class="tw:absolute tw:inset-0 tw:bg-gradient-to-t tw:from-primary/80 tw:to-transparent tw:opacity-0 tw:group-hover:opacity-100 tw:transition-opacity tw:flex tw:items-end tw:p-4">
+                            <span class="tw:text-white tw:font-medium tw:text-lg tw:tracking-[-0.03em]">Musholla</span>
+                        </div>
+                    </div>
+                    <div
+                        class="tw:group tw:relative tw:overflow-hidden tw:rounded-2xl tw:shadow-md tw:hover:shadow-xl tw:transition-all tw:duration-300">
+                        <img src="images/ruang%20musik.png" alt="Ruang Musik"
+                            class="tw:w-full tw:h-64 tw:object-cover tw:transform tw:group-hover:scale-105 tw:transition-transform tw:duration-500" />
+                        <div
+                            class="tw:absolute tw:inset-0 tw:bg-gradient-to-t tw:from-primary/80 tw:to-transparent tw:opacity-0 tw:group-hover:opacity-100 tw:transition-opacity tw:flex tw:items-end tw:p-4">
+                            <span class="tw:text-white tw:font-medium tw:text-lg tw:tracking-[-0.03em]">Ruang Musik</span>
+                        </div>
+                    </div>
+                    <div
+                        class="tw:group tw:relative tw:overflow-hidden tw:rounded-2xl tw:shadow-md tw:hover:shadow-xl tw:transition-all tw:duration-300">
+                        <img src="images/auditorium.png" alt="Auditorium"
+                            class="tw:w-full tw:h-64 tw:object-cover tw:transform tw:group-hover:scale-105 tw:transition-transform tw:duration-500" />
+                        <div
+                            class="tw:absolute tw:inset-0 tw:bg-gradient-to-t tw:from-primary/80 tw:to-transparent tw:opacity-0 tw:group-hover:opacity-100 tw:transition-opacity tw:flex tw:items-end tw:p-4">
+                            <span class="tw:text-white tw:font-medium tw:text-lg tw:tracking-[-0.03em]">Auditorium</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
