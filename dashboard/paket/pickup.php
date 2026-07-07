@@ -3,6 +3,8 @@ session_start();
 require 'helpers.php';
 paket_require_roles(['PENGHUNI']);
 require '../../db.php';
+require_once '../../database/paket.php';
+require_once '../../utils/format.php';
 
 $paketId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 if (!$paketId) {
@@ -10,32 +12,7 @@ if (!$paketId) {
 }
 
 $userId = (int) $_SESSION['userId'];
-$stmt = mysqli_prepare(
-    $db,
-    "SELECT pk.*, ph.NamaPenghuni, ph.Nim, k.NomorKamar,
-            pt.NamaPetugas AS NamaPetugasPaket,
-            pp.PengambilanPaketID, pp.PetugasID AS PickupPetugasID, pp.FotoPengambilan, pp.WaktuPengambilan, pp.Status, pp.Keterangan
-     FROM paket pk
-     JOIN penghuni ph ON pk.PenghuniID = ph.PenghuniID
-     LEFT JOIN kamar k ON ph.KamarID = k.KamarID
-     JOIN petugas pt ON pk.PetugasID = pt.PetugasID
-     LEFT JOIN (
-         SELECT pp1.*
-         FROM pengambilanpaket pp1
-         INNER JOIN (
-             SELECT PaketID, MAX(PengambilanPaketID) AS LatestPengambilanPaketID
-             FROM pengambilanpaket
-             GROUP BY PaketID
-         ) latest ON latest.LatestPengambilanPaketID = pp1.PengambilanPaketID
-     ) pp ON pp.PaketID = pk.PaketID
-     WHERE pk.PaketID = ? AND pk.PenghuniID = ?
-     LIMIT 1"
-);
-mysqli_stmt_bind_param($stmt, 'ii', $paketId, $userId);
-mysqli_stmt_execute($stmt);
-$result = mysqli_stmt_get_result($stmt);
-$paket = mysqli_fetch_assoc($result);
-mysqli_stmt_close($stmt);
+$paket = fetchPaketWithLatestPickup($db, $paketId, $userId);
 
 if (!$paket) {
     paket_redirect('/doremi-app/dashboard/paket/', 'error', 'Data paket tidak ditemukan.');
@@ -71,52 +48,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $keterangan = $keterangan !== '' ? $keterangan : null;
 
-    if (!empty($paket['PengambilanPaketID'])) {
-        $pengambilanPaketId = (int) $paket['PengambilanPaketID'];
-        $stmt = mysqli_prepare(
-            $db,
-            "UPDATE pengambilanpaket
-             SET PenghuniID = ?, PetugasID = ?, FotoPengambilan = ?, WaktuPengambilan = ?, Status = ?, Keterangan = ?
-             WHERE PengambilanPaketID = ?"
-        );
-        mysqli_stmt_bind_param(
-            $stmt,
-            'iissssi',
-            $userId,
-            $petugasId,
-            $fotoPengambilan,
-            $waktuPengambilan,
-            $status,
-            $keterangan,
-            $pengambilanPaketId
-        );
-        $successMessage = 'Catatan pengambilan paket berhasil dilengkapi.';
-    } else {
-        $stmt = mysqli_prepare(
-            $db,
-            "INSERT INTO pengambilanpaket (PaketID, PenghuniID, PetugasID, FotoPengambilan, WaktuPengambilan, Status, Keterangan)
-             VALUES (?, ?, ?, ?, ?, ?, ?)"
-        );
-        mysqli_stmt_bind_param(
-            $stmt,
-            'iiissss',
-            $paketId,
-            $userId,
-            $petugasId,
-            $fotoPengambilan,
-            $waktuPengambilan,
-            $status,
-            $keterangan
-        );
-        $successMessage = 'Pengambilan paket berhasil dicatat.';
-    }
+    $pengambilanPaketId = !empty($paket['PengambilanPaketID']) ? (int) $paket['PengambilanPaketID'] : null;
+    $successMessage = $pengambilanPaketId !== null
+        ? 'Catatan pengambilan paket berhasil dilengkapi.'
+        : 'Pengambilan paket berhasil dicatat.';
 
-    if (!mysqli_stmt_execute($stmt)) {
-        mysqli_stmt_close($stmt);
+    try {
+        savePaketPickup($db, $pengambilanPaketId, $paketId, $userId, $petugasId, $fotoPengambilan, $waktuPengambilan, $status, $keterangan);
+    } catch (RuntimeException) {
         paket_redirect($_SERVER['PHP_SELF'] . '?id=' . $paketId, 'error', 'Gagal menyimpan data pengambilan paket.');
     }
 
-    mysqli_stmt_close($stmt);
     paket_redirect('/doremi-app/dashboard/paket/', 'success', $successMessage);
 }
 
@@ -161,7 +103,7 @@ $statusMeta = paket_status_meta($paket['Status'] ?? 'Belum Diambil');
                             </div>
                             <div class="tw:p-4 tw:rounded-[18px] tw:bg-[rgba(255,255,255,0.80)] tw:border tw:border-[rgba(22,60,122,0.08)]">
                                 <span class="tw:block tw:mb-[0.3rem] tw:text-slate-500 tw:text-xs tw:font-bold">Waktu Sampai</span>
-                                <strong><?= $paket['WaktuSampai'] ? date('d M Y H:i', strtotime($paket['WaktuSampai'])) : '-' ?></strong>
+                                <strong><?= formatDateTime($paket['WaktuSampai'] ?? null) ?></strong>
                                 <p>Pencatat: <?= htmlspecialchars($paket['NamaPetugasPaket']) ?></p>
                             </div>
                             <div class="tw:p-4 tw:rounded-[18px] tw:bg-[rgba(255,255,255,0.80)] tw:border tw:border-[rgba(22,60,122,0.08)]">
@@ -174,7 +116,7 @@ $statusMeta = paket_status_meta($paket['Status'] ?? 'Belum Diambil');
                                 <span class="badge <?= htmlspecialchars($statusMeta['class']) ?>">
                                     <?= htmlspecialchars($statusMeta['label']) ?>
                                 </span>
-                                <p><?= !empty($paket['WaktuPengambilan']) ? date('d M Y H:i', strtotime($paket['WaktuPengambilan'])) : 'Belum ada waktu pengambilan tercatat' ?></p>
+                                <p><?= !empty($paket['WaktuPengambilan']) ? formatDateTime($paket['WaktuPengambilan']) : 'Belum ada waktu pengambilan tercatat' ?></p>
                             </div>
                             <?php if (!empty($paket['FotoPengambilan'])): ?>
                                 <div class="tw:p-4 tw:rounded-[18px] tw:bg-[rgba(255,255,255,0.80)] tw:border tw:border-[rgba(22,60,122,0.08)]">

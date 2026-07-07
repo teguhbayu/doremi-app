@@ -3,62 +3,17 @@ session_start();
 require 'helpers.php';
 paket_require_roles(['SIGAP', 'PENGHUNI']);
 require '../../db.php';
+require_once '../../database/paket.php';
+require_once '../../utils/format.php';
 
 $role = $_SESSION['userRole'];
 $userId = (int) $_SESSION['userId'];
-$latestPickupSubquery = "
-    LEFT JOIN (
-        SELECT pp1.PengambilanPaketID, pp1.PaketID, pp1.PenghuniID, pp1.PetugasID, 
-               pp1.WaktuPengambilan, pp1.Status, pp1.Keterangan,
-               (pp1.FotoPengambilan IS NOT NULL AND pp1.FotoPengambilan != '') AS HasFotoPengambilan
-        FROM pengambilanpaket pp1
-        INNER JOIN (
-            SELECT PaketID, MAX(PengambilanPaketID) AS LatestPengambilanPaketID
-            FROM pengambilanpaket
-            GROUP BY PaketID
-        ) latest ON latest.LatestPengambilanPaketID = pp1.PengambilanPaketID
-    ) pp ON pp.PaketID = pk.PaketID
-";
-
-if ($role === 'SIGAP') {
-    $query = mysqli_query(
-        $db,
-        "SELECT pk.*, ph.NamaPenghuni, ph.Nim, k.NomorKamar, pt.NamaPetugas,
-                pp.PengambilanPaketID, pp.Status, pp.WaktuPengambilan, pp.Keterangan, pp.HasFotoPengambilan
-         FROM paket pk
-         JOIN penghuni ph ON pk.PenghuniID = ph.PenghuniID
-         LEFT JOIN kamar k ON ph.KamarID = k.KamarID
-         JOIN petugas pt ON pk.PetugasID = pt.PetugasID
-         $latestPickupSubquery
-         ORDER BY pk.PaketID DESC"
-    );
-    $pakets = mysqli_fetch_all($query, MYSQLI_ASSOC);
-} else {
-    $stmt = mysqli_prepare(
-        $db,
-        "SELECT pk.*, ph.NamaPenghuni, ph.Nim, k.NomorKamar,
-                pt.NamaPetugas AS NamaPetugasPaket,
-                pp.PengambilanPaketID, pp.Status, pp.WaktuPengambilan,
-                pp.Keterangan, pp.HasFotoPengambilan
-         FROM paket pk
-         JOIN penghuni ph ON pk.PenghuniID = ph.PenghuniID
-         LEFT JOIN kamar k ON ph.KamarID = k.KamarID
-         JOIN petugas pt ON pk.PetugasID = pt.PetugasID
-         $latestPickupSubquery
-         WHERE pk.PenghuniID = ?
-         ORDER BY pk.PaketID DESC"
-    );
-    mysqli_stmt_bind_param($stmt, 'i', $userId);
-    mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
-    $pakets = mysqli_fetch_all($result, MYSQLI_ASSOC);
-    mysqli_stmt_close($stmt);
-}
-
-$totalPaket = count($pakets);
-$tertukar = count(array_filter($pakets, fn($paket) => ($paket['Status'] ?? 'Belum Diambil') === 'TERTUKAR'));
-$sudahDiambil = count(array_filter($pakets, fn($paket) => ($paket['Status'] ?? 'Belum Diambil') === 'Sudah Diambil'));
-$belumDiambil = count(array_filter($pakets, fn($paket) => ($paket['Status'] ?? 'Belum Diambil') === 'Belum Diambil'));
+$pakets = fetchPaketsForRole($db, $role, $userId);
+$paketSummary = summarizePaketStatuses($pakets);
+$totalPaket = $paketSummary['total'];
+$tertukar = $paketSummary['tertukar'];
+$sudahDiambil = $paketSummary['sudahDiambil'];
+$belumDiambil = $paketSummary['belumDiambil'];
 ?>
 
 <!DOCTYPE html>
@@ -181,7 +136,7 @@ $belumDiambil = count(array_filter($pakets, fn($paket) => ($paket['Status'] ?? '
                                     <td><?= htmlspecialchars($paket['NamaPengirim']) ?></td>
                                     <td><?= htmlspecialchars($paket['Kurir']) ?></td>
                                     <td>
-                                        <?= $paket['WaktuSampai'] ? date('d M Y H:i', strtotime($paket['WaktuSampai'])) : '-' ?>
+                                        <?= formatDateTime($paket['WaktuSampai'] ?? null) ?>
                                     </td>
                                     <td>
                                         <span class="badge <?= htmlspecialchars($statusMeta['class']) ?>">
@@ -190,7 +145,7 @@ $belumDiambil = count(array_filter($pakets, fn($paket) => ($paket['Status'] ?? '
 
                                         <?php if (!empty($paket['WaktuPengambilan'])): ?>
                                             <div class="tw:text-xs tw:text-slate-500 tw:mt-1">
-                                                <?= date('d M Y H:i', strtotime($paket['WaktuPengambilan'])) ?>
+                                                <?= formatDateTime($paket['WaktuPengambilan']) ?>
                                             </div>
                                         <?php endif; ?>
                                     </td>

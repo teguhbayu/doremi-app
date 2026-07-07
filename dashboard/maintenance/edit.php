@@ -5,8 +5,8 @@ require 'helpers.php';
 maintenance_require_roles(['PENGURUS', 'PENGHUNI', 'SIGAP', 'SERVANDA', 'MAINTENANCE']);
 require '../../csrf.php';
 require '../../db.php';
-
-use Respect\Validation\Validator as v;
+require_once '../../database/maintenance.php';
+require 'validation.php';
 
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 $userId = (int)$_SESSION['userId'];
@@ -16,12 +16,7 @@ if (!$id) {
     maintenance_redirect('index.php', 'error', 'ID laporan tidak valid.');
 }
 
-$stmt = mysqli_prepare($db, "SELECT * FROM maintenance WHERE MaintenanceID = ? AND IsDeleted = 0 LIMIT 1");
-mysqli_stmt_bind_param($stmt, 'i', $id);
-mysqli_stmt_execute($stmt);
-$result = mysqli_stmt_get_result($stmt);
-$report = mysqli_fetch_assoc($result);
-mysqli_stmt_close($stmt);
+$report = fetchMaintenanceReportById($db, $id);
 
 if (!$report) {
     maintenance_redirect('index.php', 'error', 'Laporan tidak ditemukan.');
@@ -31,79 +26,23 @@ if ($report['StatusMaintenance'] !== 'Diajukan') {
     maintenance_redirect('index.php', 'error', 'Laporan yang sedang diproses atau selesai tidak dapat diubah.');
 }
 
-$isOwner = false;
-if ($role === 'PENGHUNI') {
-    if ((int)$report['PenghuniID'] === $userId) {
-        $isOwner = true;
-    }
-} else {
-    // Correctly identifies ownership for staff creators (including the MAINTENANCE technician)
-    if ((int)$report['PetugasID'] === $userId && $report['PenghuniID'] === null) {
-        $isOwner = true;
-    }
-}
+$isOwner = isMaintenanceReportOwner($report, $role, $userId);
 
 if (!$isOwner) {
     maintenance_redirect('index.php', 'error', 'Anda tidak memiliki hak akses untuk mengedit laporan ini.');
 }
 
-$ruanganQuery = mysqli_query($db, "SELECT RuanganID, NamaRuangan, Lantai FROM ruangan WHERE IsDeleted = 0 ORDER BY NamaRuangan ASC");
-$ruangans = mysqli_fetch_all($ruanganQuery, MYSQLI_ASSOC);
-
-$inventarisQuery = mysqli_query($db, "SELECT InventarisID, NamaBarang FROM inventaris WHERE IsDeleted = 0 ORDER BY NamaBarang ASC");
-$inventarisList = mysqli_fetch_all($inventarisQuery, MYSQLI_ASSOC);
+$ruangans = fetchMaintenanceRooms($db);
+$inventarisList = fetchMaintenanceInventory($db);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_validate($_SERVER['PHP_SELF'] . '?id=' . $id);
-    $jenisLaporan = trim($_POST['jenisLaporan'] ?? '');
-    $targetType = trim($_POST['targetType'] ?? '');
-    $targetValue = trim($_POST['targetValue'] ?? '');
-    $deskripsi = trim($_POST['deskripsi'] ?? '');
-
-    $schema = v::keySet(
-        v::key('jenisLaporan', v::in(['Kerusakan Ringan', 'Kerusakan Sedang', 'Kerusakan Darurat / Berat'])),
-        v::key('targetType', v::in(['ruangan', 'inventaris'])),
-        v::key('targetValue', v::numericVal()),
-        v::key('deskripsi', v::stringType()->length(1, 1000))
-    );
-
-    $postData = [
-        'jenisLaporan' => $jenisLaporan,
-        'targetType' => $targetType,
-        'targetValue' => $targetValue,
-        'deskripsi' => $deskripsi
-    ];
-
-    if (!$schema->validate($postData)) {
-        maintenance_redirect($_SERVER['PHP_SELF'] . '?id=' . $id, 'error', 'Data input tidak valid.');
+    $reportInput = collectMaintenanceReportInput($_POST);
+    $validationMessage = validateMaintenanceReportInput($db, $reportInput);
+    if ($validationMessage !== null) {
+        maintenance_redirect($_SERVER['PHP_SELF'] . '?id=' . $id, 'error', $validationMessage);
     }
-
-    $ruanganId = null;
-    $inventarisId = null;
-
-    if ($targetType === 'ruangan') {
-        $ruanganId = (int)$targetValue;
-        // Validate that the ruangan actually exists
-        $chk = mysqli_prepare($db, "SELECT RuanganID FROM ruangan WHERE RuanganID = ? AND IsDeleted = 0 LIMIT 1");
-        mysqli_stmt_bind_param($chk, 'i', $ruanganId);
-        mysqli_stmt_execute($chk);
-        if (!mysqli_fetch_assoc(mysqli_stmt_get_result($chk))) {
-            mysqli_stmt_close($chk);
-            maintenance_redirect($_SERVER['PHP_SELF'] . '?id=' . $id, 'error', 'Ruangan yang dipilih tidak ditemukan.');
-        }
-        mysqli_stmt_close($chk);
-    } else {
-        $inventarisId = (int)$targetValue;
-        // Validate that the inventaris actually exists
-        $chk = mysqli_prepare($db, "SELECT InventarisID FROM inventaris WHERE InventarisID = ? AND IsDeleted = 0 LIMIT 1");
-        mysqli_stmt_bind_param($chk, 'i', $inventarisId);
-        mysqli_stmt_execute($chk);
-        if (!mysqli_fetch_assoc(mysqli_stmt_get_result($chk))) {
-            mysqli_stmt_close($chk);
-            maintenance_redirect($_SERVER['PHP_SELF'] . '?id=' . $id, 'error', 'Inventaris yang dipilih tidak ditemukan.');
-        }
-        mysqli_stmt_close($chk);
-    }
+    $targetIds = resolveMaintenanceTargetIds($reportInput);
 
     try {
         $fotoLaporan = maintenance_store_photo($_FILES['fotoLaporan'] ?? [], $report['FotoLaporan']);
@@ -111,26 +50,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         maintenance_redirect($_SERVER['PHP_SELF'] . '?id=' . $id, 'error', $e->getMessage());
     }
 
-    $updateStmt = mysqli_prepare(
-        $db,
-        "UPDATE maintenance SET RuanganID = ?, InventarisID = ?, JenisLaporan = ?, Deskripsi = ?, FotoLaporan = ? WHERE MaintenanceID = ?"
-    );
-    mysqli_stmt_bind_param(
-        $updateStmt,
-        'iisssi',
-        $ruanganId,
-        $inventarisId,
-        $jenisLaporan,
-        $deskripsi,
-        $fotoLaporan,
-        $id
-    );
-
-    if (mysqli_stmt_execute($updateStmt)) {
-        mysqli_stmt_close($updateStmt);
+    try {
+        updateMaintenanceReport(
+            $db,
+            $id,
+            $targetIds['ruanganId'],
+            $targetIds['inventarisId'],
+            $reportInput['jenisLaporan'],
+            $reportInput['deskripsi'],
+            $fotoLaporan
+        );
         maintenance_redirect('index.php', 'success', 'Laporan kerusakan berhasil diperbarui!');
-    } else {
-        mysqli_stmt_close($updateStmt);
+    } catch (RuntimeException) {
         maintenance_redirect($_SERVER['PHP_SELF'] . '?id=' . $id, 'error', 'Terjadi kesalahan sistem saat menyimpan perubahan.');
     }
 }

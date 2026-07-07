@@ -3,53 +3,34 @@ session_start();
 require 'helpers.php';
 paket_require_roles(['SIGAP']);
 require '../../db.php';
+require_once '../../database/paket.php';
+require 'validation.php';
 
-$penghuniQuery = mysqli_query(
-    $db,
-    "CALL sp_getActivePenghuniForSelect()"
-);
-$penghuniList = mysqli_fetch_all($penghuniQuery, MYSQLI_ASSOC);
+$penghuniList = fetchActivePenghuniOptions($db);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $jenisPaket = paket_normalize_type($_POST['jenisPaket'] ?? null);
-    $namaPengirim = trim($_POST['namaPengirim'] ?? '');
-    $kurir = trim($_POST['kurir'] ?? '');
-    $penghuniId = filter_input(INPUT_POST, 'penghuniId', FILTER_VALIDATE_INT);
-    $waktuSampai = paket_normalize_datetime($_POST['waktuSampai'] ?? '');
-
-    if (
-        $jenisPaket === null
-        || !paket_is_valid_length($namaPengirim, 1, 100)
-        || !paket_is_valid_length($kurir, 1, 50)
-        || $penghuniId === false
-        || $penghuniId === null
-        || $waktuSampai === null
-    ) {
-        paket_redirect($_SERVER['PHP_SELF'], 'error', 'Data paket tidak valid.');
-    }
-
-    $stmt = mysqli_prepare($db, "CALL sp_checkPenghuniExist(?)");
-    mysqli_stmt_bind_param($stmt, 'i', $penghuniId);
-    mysqli_stmt_execute($stmt);
-    $penghuniResult = mysqli_stmt_get_result($stmt);
-    $penghuni = mysqli_fetch_assoc($penghuniResult);
-    mysqli_stmt_close($stmt);
-
-    if (!$penghuni) {
-        paket_redirect($_SERVER['PHP_SELF'], 'error', 'Penghuni tujuan tidak ditemukan.');
+    $paketInput = collectPaketInput($_POST);
+    $validationMessage = validatePaketInput($db, $paketInput);
+    if ($validationMessage !== null) {
+        paket_redirect($_SERVER['PHP_SELF'], 'error', $validationMessage);
     }
 
     $petugasId = (int) $_SESSION['userId'];
 
-    $stmt = mysqli_prepare($db, "CALL sp_createPaket(?, ?, ?, ?, ?, ?)");
-    mysqli_stmt_bind_param($stmt, 'issssi', $petugasId, $namaPengirim, $kurir, $jenisPaket, $waktuSampai, $penghuniId);
-
-    if (!mysqli_stmt_execute($stmt)) {
-        mysqli_stmt_close($stmt);
+    try {
+        createPaket(
+            $db,
+            $petugasId,
+            $paketInput['namaPengirim'],
+            $paketInput['kurir'],
+            $paketInput['jenisPaket'],
+            $paketInput['waktuSampai'],
+            (int) $paketInput['penghuniId']
+        );
+    } catch (RuntimeException) {
         paket_redirect($_SERVER['PHP_SELF'], 'error', 'Gagal menyimpan data paket.');
     }
 
-    mysqli_stmt_close($stmt);
     paket_redirect('/doremi-app/dashboard/paket/', 'success', 'Data paket berhasil ditambahkan.');
 }
 ?>

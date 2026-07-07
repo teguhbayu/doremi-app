@@ -1,7 +1,5 @@
 <?php
 require '../../vendor/autoload.php';
-
-use Respect\Validation\Validator as v;
 session_start();
 
 if (!isset($_SESSION['userId'])) {
@@ -10,6 +8,7 @@ if (!isset($_SESSION['userId'])) {
 }
 require '../../db.php';
 require 'helpers.php';
+require 'validation.php';
 
 $id = $_GET['id'] ?? null;
 if (!$id) {
@@ -17,131 +16,34 @@ if (!$id) {
     exit;
 }
 
-$stmt = mysqli_prepare($db, "SELECT * FROM penghuni WHERE PenghuniID = ? AND IsDeleted = 0 LIMIT 1");
-mysqli_stmt_bind_param($stmt, 'i', $id);
-mysqli_stmt_execute($stmt);
-$result = mysqli_stmt_get_result($stmt);
-$penghuni = mysqli_fetch_assoc($result);
-mysqli_stmt_close($stmt);
+$penghuni = fetchPenghuniById($db, (int) $id);
 
 if (!$penghuni) {
     header("Location: /doremi-app/dashboard/penghuni/");
     exit;
 }
 
-$kamarQuery = mysqli_query(
-    $db,
-    "SELECT
-        k.KamarID,
-        k.NomorKamar,
-        k.Lantai,
-        k.KapasitasPenghuni,
-        COUNT(p.PenghuniID) AS JumlahPenghuniAktual
-    FROM kamar k
-    LEFT JOIN penghuni p ON p.KamarID = k.KamarID AND p.IsDeleted = 0
-    WHERE k.IsDeleted = 0
-    GROUP BY k.KamarID, k.NomorKamar, k.Lantai, k.KapasitasPenghuni
-    ORDER BY k.NomorKamar ASC"
-);
-$kamars = mysqli_fetch_all($kamarQuery, MYSQLI_ASSOC);
+$kamars = fetchActiveKamarWithOccupancy($db);
 $kamarMap = [];
 foreach ($kamars as $kamar) {
     $kamarMap[(int) $kamar['KamarID']] = $kamar;
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nama = trim($_POST['namaPenghuni'] ?? '');
-    $nim = penghuni_normalize_nim($_POST['nimPenghuni'] ?? '');
-    $email = penghuni_normalize_email($_POST['emailPenghuni'] ?? '');
-    $no = penghuni_normalize_phone($_POST['noPenghuni'] ?? '');
-    $jk = trim($_POST['jkPenghuni'] ?? '');
-    $kamarId = trim($_POST['kamarPenghuni'] ?? '');
-    $alamat = trim($_POST['alamatPenghuni'] ?? '');
-    $password = trim($_POST['passwordPenghuni'] ?? '');
-    $confirmPassword = trim($_POST['confirmPasswordPenghuni'] ?? '');
-
-    $isChangingPassword = $password !== '' || $confirmPassword !== '';
-
-    $baseSchema = v::keySet(
-        v::key('nama', v::stringType()->length(3, 100)),
-        v::key('nim', v::stringType()),
-        v::key('email', v::email()->length(3, 100)),
-        v::key('no', v::stringType()),
-        v::key('jk', v::in(['L', 'P'])),
-        v::key('kamarId', v::numericVal()),
-        v::key('alamat', v::stringType()->length(3, 255)),
-        v::key('password', v::optional(v::length(8, 100))),
-        v::key('confirmPassword', v::optional(v::length(8, 100)))
-    );
-
-    $postData = [
-        'nama' => $nama,
-        'nim' => $nim,
-        'email' => $email,
-        'no' => $no,
-        'jk' => $jk,
-        'kamarId' => $kamarId,
-        'alamat' => $alamat,
-        'password' => $password,
-        'confirmPassword' => $confirmPassword,
-    ];
-
-    if (!$baseSchema->validate($postData)) {
-        header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&status=error&message=Data Penghuni Tidak Valid!');
+    $input = collectPenghuniInput($_POST);
+    $validationMessage = validateEditPenghuniInput($db, $input, $kamarMap, (int) $id);
+    if ($validationMessage !== null) {
+        header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&status=error&message=' . urlencode($validationMessage));
         exit;
     }
 
-    if (!penghuni_is_valid_nim($nim)) {
-        header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&status=error&message=' . urlencode(penghuni_nim_validation_message()));
-        exit;
-    }
-
-    if (!penghuni_is_valid_phone($no)) {
-        header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&status=error&message=No. HP harus 10-16 digit angka yang valid!');
-        exit;
-    }
-
-    if ($isChangingPassword && $password !== $confirmPassword) {
-        header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&status=error&message=Password Tidak Cocok!');
-        exit;
-    }
-
-    $selectedKamar = $kamarMap[(int) $kamarId] ?? null;
-    if (!$selectedKamar) {
-        header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&status=error&message=Kamar yang dipilih tidak ditemukan!');
-        exit;
-    }
-
-    $duplicateMatches = penghuni_find_identity_matches($db, $nim, $email, $no, 0, (int) $id);
-    $duplicatePenghuni = $duplicateMatches[0] ?? null;
-
-    if ($duplicatePenghuni) {
-        header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&status=error&message=' . urlencode(penghuni_duplicate_identity_message($duplicatePenghuni, $nim, $email, $no)));
-        exit;
-    }
-
-    $roomValidationMessage = penghuni_validate_room_assignment($db, (int) $kamarId, $jk, (int) $id);
-    if ($roomValidationMessage !== null) {
-        header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&status=error&message=' . urlencode($roomValidationMessage));
-        exit;
-    }
-
-    if ($isChangingPassword) {
-        $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-        $stmt = mysqli_prepare($db, "CALL sp_updatePenghuniWithPassword(?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        mysqli_stmt_bind_param($stmt, 'iisssssss', $id, $kamarId, $nama, $nim, $jk, $no, $email, $hashedPassword, $alamat);
-    } else {
-        $stmt = mysqli_prepare($db, "CALL sp_updatePenghuniWithoutPassword(?, ?, ?, ?, ?, ?, ?, ?)");
-        mysqli_stmt_bind_param($stmt, 'iissssss', $id, $kamarId, $nama, $nim, $jk, $no, $email, $alamat);
-    }
-
-    if (!mysqli_stmt_execute($stmt)) {
+    $passwordHash = $input['password'] !== '' ? password_hash($input['password'], PASSWORD_BCRYPT) : null;
+    try {
+        updatePenghuni($db, (int) $id, (int) $input['kamarId'], $input['nama'], $input['nim'], $input['jk'], $input['no'], $input['email'], $input['alamat'], $passwordHash);
+    } catch (RuntimeException) {
         header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&status=error&message=Terjadi Kesalahan saat mengupdate data!');
-        mysqli_stmt_close($stmt);
         exit;
     }
-
-    mysqli_stmt_close($stmt);
 
     header("Location: /doremi-app/dashboard/penghuni/?status=success&message=Penghuni Berhasil Diupdate!");
     exit;

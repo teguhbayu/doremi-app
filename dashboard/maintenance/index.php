@@ -4,45 +4,14 @@ require 'helpers.php';
 maintenance_require_roles(['PENGURUS', 'PENGHUNI', 'SIGAP', 'SERVANDA', 'MAINTENANCE']);
 require '../../csrf.php';
 require '../../db.php';
+require_once '../../database/maintenance.php';
+require_once '../../utils/format.php';
 
 $role = $_SESSION['userRole'];
 $userId = (int)$_SESSION['userId'];
 session_write_close(); // Lepas session lock halaman ini hanya baca session
 
-$whereClause = "WHERE m.IsDeleted = 0";
-if ($role !== 'MAINTENANCE') {
-    if ($role === 'PENGHUNI') {
-        $whereClause .= " AND m.PenghuniID = $userId";
-    } else {
-        $whereClause .= " AND m.PetugasID = $userId AND m.PenghuniID IS NULL";
-    }
-}
-
-$queryStr = "
-    SELECT m.MaintenanceID, m.PenghuniID, m.PetugasID, m.RuanganID, m.InventarisID,
-           m.TanggalLapor, m.JenisLaporan, m.Deskripsi, m.StatusMaintenance,
-           m.TanggalSelesai, m.Keterangan,
-           (m.FotoLaporan IS NOT NULL AND m.FotoLaporan != '') AS HasFotoLaporan,
-           (m.FotoMaintenance IS NOT NULL AND m.FotoMaintenance != '') AS HasFotoMaintenance,
-           p.NamaPenghuni, p.Nim,
-           pt.NamaPetugas AS NamaReporterPetugas,
-           tech.NamaPetugas AS NamaTeknisi,
-           r.NamaRuangan, r.Lantai AS LantaiRuangan,
-           i.NamaBarang
-    FROM maintenance m
-    LEFT JOIN penghuni p ON m.PenghuniID = p.PenghuniID
-    LEFT JOIN petugas pt ON m.PetugasID = pt.PetugasID
-    LEFT JOIN petugas tech ON m.PetugasID = tech.PetugasID
-    LEFT JOIN ruangan r ON m.RuanganID = r.RuanganID
-    LEFT JOIN inventaris i ON m.InventarisID = i.InventarisID
-    $whereClause
-    ORDER BY CASE WHEN m.JenisLaporan = 'Kerusakan Darurat / Berat' THEN 1 
-                  WHEN m.JenisLaporan = 'Kerusakan Sedang' THEN 2 
-                  ELSE 3 END, m.MaintenanceID DESC
-";
-
-$query = mysqli_query($db, $queryStr);
-$reports = mysqli_fetch_all($query, MYSQLI_ASSOC);
+$reports = fetchMaintenanceReportsForRole($db, $role, $userId);
 $totalReports = count($reports);
 ?>
 
@@ -118,7 +87,7 @@ $totalReports = count($reports);
                                             <span class="badge bg-success text-white tw:text-xs">Ringan</span>
                                         <?php endif; ?>
                                     </td>
-                                    <td><?= date('d M Y', strtotime($r['TanggalLapor'])) ?></td>
+                                    <td><?= formatDateTime($r['TanggalLapor'] ?? null, 'd M Y') ?></td>
                                     <td>
                                         <span class="badge <?= $statusMeta['class'] ?>"><?= $statusMeta['label'] ?></span>
                                     </td>
@@ -150,12 +119,7 @@ $totalReports = count($reports);
                                             
                                             <?php if ($r['StatusMaintenance'] === 'Diajukan'): ?>
                                                 <?php 
-                                                    $isOwner = false;
-                                                    if ($role === 'PENGHUNI' && (int)$r['PenghuniID'] === $userId) {
-                                                        $isOwner = true;
-                                                    } elseif ($role !== 'PENGHUNI' && (int)$r['PetugasID'] === $userId && $r['PenghuniID'] === null) {
-                                                        $isOwner = true;
-                                                    }
+                                                    $isOwner = isMaintenanceReportOwner($r, $role, $userId);
                                                 ?>
                                                 <?php if ($isOwner): ?>
                                                     <a href="edit.php?id=<?= $r['MaintenanceID'] ?>" class="tw:w-9 tw:h-9 tw:inline-flex tw:items-center tw:justify-center tw:rounded-[12px] tw:bg-[rgba(47,127,240,0.08)] tw:text-primary tw:no-underline tw:hover:bg-[rgba(47,127,240,0.16)] tw:transition-all">
@@ -220,7 +184,7 @@ $totalReports = count($reports);
                                                             </div>
                                                             <div class="tw:mb-2">
                                                                 <label class="tw:text-xs tw:text-emerald-600">Tanggal Selesai</label>
-                                                                <p class="tw:font-semibold tw:text-emerald-950 tw:mb-0"><?= date('d M Y', strtotime($r['TanggalSelesai'])) ?></p>
+                                                                <p class="tw:font-semibold tw:text-emerald-950 tw:mb-0"><?= formatDateTime($r['TanggalSelesai'] ?? null, 'd M Y') ?></p>
                                                             </div>
                                                             <div class="tw:mb-3">
                                                                 <label class="tw:text-xs tw:text-emerald-600">Keterangan Hasil Kerja</label>

@@ -26,6 +26,50 @@ As of **June 30, 2026**, the database layer has been migrated away from inline q
 
 ---
 
+## Current PHP Module Layout
+
+As of **July 7, 2026**, page controllers should stay thin. Put reusable fetching, validation, formatting, and auth logic in small function files whose folder matches the app area.
+
+### Shared Helpers
+
+- `database/query.php` - shared `mysqli` helpers: `dbFetchAll`, `dbFetchOne`, `dbFetchValue`, `dbExecute`, and stored-procedure result cleanup.
+- `utils/format.php` - generic non-database formatting helpers such as `formatDateTime`, `normalizeDateTimeForSql`, `normalizeDateTimeInputValue`, and `textLength`.
+
+Do not put generic formatting helpers under `database/`; keep them in `utils/`.
+
+### Domain Database Helpers
+
+Place database-facing functions under `database/<part>.php`, using camelCase function names:
+
+- `database/auth.php` - `fetchPetugasByEmail`, `fetchPenghuniByEmail`, `findAuthUserByEmail`.
+- `database/paket.php` - package list/detail, package CRUD procedure calls, pickup/review operations, package photo fetching.
+- `database/inout.php` - in/out list fetches and stored-procedure actions.
+- `database/maintenance.php` - maintenance list/detail fetches, room/inventory option fetches, ownership checks, create/update/claim/complete/delete actions, photo fetching.
+- `database/penghuni.php` - resident fetches, room occupancy fetches, duplicate/assignment support queries, create/update/restore procedure calls.
+- `database/photos.php` - dispatches photo requests by type to the correct domain helper.
+
+Pages should call these helpers instead of embedding `mysqli_prepare`, `mysqli_query`, or repeated SQL directly in the page.
+
+### Validation Helpers
+
+Put input collection and validation in the app area's own `validation.php` file:
+
+- `auth/validation.php` - login input collection and validation.
+- `dashboard/penghuni/validation.php` - resident create/edit validation.
+- `dashboard/paket/validation.php` - package create/edit/review validation.
+- `dashboard/inout/validation.php` - in/out request validation and date-time construction.
+- `dashboard/maintenance/validation.php` - maintenance report create/edit validation and target ID resolution.
+
+Validation functions should return `null` on success or an Indonesian error message string on failure. Page controllers should redirect after receiving a validation error.
+
+### Auth Helpers
+
+- `auth/helpers.php` owns session setup and login redirects: `authSetUserSession`, `authAttemptPasswordLogin`, `authAttemptEmailLogin`, `authRedirectToDashboard`, `authRedirectToLoginError`.
+- `login.php` should collect and validate credentials, call `authAttemptPasswordLogin`, set the session, then redirect.
+- `auth/callback.php` should call `authAttemptEmailLogin` for Google login, set the session, then redirect.
+
+---
+
 ## CSS / Styling Rules
 
 **All CSS edits must be made in `index.css` only.** This file is the Tailwind CSS v4 source and is compiled by the Tailwind CLI into `css/main.css`. Never edit `css/main.css` directly — it is a generated file and any manual changes will be overwritten on the next build.
@@ -64,6 +108,8 @@ The UI must look **modern and stylish**. Always layer Tailwind utility classes o
 ## Authentication
 
 Call `session_start()` at the top of every page.
+
+Current login implementation uses helper functions: `authAttemptPasswordLogin()` for password login and `authAttemptEmailLogin()` for Google login. These helpers call `database/auth.php`, which wraps `sp_getPetugasByEmail(email)` and `sp_getPenghuniByEmail(email)`.
 
 | Session Key             | Value                                            |
 | ----------------------- | ------------------------------------------------ |
@@ -291,6 +337,11 @@ See the migration script: [20260630_stored_procedures_functions_triggers.sql](fi
 
 - **Never write raw `SELECT`/`INSERT`/`UPDATE`/`DELETE` queries** for entities that already have a stored procedure — call the procedure instead via prepared statements (e.g. `CALL sp_someProcedure(?, ?)`).
 - If new database logic is needed, implement it as a new stored procedure following the `sp_` naming convention above, rather than inlining SQL in PHP.
+- Prefer the existing helper layer: add fetch/action functions to `database/<part>.php` and call `dbFetchAll`, `dbFetchOne`, `dbFetchValue`, or `dbExecute` from `database/query.php`.
+- Keep page controllers thin: require helpers, collect input, call validation, call domain functions, then render or redirect.
+- Use camelCase for new helper function names.
+- Put non-database generic helpers in `utils/`, not `database/`.
+- Put validation logic in `auth/validation.php` or `dashboard/<part>/validation.php`, matching the app area.
 - Always use **prepared statements** (`mysqli_prepare` / `mysqli_stmt_bind_param`) when calling stored procedures — never interpolate user input into the `CALL` statement.
 - Always filter soft-deleted records: `WHERE IsDeleted = 0` (already handled inside relevant stored procedures — don't re-filter redundantly unless the procedure doesn't do it).
 - **Never manually set or pass `UpdateAt` / `UpdatedAt`** — the `trg_before...` triggers handle this automatically.

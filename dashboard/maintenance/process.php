@@ -8,6 +8,7 @@ require '../../csrf.php';
 csrf_validate('index.php');
 
 require '../../db.php';
+require_once '../../database/maintenance.php';
 
 $action = $_POST['action'] ?? '';
 $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
@@ -18,33 +19,21 @@ if (!$id) {
 }
 
 if ($action === 'claim') {
-    // Guard: only claim tickets still in 'Diajukan' status (prevents race condition)
-    $stmt = mysqli_prepare($db, "UPDATE maintenance SET StatusMaintenance = 'Diproses', PetugasID = ? WHERE MaintenanceID = ? AND IsDeleted = 0 AND StatusMaintenance = 'Diajukan'");
-    mysqli_stmt_bind_param($stmt, 'ii', $userId, $id);
-
-    if (mysqli_stmt_execute($stmt)) {
-        $affected = mysqli_stmt_affected_rows($stmt);
-        mysqli_stmt_close($stmt);
+    try {
+        $affected = claimMaintenanceReport($db, $id, $userId);
         if ($affected === 0) {
             maintenance_redirect('index.php', 'error', 'Laporan sudah diklaim oleh teknisi lain.');
         }
         maintenance_redirect('index.php', 'success', 'Laporan berhasil di-claim! Silahkan mulai perbaikan.');
-    } else {
-        mysqli_stmt_close($stmt);
+    } catch (RuntimeException) {
         maintenance_redirect('index.php', 'error', 'Gagal memproses klaim pekerjaan.');
     }
 }
 
 elseif ($action === 'complete') {
-    // Ownership check: only the claiming technician can mark their own ticket complete
-    $ownerStmt = mysqli_prepare($db, "SELECT MaintenanceID FROM maintenance WHERE MaintenanceID = ? AND PetugasID = ? AND StatusMaintenance = 'Diproses' AND IsDeleted = 0 LIMIT 1");
-    mysqli_stmt_bind_param($ownerStmt, 'ii', $id, $userId);
-    mysqli_stmt_execute($ownerStmt);
-    if (!mysqli_fetch_assoc(mysqli_stmt_get_result($ownerStmt))) {
-        mysqli_stmt_close($ownerStmt);
+    if (!checkMaintenanceTechnicianOwnership($db, $id, $userId)) {
         maintenance_redirect('index.php', 'error', 'Anda tidak memiliki wewenang untuk menyelesaikan laporan ini.');
     }
-    mysqli_stmt_close($ownerStmt);
 
     $keterangan = trim($_POST['keterangan'] ?? '');
     $tanggalSelesai = date('Y-m-d');
@@ -63,17 +52,10 @@ elseif ($action === 'complete') {
         maintenance_redirect('index.php', 'error', 'Foto hasil perbaikan wajib diunggah.');
     }
 
-    $stmt = mysqli_prepare(
-        $db,
-        "UPDATE maintenance SET StatusMaintenance = 'Selesai', TanggalSelesai = ?, Keterangan = ?, FotoMaintenance = ? WHERE MaintenanceID = ? AND IsDeleted = 0"
-    );
-    mysqli_stmt_bind_param($stmt, 'sssi', $tanggalSelesai, $keterangan, $fotoMaintenance, $id);
-
-    if (mysqli_stmt_execute($stmt)) {
-        mysqli_stmt_close($stmt);
+    try {
+        completeMaintenanceReport($db, $id, $tanggalSelesai, $keterangan, $fotoMaintenance);
         maintenance_redirect('index.php', 'success', 'Perbaikan selesai! Laporan berhasil diperbarui.');
-    } else {
-        mysqli_stmt_close($stmt);
+    } catch (RuntimeException) {
         maintenance_redirect('index.php', 'error', 'Terjadi kesalahan sistem saat memperbarui status selesai.');
     }
 } else {
