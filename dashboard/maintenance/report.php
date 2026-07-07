@@ -229,7 +229,7 @@ mysqli_free_result($res);
     <?php require '../components/sidebar.php'; ?>
 
     <main class="tw:md:ml-75 tw:grow tw:relative tw:z-10">
-        <div class="tw:pt-20 tw:md:pt-8 tw:px-8 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full" id="report-content">
+        <div class="tw:pt-28 tw:md:pt-8 tw:px-8 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full" id="report-content">
 
             <h1 class="page-title" data-kicker="Laporan &amp; Analitik"
                 data-subtitle="Statistik dan ringkasan seluruh laporan maintenance dalam periode yang dipilih.">
@@ -260,7 +260,7 @@ mysqli_free_result($res);
                 </div>
             </div>
 
-            <div class="tw:grid tw:grid-cols-2 tw:lg:grid-cols-4 tw:gap-5 tw:mb-8">
+            <div class="report-stat-grid tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:lg:grid-cols-4 tw:gap-5 tw:mb-8">
                 <div data-gsap="stat-card"
                     class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.85)] tw:shadow-sm">
                     <div class="tw:flex tw:items-center tw:gap-4">
@@ -408,7 +408,7 @@ mysqli_free_result($res);
                             berdasarkan jumlah tugas selesai dalam <?= $rangeLabel ?>.</p>
                         <div class="table-panel tw:mt-2">
                             <div class="doremi-table-wrapper">
-                                <table class="table doremi-table tw:w-full">
+                                <table class="table doremi-table tw:w-full report-card-table">
                                     <thead>
                                         <tr>
                                             <th class="tw:w-[50px]">Rank</th>
@@ -432,16 +432,16 @@ mysqli_free_result($res);
                                             $rateColor = $completionRate >= 80 ? '#16a34a' : ($completionRate >= 50 ? '#d97706' : '#dc2626');
                                             ?>
                                             <tr>
-                                                <td class="text-center"><?= $rankIcon ?></td>
-                                                <td><strong><?= htmlspecialchars($p['NamaPetugas']) ?></strong></td>
-                                                <td class="text-center"><?= (int) $p['total'] ?></td>
-                                                <td class="text-center"><span
+                                                <td class="text-center" data-label="Rank"><?= $rankIcon ?></td>
+                                                <td data-label="Petugas"><strong><?= htmlspecialchars($p['NamaPetugas']) ?></strong></td>
+                                                <td class="text-center" data-label="Total Tugas"><?= (int) $p['total'] ?></td>
+                                                <td class="text-center" data-label="Selesai"><span
                                                         class="tw:bg-emerald-100 tw:text-green-700 tw:px-[10px] tw:py-[2px] tw:rounded-full tw:text-xs tw:font-semibold"><?= (int) $p['selesai'] ?></span>
                                                 </td>
-                                                <td class="text-center"><span
+                                                <td class="text-center" data-label="Diproses"><span
                                                         class="tw:bg-blue-100 tw:text-blue-700 tw:px-[10px] tw:py-[2px] tw:rounded-full tw:text-xs tw:font-semibold"><?= (int) $p['diproses'] ?></span>
                                                 </td>
-                                                <td class="text-center">
+                                                <td class="text-center" data-label="Tingkat Selesai">
                                                     <div class="tw:flex tw:items-center tw:gap-[6px] tw:justify-center">
                                                         <div
                                                             class="tw:bg-gray-200 tw:rounded tw:h-[6px] tw:w-20 tw:overflow-hidden">
@@ -453,7 +453,7 @@ mysqli_free_result($res);
                                                             style="font-size:12px; font-weight:700; color:<?= $rateColor ?>;"><?= $completionRate ?>%</span>
                                                     </div>
                                                 </td>
-                                                <td class="text-center">
+                                                <td class="text-center" data-label="Avg Penyelesaian">
                                                     <?= $p['avg_hari'] ? $p['avg_hari'] . ' hari' : '0 hari' ?>
                                                 </td>
                                             </tr>
@@ -478,7 +478,7 @@ mysqli_free_result($res);
                 </div>
                 <div class="doremi-table-wrapper print-table-wrapper">
                     <table id="reportTable"
-                        class="table doremi-table text-center align-middle tw:mb-0 tw:w-full print-table">
+                        class="table doremi-table text-center align-middle tw:mb-0 tw:w-full print-table report-card-table">
                         <thead>
                             <tr>
                                 <th>No</th>
@@ -507,22 +507,22 @@ mysqli_free_result($res);
                                 };
                                 ?>
                                 <tr>
-                                    <td class="row-number-cell"></td>
-                                    <td><?= htmlspecialchars($r['Pelapor']) ?></td>
-                                    <td><?= htmlspecialchars($r['Lokasi']) ?></td>
-                                    <td><span
+                                    <td class="row-number-cell" data-label="No"></td>
+                                    <td data-label="Pelapor"><?= htmlspecialchars($r['Pelapor']) ?></td>
+                                    <td data-label="Lokasi / Target"><?= htmlspecialchars($r['Lokasi']) ?></td>
+                                    <td data-label="Jenis"><span
                                             style="font-size:11px; font-weight:600; padding:2px 8px; border-radius:20px; <?= $jenisStyle ?>"><?= htmlspecialchars($r['JenisLaporan']) ?></span>
                                     </td>
-                                    <td><span
+                                    <td data-label="Status"><span
                                             style="font-size:11px; font-weight:600; padding:2px 8px; border-radius:20px; <?= $statusStyle ?>"><?= htmlspecialchars($r['StatusMaintenance']) ?></span>
                                     </td>
-                                    <td><?= $r['TanggalLapor'] ? date('d M Y', strtotime($r['TanggalLapor'])) : '—' ?>
+                                    <td data-label="Tanggal Lapor"><?= $r['TanggalLapor'] ? date('d M Y', strtotime($r['TanggalLapor'])) : '—' ?>
                                     </td>
-                                    <td><?= $r['TanggalSelesai'] ? date('d M Y', strtotime($r['TanggalSelesai'])) : '—' ?>
+                                    <td data-label="Selesai"><?= $r['TanggalSelesai'] ? date('d M Y', strtotime($r['TanggalSelesai'])) : '—' ?>
                                     </td>
-                                    <td><?= $r['Durasi'] !== null ? $r['Durasi'] . ' hari' : '—' ?></td>
+                                    <td data-label="Durasi"><?= $r['Durasi'] !== null ? $r['Durasi'] . ' hari' : '—' ?></td>
                                     <?php if ($role === 'PENGURUS'): ?>
-                                        <td><?= htmlspecialchars($r['Petugas'] ?? '—') ?></td><?php endif; ?>
+                                        <td data-label="Petugas"><?= htmlspecialchars($r['Petugas'] ?? '—') ?></td><?php endif; ?>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
