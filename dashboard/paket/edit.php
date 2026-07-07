@@ -3,31 +3,21 @@ session_start();
 require 'helpers.php';
 paket_require_roles(['SIGAP']);
 require '../../db.php';
+require_once '../../database/paket.php';
+require 'validation.php';
 
 $paketId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 if (!$paketId) {
     paket_redirect('/doremi-app/dashboard/paket/', 'error', 'Data paket tidak valid.');
 }
 
-$stmt = mysqli_prepare(
-    $db,
-    "CALL sp_getPaketDetail(?)"
-);
-mysqli_stmt_bind_param($stmt, 'i', $paketId);
-mysqli_stmt_execute($stmt);
-$result = mysqli_stmt_get_result($stmt);
-$paket = mysqli_fetch_assoc($result);
-mysqli_stmt_close($stmt);
+$paket = fetchPaketDetail($db, $paketId);
 
 if (!$paket) {
     paket_redirect('/doremi-app/dashboard/paket/', 'error', 'Data paket tidak ditemukan.');
 }
 
-$penghuniQuery = mysqli_query(
-    $db,
-    "CALL sp_getActivePenghuniForSelect()"
-);
-$penghuniList = mysqli_fetch_all($penghuniQuery, MYSQLI_ASSOC);
+$penghuniList = fetchActivePenghuniOptions($db);
 $selectedPenghuniLabel = '';
 foreach ($penghuniList as $penghuniOption) {
     if ((int) $paket['PenghuniID'] === (int) $penghuniOption['PenghuniID']) {
@@ -37,43 +27,26 @@ foreach ($penghuniList as $penghuniOption) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $jenisPaket = paket_normalize_type($_POST['jenisPaket'] ?? null);
-    $namaPengirim = trim($_POST['namaPengirim'] ?? '');
-    $kurir = trim($_POST['kurir'] ?? '');
-    $penghuniId = filter_input(INPUT_POST, 'penghuniId', FILTER_VALIDATE_INT);
-    $waktuSampai = paket_normalize_datetime($_POST['waktuSampai'] ?? '');
-
-    if (
-        $jenisPaket === null
-        || !paket_is_valid_length($namaPengirim, 1, 100)
-        || !paket_is_valid_length($kurir, 1, 50)
-        || $penghuniId === false
-        || $penghuniId === null
-        || $waktuSampai === null
-    ) {
-        paket_redirect($_SERVER['PHP_SELF'] . '?id=' . $paketId, 'error', 'Data paket tidak valid.');
+    $paketInput = collectPaketInput($_POST);
+    $validationMessage = validatePaketInput($db, $paketInput);
+    if ($validationMessage !== null) {
+        paket_redirect($_SERVER['PHP_SELF'] . '?id=' . $paketId, 'error', $validationMessage);
     }
 
-    $stmt = mysqli_prepare($db, "CALL sp_checkPenghuniExist(?)");
-    mysqli_stmt_bind_param($stmt, 'i', $penghuniId);
-    mysqli_stmt_execute($stmt);
-    $penghuniResult = mysqli_stmt_get_result($stmt);
-    $penghuni = mysqli_fetch_assoc($penghuniResult);
-    mysqli_stmt_close($stmt);
-
-    if (!$penghuni) {
-        paket_redirect($_SERVER['PHP_SELF'] . '?id=' . $paketId, 'error', 'Penghuni tujuan tidak ditemukan.');
-    }
-
-    $stmt = mysqli_prepare($db, "CALL sp_updatePaket(?, ?, ?, ?, ?, ?)");
-    mysqli_stmt_bind_param($stmt, 'issssi', $paketId, $namaPengirim, $kurir, $jenisPaket, $waktuSampai, $penghuniId);
-
-    if (!mysqli_stmt_execute($stmt)) {
-        mysqli_stmt_close($stmt);
+    try {
+        updatePaket(
+            $db,
+            $paketId,
+            $paketInput['namaPengirim'],
+            $paketInput['kurir'],
+            $paketInput['jenisPaket'],
+            $paketInput['waktuSampai'],
+            (int) $paketInput['penghuniId']
+        );
+    } catch (RuntimeException) {
         paket_redirect($_SERVER['PHP_SELF'] . '?id=' . $paketId, 'error', 'Gagal memperbarui data paket.');
     }
 
-    mysqli_stmt_close($stmt);
     paket_redirect('/doremi-app/dashboard/paket/', 'success', 'Data paket berhasil diperbarui.');
 }
 ?>

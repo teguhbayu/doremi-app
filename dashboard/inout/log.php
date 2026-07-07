@@ -6,14 +6,11 @@ if (!isset($_SESSION['userId']) || $_SESSION['userRole'] !== 'SIGAP') {
 }
 
 require '../../db.php';
+require_once '../../database/inout.php';
+require_once '../../utils/format.php';
 
-$logQuery = mysqli_query($db, "SELECT io.*, pe.NamaPenghuni, pe.Nim, k.NomorKamar, pt.NamaPetugas 
-                               FROM inoutpenghuni io 
-                               JOIN penghuni pe ON io.PenghuniID = pe.PenghuniID 
-                               JOIN kamar k ON pe.KamarID = k.KamarID 
-                               LEFT JOIN petugas pt ON io.PetugasID = pt.PetugasID 
-                               ORDER BY io.InOutID DESC");
-$totalLogs = mysqli_num_rows($logQuery);
+$logRows = fetchAllInOutLogs($db);
+$totalLogs = count($logRows);
 ?>
 
 <!DOCTYPE html>
@@ -51,7 +48,7 @@ $totalLogs = mysqli_num_rows($logQuery);
                             </tr>
                         </thead>
                         <tbody>
-                            <?php while ($row = mysqli_fetch_assoc($logQuery)): ?>
+                            <?php foreach ($logRows as $row): ?>
                                 <tr>
                                     <td></td>
                                     <td>
@@ -69,11 +66,11 @@ $totalLogs = mysqli_num_rows($logQuery);
                                         <?php endif; ?>
                                     </td>
                                     <td><?= htmlspecialchars($row['Keperluan']) ?></td>
-                                    <td><?= $row['WaktuKeluar'] ? date('H:i, d M Y', strtotime($row['WaktuKeluar'])) : '-' ?></td>
-                                    <td><?= $row['WaktuMasuk'] ? date('H:i, d M Y', strtotime($row['WaktuMasuk'])) : '-' ?></td>
+                                    <td><?= formatDateTime($row['WaktuKeluar'] ?? null, 'H:i, d M Y') ?></td>
+                                    <td><?= formatDateTime($row['WaktuMasuk'] ?? null, 'H:i, d M Y') ?></td>
                                     <td><?= htmlspecialchars($row['NamaPetugas'] ?? '-') ?></td>
                                 </tr>
-                            <?php endwhile; ?>
+                            <?php endforeach; ?>
                         </tbody>
                     </table>
                 </div>

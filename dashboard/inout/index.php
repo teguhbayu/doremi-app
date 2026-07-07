@@ -6,37 +6,21 @@ if (!isset($_SESSION['userId'])) {
 }
 
 require '../../db.php';
+require_once '../../database/inout.php';
+require_once '../../utils/format.php';
 $role = $_SESSION['userRole'];
-$userId = $_SESSION['userId'];
+$userId = (int) $_SESSION['userId'];
 if ($role === 'PENGHUNI') {
-    $historyQuery = mysqli_query($db, "SELECT io.*, p.NamaPetugas 
-                                     FROM inoutpenghuni io 
-                                     LEFT JOIN petugas p ON io.PetugasID = p.PetugasID 
-                                     WHERE io.PenghuniID = $userId 
-                                     ORDER BY io.InOutID DESC");
-
-    $activeQuery = mysqli_query($db, "SELECT COUNT(*) as count FROM inoutpenghuni WHERE PenghuniID = $userId AND Status IN ('Pending', 'Keluar')");
-    $activeRequestCount = (int) mysqli_fetch_assoc($activeQuery)['count'];
+    $historyRows = fetchInOutHistoryForPenghuni($db, $userId);
+    $activeRequestCount = countActiveInOutRequests($db, $userId);
     $hasActiveRequest = $activeRequestCount > 0;
 }
 
 if ($role === 'SIGAP') {
-    $pendingQuery = mysqli_query($db, "SELECT io.*, pe.NamaPenghuni, pe.Nim, k.NomorKamar 
-                                     FROM inoutpenghuni io 
-                                     JOIN penghuni pe ON io.PenghuniID = pe.PenghuniID 
-                                     JOIN kamar k ON pe.KamarID = k.KamarID 
-                                     WHERE io.Status = 'Pending' 
-                                     ORDER BY io.InOutID ASC");
-
-    $outsideQuery = mysqli_query($db, "SELECT io.*, pe.NamaPenghuni, pe.Nim, k.NomorKamar 
-                                     FROM inoutpenghuni io 
-                                     JOIN penghuni pe ON io.PenghuniID = pe.PenghuniID 
-                                     JOIN kamar k ON pe.KamarID = k.KamarID 
-                                     WHERE io.Status = 'Keluar' 
-                                     ORDER BY io.WaktuKeluar ASC");
-
-    $pendingCount = mysqli_num_rows($pendingQuery);
-    $outsideCount = mysqli_num_rows($outsideQuery);
+    $pendingRows = fetchPendingInOutRequests($db);
+    $outsideRows = fetchOutsideInOutRequests($db);
+    $pendingCount = count($pendingRows);
+    $outsideCount = count($outsideRows);
 }
 ?>
 
@@ -121,7 +105,7 @@ if ($role === 'SIGAP') {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php while ($row = mysqli_fetch_assoc($historyQuery)): ?>
+                                        <?php foreach ($historyRows as $row): ?>
                                             <tr>
                                                 <td>
                                                     <?php if ($row['Status'] === 'Pending'): ?>
@@ -133,12 +117,12 @@ if ($role === 'SIGAP') {
                                                     <?php endif; ?>
                                                 </td>
                                                 <td><?= htmlspecialchars($row['Keperluan']) ?></td>
-                                                <td><?= $row['WaktuKeluar'] ? date('H:i, d M', strtotime($row['WaktuKeluar'])) : '-' ?>
+                                                <td><?= formatDateTime($row['WaktuKeluar'] ?? null, 'H:i, d M') ?>
                                                 </td>
-                                                <td><?= $row['WaktuMasuk'] ? date('H:i, d M', strtotime($row['WaktuMasuk'])) : '-' ?>
+                                                <td><?= formatDateTime($row['WaktuMasuk'] ?? null, 'H:i, d M') ?>
                                                 </td>
                                             </tr>
-                                        <?php endwhile; ?>
+                                        <?php endforeach; ?>
                                     </tbody>
                                 </table>
                             </div>
@@ -166,7 +150,7 @@ if ($role === 'SIGAP') {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php while ($row = mysqli_fetch_assoc($pendingQuery)): ?>
+                                    <?php foreach ($pendingRows as $row): ?>
                                         <tr>
                                             <td>
                                                 <div class="tw:font-bold"><?= htmlspecialchars($row['NamaPenghuni']) ?></div>
@@ -183,7 +167,7 @@ if ($role === 'SIGAP') {
                                                 </form>
                                             </td>
                                         </tr>
-                                    <?php endwhile; ?>
+                                    <?php endforeach; ?>
                                 </tbody>
                             </table>
                         </div>
@@ -208,14 +192,14 @@ if ($role === 'SIGAP') {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php while ($row = mysqli_fetch_assoc($outsideQuery)): ?>
+                                    <?php foreach ($outsideRows as $row): ?>
                                         <tr>
                                             <td>
                                                 <div class="tw:font-bold"><?= htmlspecialchars($row['NamaPenghuni']) ?></div>
                                                 <div class="tw:text-xs tw:text-gray-500"><?= $row['Nim'] ?></div>
                                             </td>
                                             <td><?= $row['NomorKamar'] ?></td>
-                                            <td><?= date('H:i, d M', strtotime($row['WaktuKeluar'])) ?></td>
+                                            <td><?= formatDateTime($row['WaktuKeluar'] ?? null, 'H:i, d M') ?></td>
                                             <td>
                                                 <form action="process.php" method="POST" class="tw:inline">
                                                     <input type="hidden" name="action" value="confirm_entry">
@@ -225,7 +209,7 @@ if ($role === 'SIGAP') {
                                                 </form>
                                             </td>
                                         </tr>
-                                    <?php endwhile; ?>
+                                    <?php endforeach; ?>
                                 </tbody>
                             </table>
                         </div>

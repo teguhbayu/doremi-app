@@ -12,6 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 csrf_validate('index.php');
 
 require '../../db.php';
+require_once '../../database/maintenance.php';
 
 $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
 $userId = (int)$_SESSION['userId'];
@@ -21,13 +22,7 @@ if (!$id) {
     maintenance_redirect('index.php', 'error', 'ID laporan tidak valid.');
 }
 
-// Fetch report details
-$stmt = mysqli_prepare($db, "SELECT * FROM maintenance WHERE MaintenanceID = ? AND IsDeleted = 0 LIMIT 1");
-mysqli_stmt_bind_param($stmt, 'i', $id);
-mysqli_stmt_execute($stmt);
-$result = mysqli_stmt_get_result($stmt);
-$report = mysqli_fetch_assoc($result);
-mysqli_stmt_close($stmt);
+$report = fetchMaintenanceReportById($db, $id);
 
 if (!$report) {
     maintenance_redirect('index.php', 'error', 'Laporan tidak ditemukan.');
@@ -39,30 +34,15 @@ if ($report['StatusMaintenance'] !== 'Diajukan') {
 }
 
 // Ownership verification
-$isOwner = false;
-if ($role === 'PENGHUNI') {
-    if ((int)$report['PenghuniID'] === $userId) {
-        $isOwner = true;
-    }
-} else {
-    // Allows maintenance technicians to delete their own created tickets as well
-    if ((int)$report['PetugasID'] === $userId && $report['PenghuniID'] === null) {
-        $isOwner = true;
-    }
-}
+$isOwner = isMaintenanceReportOwner($report, $role, $userId);
 
 if (!$isOwner) {
     maintenance_redirect('index.php', 'error', 'Anda tidak memiliki wewenang untuk menghapus laporan ini.');
 }
 
-// Execute soft delete
-$deleteStmt = mysqli_prepare($db, "UPDATE maintenance SET IsDeleted = 1 WHERE MaintenanceID = ?");
-mysqli_stmt_bind_param($deleteStmt, 'i', $id);
-
-if (mysqli_stmt_execute($deleteStmt)) {
-    mysqli_stmt_close($deleteStmt);
+try {
+    deleteMaintenanceReport($db, $id);
     maintenance_redirect('index.php', 'success', 'Laporan kerusakan berhasil dihapus.');
-} else {
-    mysqli_stmt_close($deleteStmt);
+} catch (RuntimeException) {
     maintenance_redirect('index.php', 'error', 'Gagal menghapus laporan.');
 }

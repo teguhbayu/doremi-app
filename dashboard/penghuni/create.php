@@ -1,7 +1,5 @@
 <?php
 require '../../vendor/autoload.php';
-
-use Respect\Validation\Validator as v;
 session_start();
 
 if (!isset($_SESSION['userId'])) {
@@ -10,120 +8,26 @@ if (!isset($_SESSION['userId'])) {
 }
 require '../../db.php';
 require 'helpers.php';
+require 'validation.php';
 
-$kamarQuery = mysqli_query(
-    $db,
-    "SELECT
-        k.KamarID,
-        k.NomorKamar,
-        k.Lantai,
-        k.KapasitasPenghuni,
-        COUNT(p.PenghuniID) AS JumlahPenghuniAktual
-    FROM kamar k
-    LEFT JOIN penghuni p ON p.KamarID = k.KamarID AND p.IsDeleted = 0
-    WHERE k.IsDeleted = 0
-    GROUP BY k.KamarID, k.NomorKamar, k.Lantai, k.KapasitasPenghuni
-    ORDER BY k.NomorKamar ASC"
-);
-$kamars = mysqli_fetch_all($kamarQuery, MYSQLI_ASSOC);
+$kamars = fetchActiveKamarWithOccupancy($db);
 $kamarMap = [];
 foreach ($kamars as $kamar) {
     $kamarMap[(int) $kamar['KamarID']] = $kamar;
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nama = trim($_POST['namaPenghuni'] ?? '');
-    $nim = penghuni_normalize_nim($_POST['nimPenghuni'] ?? '');
-    $email = penghuni_normalize_email($_POST['emailPenghuni'] ?? '');
-    $no = penghuni_normalize_phone($_POST['noPenghuni'] ?? '');
-    $jk = trim($_POST['jkPenghuni'] ?? '');
-    $kamarId = trim($_POST['kamarPenghuni'] ?? '');
-    $alamat = trim($_POST['alamatPenghuni'] ?? '');
-    $password = trim($_POST['passwordPenghuni'] ?? '');
-    $confirmPassword = trim($_POST['confirmPasswordPenghuni'] ?? '');
-    $formData = [
-        'nama' => $nama,
-        'nim' => $nim,
-        'email' => $email,
-        'no' => $no,
-        'jk' => $jk,
-        'kamarId' => $kamarId,
-        'alamat' => $alamat,
-    ];
-
-    $penghuniSchema = v::keySet(
-        v::key('nama', v::stringType()->length(3, 100)),
-        v::key('nim', v::stringType()),
-        v::key('email', v::email()->length(3, 100)),
-        v::key('no', v::stringType()),
-        v::key('jk', v::in(['L', 'P'])),
-        v::key('kamarId', v::numericVal()),
-        v::key('alamat', v::stringType()->length(3, 255)),
-        v::key('password', v::length(8, 100)),
-        v::key('confirmPassword', v::length(8, 100))
-    );
-
-    $postData = [
-        'nama' => $nama,
-        'nim' => $nim,
-        'email' => $email,
-        'no' => $no,
-        'jk' => $jk,
-        'kamarId' => $kamarId,
-        'alamat' => $alamat,
-        'password' => $password,
-        'confirmPassword' => $confirmPassword,
-    ];
-
-    if (!$penghuniSchema->validate($postData)) {
+    $input = collectPenghuniInput($_POST);
+    $formData = penghuniFormData($input);
+    $validationMessage = validateCreatePenghuniInput($db, $input, $kamarMap);
+    if ($validationMessage !== null) {
         $_SESSION['form_data'] = $formData;
-        header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Data Penghuni tidak Valid!');
+        header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=' . urlencode($validationMessage));
         exit;
     }
 
-    if (!penghuni_is_valid_nim($nim)) {
-        $_SESSION['form_data'] = $formData;
-        header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=' . urlencode(penghuni_nim_validation_message()));
-        exit;
-    }
-
-    if (!penghuni_is_valid_phone($no)) {
-        $_SESSION['form_data'] = $formData;
-        header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=No. HP harus 10-16 digit angka yang valid!');
-        exit;
-    }
-
-    if ($password !== $confirmPassword) {
-        $_SESSION['form_data'] = $formData;
-        header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Password Tidak Cocok!');
-        exit;
-    }
-
-    $selectedKamar = $kamarMap[(int) $kamarId] ?? null;
-    if (!$selectedKamar) {
-        $_SESSION['form_data'] = $formData;
-        header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Kamar yang dipilih tidak ditemukan!');
-        exit;
-    }
-
-    $activeMatches = penghuni_find_identity_matches($db, $nim, $email, $no, 0);
-    $activePenghuni = $activeMatches[0] ?? null;
-
-    if ($activePenghuni) {
-        $_SESSION['form_data'] = $formData;
-        header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=' . urlencode(penghuni_duplicate_identity_message($activePenghuni, $nim, $email, $no)));
-        exit;
-    }
-
-    $roomValidationMessage = penghuni_validate_room_assignment($db, (int) $kamarId, $jk);
-    if ($roomValidationMessage !== null) {
-        $_SESSION['form_data'] = $formData;
-        header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=' . urlencode($roomValidationMessage));
-        exit;
-    }
-
-    $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-    $deletedPenghuniRows = penghuni_find_identity_matches($db, $nim, $email, $no, 1);
+    $hashedPassword = password_hash($input['password'], PASSWORD_BCRYPT);
+    $deletedPenghuniRows = penghuni_find_identity_matches($db, $input['nim'], $input['email'], $input['no'], 1);
 
     $restoredDeletedPenghuniId = null;
     if ($deletedPenghuniRows) {
@@ -142,39 +46,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($restoredDeletedPenghuniId !== null) {
-        $restoreStmt = mysqli_prepare(
-            $db,
-            "CALL sp_restorePenghuni(?, ?, ?, ?, ?, ?, ?, ?, ?)"
-        );
-        mysqli_stmt_bind_param($restoreStmt, 'iisssssss', $restoredDeletedPenghuniId, $kamarId, $nama, $nim, $jk, $no, $email, $hashedPassword, $alamat);
-
-        if (!mysqli_stmt_execute($restoreStmt)) {
+        try {
+            restorePenghuni($db, $restoredDeletedPenghuniId, (int) $input['kamarId'], $input['nama'], $input['nim'], $input['jk'], $input['no'], $input['email'], $hashedPassword, $input['alamat']);
+        } catch (RuntimeException) {
             $_SESSION['form_data'] = $formData;
-            mysqli_stmt_close($restoreStmt);
             header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Gagal memulihkan data penghuni yang pernah dihapus!');
             exit;
         }
 
-        mysqli_stmt_close($restoreStmt);
         unset($_SESSION['form_data']);
 
         header("Location: " . '/doremi-app/dashboard/penghuni/' . '?status=success&message=Penghuni berhasil ditambahkan kembali dari data yang pernah dihapus!');
         exit;
     }
 
-    $now = date('Y-m-d H:i:s');
-
-    $stmt = mysqli_prepare($db, "CALL sp_createPenghuni(?, ?, ?, ?, ?, ?, ?, ?)");
-    mysqli_stmt_bind_param($stmt, 'isssssss', $kamarId, $nama, $nim, $jk, $no, $email, $hashedPassword, $alamat);
-
-    if (!mysqli_stmt_execute($stmt)) {
+    try {
+        createPenghuni($db, (int) $input['kamarId'], $input['nama'], $input['nim'], $input['jk'], $input['no'], $input['email'], $hashedPassword, $input['alamat']);
+    } catch (RuntimeException) {
         $_SESSION['form_data'] = $formData;
         header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Terjadi Kesalahan saat menyimpan data!');
-        mysqli_stmt_close($stmt);
         exit;
     }
 
-    mysqli_stmt_close($stmt);
     unset($_SESSION['form_data']);
 
     header("Location: " . '/doremi-app/dashboard/penghuni/' . '?status=success&message=Penghuni Berhasil Ditambahkan!');

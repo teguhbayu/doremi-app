@@ -3,38 +3,16 @@ session_start();
 require 'helpers.php';
 paket_require_roles(['SIGAP']);
 require '../../db.php';
+require_once '../../database/paket.php';
+require_once '../../utils/format.php';
+require 'validation.php';
 
 $paketId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 if (!$paketId) {
     paket_redirect('/doremi-app/dashboard/paket/', 'error', 'Data paket tidak valid.');
 }
 
-$stmt = mysqli_prepare(
-    $db,
-    "SELECT pk.*, ph.NamaPenghuni, ph.Nim, k.NomorKamar,
-            pt.NamaPetugas AS NamaPetugasPaket,
-            pp.PengambilanPaketID, pp.PetugasID AS PickupPetugasID, pp.FotoPengambilan, pp.WaktuPengambilan, pp.Status, pp.Keterangan
-     FROM paket pk
-     JOIN penghuni ph ON pk.PenghuniID = ph.PenghuniID
-     LEFT JOIN kamar k ON ph.KamarID = k.KamarID
-     JOIN petugas pt ON pk.PetugasID = pt.PetugasID
-     LEFT JOIN (
-         SELECT pp1.*
-         FROM pengambilanpaket pp1
-         INNER JOIN (
-             SELECT PaketID, MAX(PengambilanPaketID) AS LatestPengambilanPaketID
-             FROM pengambilanpaket
-             GROUP BY PaketID
-         ) latest ON latest.LatestPengambilanPaketID = pp1.PengambilanPaketID
-     ) pp ON pp.PaketID = pk.PaketID
-     WHERE pk.PaketID = ?
-     LIMIT 1"
-);
-mysqli_stmt_bind_param($stmt, 'i', $paketId);
-mysqli_stmt_execute($stmt);
-$result = mysqli_stmt_get_result($stmt);
-$paket = mysqli_fetch_assoc($result);
-mysqli_stmt_close($stmt);
+$paket = fetchPaketWithLatestPickup($db, $paketId);
 
 if (!$paket) {
     paket_redirect('/doremi-app/dashboard/paket/', 'error', 'Data paket tidak ditemukan.');
@@ -45,38 +23,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         paket_redirect($_SERVER['PHP_SELF'] . '?id=' . $paketId, 'error', 'Belum ada bukti pengambilan untuk direview.');
     }
 
-    $status = trim($_POST['status'] ?? '');
-    $keterangan = trim($_POST['keterangan'] ?? '');
+    $reviewInput = collectPaketReviewInput($_POST);
     $petugasSigapId = (int) $_SESSION['userId'];
 
-    if ($petugasSigapId < 1 || !in_array($status, ['Sudah Diambil', 'TERTUKAR'], true)) {
-        paket_redirect($_SERVER['PHP_SELF'] . '?id=' . $paketId, 'error', 'Status review paket tidak valid.');
+    $validationMessage = validatePaketReviewInput($reviewInput, $petugasSigapId);
+    if ($validationMessage !== null) {
+        paket_redirect($_SERVER['PHP_SELF'] . '?id=' . $paketId, 'error', $validationMessage);
     }
 
-    $keterangan = $keterangan !== '' ? $keterangan : '-';
+    $keterangan = $reviewInput['keterangan'] !== '' ? $reviewInput['keterangan'] : '-';
     $pengambilanPaketId = (int) $paket['PengambilanPaketID'];
 
-    $stmt = mysqli_prepare(
-        $db,
-        "UPDATE pengambilanpaket
-         SET PetugasID = ?, Status = ?, Keterangan = ?
-         WHERE PengambilanPaketID = ?"
-    );
-    mysqli_stmt_bind_param(
-        $stmt,
-        'issi',
-        $petugasSigapId,
-        $status,
-        $keterangan,
-        $pengambilanPaketId
-    );
-
-    if (!mysqli_stmt_execute($stmt)) {
-        mysqli_stmt_close($stmt);
+    try {
+        updatePaketPickupReview($db, $pengambilanPaketId, $petugasSigapId, $reviewInput['status'], $keterangan);
+    } catch (RuntimeException) {
         paket_redirect($_SERVER['PHP_SELF'] . '?id=' . $paketId, 'error', 'Gagal memperbarui status paket.');
     }
 
-    mysqli_stmt_close($stmt);
     paket_redirect('/doremi-app/dashboard/paket/', 'success', 'Status paket berhasil diperbarui.');
 }
 
@@ -135,7 +98,7 @@ $statusMeta = paket_status_meta($paket['Status'] ?? 'Belum Diambil');
                                 <span class="badge <?= htmlspecialchars($statusMeta['class']) ?>">
                                     <?= htmlspecialchars($statusMeta['label']) ?>
                                 </span>
-                                <p><?= !empty($paket['WaktuPengambilan']) ? date('d M Y H:i', strtotime($paket['WaktuPengambilan'])) : 'Belum ada catatan pengambilan' ?></p>
+                                <p><?= !empty($paket['WaktuPengambilan']) ? formatDateTime($paket['WaktuPengambilan']) : 'Belum ada catatan pengambilan' ?></p>
                             </div>
                             <?php if (!empty($paket['FotoPengambilan'])): ?>
                                 <div class="tw:p-4 tw:rounded-[18px] tw:bg-[rgba(255,255,255,0.80)] tw:border tw:border-[rgba(22,60,122,0.08)]">

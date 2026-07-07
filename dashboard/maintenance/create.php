@@ -5,37 +5,26 @@ require 'helpers.php';
 maintenance_require_roles(['PENGURUS', 'PENGHUNI', 'SIGAP', 'SERVANDA', 'MAINTENANCE']);
 require '../../csrf.php';
 require '../../db.php';
+require_once '../../database/maintenance.php';
+require 'validation.php';
 
 $role = $_SESSION['userRole'];
 $userId = (int)$_SESSION['userId'];
 
-// 1. Mengambil Data Ruangan untuk Pilihan Lokasi
-$roomsQuery = mysqli_query($db, "SELECT RuanganID, NamaRuangan, Lantai FROM ruangan ORDER BY Lantai ASC, NamaRuangan ASC");
-$rooms = mysqli_fetch_all($roomsQuery, MYSQLI_ASSOC);
+$rooms = fetchMaintenanceRooms($db, false);
+$inventory = fetchMaintenanceInventory($db, false);
 
-// 2. Mengambil Data Inventaris untuk Pilihan Target Barang
-$inventoryQuery = mysqli_query($db, "SELECT InventarisID, NamaBarang FROM inventaris ORDER BY NamaBarang ASC");
-$inventory = mysqli_fetch_all($inventoryQuery, MYSQLI_ASSOC);
-
-// 3. Memproses Form Saat Disubmit
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_validate('create.php');
-    $jenisLaporan = mysqli_real_escape_string($db, trim($_POST['skala_prioritas'] ?? ''));
-    $deskripsi = mysqli_real_escape_string($db, trim($_POST['deskripsi'] ?? ''));
-    $targetTipe = $_POST['target_tipe'] ?? 'ruangan';
-    
-    $ruanganId = null;
-    $inventarisId = null;
-
-    if ($targetTipe === 'ruangan') {
-        $ruanganId = filter_input(INPUT_POST, 'ruangan_id', FILTER_VALIDATE_INT);
-    } else {
-        $inventarisId = filter_input(INPUT_POST, 'inventaris_id', FILTER_VALIDATE_INT);
+    $reportInput = collectMaintenanceReportInput($_POST);
+    $validationMessage = validateMaintenanceReportInput($db, $reportInput);
+    if ($validationMessage !== null) {
+        maintenance_redirect('create.php', 'error', $validationMessage);
     }
+    $targetIds = resolveMaintenanceTargetIds($reportInput);
 
     $tanggalLapor = date('Y-m-d');
     
-    // Logika Kepemilikan Laporan berdasarkan Peran Pengguna
     $penghuniId = null;
     $petugasId = null;
     if ($role === 'PENGHUNI') {
@@ -44,39 +33,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $petugasId = $userId;
     }
 
-    // Mengonversi Foto Laporan ke Base64 dengan validasi MIME type via helpers.php
     try {
         $fotoBase64 = maintenance_store_photo($_FILES['foto_laporan'] ?? []);
     } catch (RuntimeException $e) {
         maintenance_redirect('create.php', 'error', $e->getMessage());
     }
 
-    // Menyisipkan Data Laporan Baru ke Database
-    $stmt = mysqli_prepare($db, "
-        INSERT INTO maintenance (
-            PenghuniID, PetugasID, RuanganID, InventarisID, 
-            JenisLaporan, Deskripsi, FotoLaporan, TanggalLapor, StatusMaintenance
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Diajukan')
-    ");
-    
-    mysqli_stmt_bind_param(
-        $stmt, 
-        'iiiissss', 
-        $penghuniId, 
-        $petugasId, 
-        $ruanganId, 
-        $inventarisId, 
-        $jenisLaporan, 
-        $deskripsi, 
-        $fotoBase64, 
-        $tanggalLapor
-    );
-
-    if (mysqli_stmt_execute($stmt)) {
-        mysqli_stmt_close($stmt);
+    try {
+        createMaintenanceReport(
+            $db,
+            $penghuniId,
+            $petugasId,
+            $targetIds['ruanganId'],
+            $targetIds['inventarisId'],
+            $reportInput['jenisLaporan'],
+            $reportInput['deskripsi'],
+            $fotoBase64,
+            $tanggalLapor
+        );
         maintenance_redirect('index.php', 'success', 'Laporan kerusakan berhasil dibuat.');
-    } else {
-        mysqli_stmt_close($stmt);
+    } catch (RuntimeException) {
         maintenance_redirect('create.php', 'error', 'Terjadi kesalahan sistem saat mengirim laporan.');
     }
 }

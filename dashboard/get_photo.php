@@ -7,6 +7,7 @@ if (!isset($_SESSION['userId'])) {
 session_write_close(); // Release session lock early to allow parallel image fetching
 
 require_once '../db.php';
+require_once '../database/photos.php';
 
 $type = $_GET['type'] ?? '';
 $id = (int)($_GET['id'] ?? 0);
@@ -16,30 +17,7 @@ if (!$type || !$id) {
     exit('Bad Request');
 }
 
-$photoData = null;
-
-if ($type === 'maintenance_laporan') {
-    $stmt = mysqli_prepare($db, "CALL sp_getFotoLaporanFromMaintenance(?)");
-    mysqli_stmt_bind_param($stmt, "i", $id);
-    mysqli_stmt_execute($stmt);
-    mysqli_stmt_bind_result($stmt, $photoData);
-    mysqli_stmt_fetch($stmt);
-    mysqli_stmt_close($stmt);
-} elseif ($type === 'maintenance_perbaikan') {
-    $stmt = mysqli_prepare($db, "CALL sp_getFotoMaintenanceFromMaintenance(?)");
-    mysqli_stmt_bind_param($stmt, "i", $id);
-    mysqli_stmt_execute($stmt);
-    mysqli_stmt_bind_result($stmt, $photoData);
-    mysqli_stmt_fetch($stmt);
-    mysqli_stmt_close($stmt);
-} elseif ($type === 'paket_pengambilan') {
-    $stmt = mysqli_prepare($db, "CALL sp_getFotoPengambilanFromPengambilanPaket(?)");
-    mysqli_stmt_bind_param($stmt, "i", $id);
-    mysqli_stmt_execute($stmt);
-    mysqli_stmt_bind_result($stmt, $photoData);
-    mysqli_stmt_fetch($stmt);
-    mysqli_stmt_close($stmt);
-}
+$photoData = fetchPhotoDataByType($db, $type, $id);
 
 if (empty($photoData)) {
     http_response_code(404);

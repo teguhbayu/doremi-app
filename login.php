@@ -1,9 +1,10 @@
 <?php
 session_start();
 require './db.php';
+require_once 'database/auth.php';
+require_once 'auth/helpers.php';
+require_once 'auth/validation.php';
 require 'auth/config.php';
-
-use Respect\Validation\Validator as v;
 
 
 if (isset($_SESSION['userId'])) {
@@ -12,62 +13,19 @@ if (isset($_SESSION['userId'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = trim($_POST['email'] ?? "");
-    $password = trim($_POST['password'] ?? "");
-
-    if (!v::length(5)->email()->validate($email)) {
-        header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Email atau Password Tidak Valid!');
-        exit;
-    }
-    if (!v::length(5)->validate($password)) {
-        header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Email atau Password Tidak Valid!');
-        exit;
+    $loginInput = collectLoginInput($_POST);
+    $validationMessage = validateLoginInput($loginInput);
+    if ($validationMessage !== null) {
+        authRedirectToLoginError($validationMessage, $_SERVER['PHP_SELF']);
     }
 
-    $stmt = mysqli_prepare($db, "CALL sp_getPetugasByEmail(?)");
-    mysqli_stmt_bind_param($stmt, 's', $email);
-    mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
-    $petugas = mysqli_fetch_assoc($result);
-    mysqli_stmt_close($stmt);
-
-    if ($petugas) {
-        if (!password_verify($password, $petugas['Password'])) {
-            header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Email atau Password Tidak Valid!');
-            exit;
-        }
-
-        $_SESSION['userId'] = $petugas['PetugasID'];
-        $_SESSION['userName'] = $petugas['NamaPetugas'];
-        $_SESSION['userRole'] = $petugas['Jabatan'];
-
-        header("Location: /doremi-app/dashboard");
-        exit;
+    $authUser = authAttemptPasswordLogin($db, $loginInput['email'], $loginInput['password']);
+    if ($authUser === null) {
+        authRedirectToLoginError('Email atau Password Tidak Valid!', $_SERVER['PHP_SELF']);
     }
 
-    $stmt = mysqli_prepare($db, "CALL sp_getPenghuniByEmail(?)");
-    mysqli_stmt_bind_param($stmt, 's', $email);
-    mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
-    $penghuni = mysqli_fetch_assoc($result);
-    mysqli_stmt_close($stmt);
-
-    if ($penghuni) {
-        if (!password_verify($password, $penghuni['Password'])) {
-            header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Email atau Password Tidak Valid!');
-            exit;
-        }
-
-        $_SESSION['userId'] = $penghuni['PenghuniID'];
-        $_SESSION['userName'] = $penghuni['NamaPenghuni'];
-        $_SESSION['userRole'] = 'PENGHUNI';
-
-        header("Location: /doremi-app/dashboard");
-        exit;
-    }
-
-    header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Email atau Password Tidak Valid!');
-    exit;
+    authSetUserSession($authUser);
+    authRedirectToDashboard();
 }
 
 $login_url = $client->createAuthUrl();

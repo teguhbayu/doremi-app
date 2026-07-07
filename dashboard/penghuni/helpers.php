@@ -3,6 +3,8 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
     die('Access denied');
 }
 
+require_once dirname(__DIR__, 2) . '/database/penghuni.php';
+
 function penghuni_duplicate_identity_message(array $existingPenghuni, string $nim, string $email, string $noHp): string
 {
     if (penghuni_normalize_nim((string) ($existingPenghuni['Nim'] ?? '')) === penghuni_normalize_nim($nim)) {
@@ -80,23 +82,7 @@ function penghuni_find_identity_matches(
     int $isDeleted,
     ?int $excludePenghuniId = null
 ): array {
-    $sql = "SELECT PenghuniID, Nim, Email, NoHP FROM penghuni WHERE IsDeleted = ?";
-
-    if ($excludePenghuniId !== null) {
-        $sql .= " AND PenghuniID != ?";
-    }
-
-    $stmt = mysqli_prepare($db, $sql);
-    if ($excludePenghuniId !== null) {
-        mysqli_stmt_bind_param($stmt, 'ii', $isDeleted, $excludePenghuniId);
-    } else {
-        mysqli_stmt_bind_param($stmt, 'i', $isDeleted);
-    }
-
-    mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
-    $rows = mysqli_fetch_all($result, MYSQLI_ASSOC);
-    mysqli_stmt_close($stmt);
+    $rows = fetchPenghuniIdentityRows($db, $isDeleted, $excludePenghuniId);
 
     $normalizedNim = penghuni_normalize_nim($nim);
     $normalizedEmail = penghuni_normalize_email($email);
@@ -134,18 +120,7 @@ function penghuni_floor_zone_label(?string $lantai): string
 
 function penghuni_validate_room_assignment(mysqli $db, int $kamarId, string $gender, ?int $excludePenghuniId = null): ?string
 {
-    $roomStmt = mysqli_prepare(
-        $db,
-        "SELECT KamarID, NomorKamar, KapasitasPenghuni, Lantai
-         FROM kamar
-         WHERE KamarID = ? AND IsDeleted = 0
-         LIMIT 1"
-    );
-    mysqli_stmt_bind_param($roomStmt, 'i', $kamarId);
-    mysqli_stmt_execute($roomStmt);
-    $roomResult = mysqli_stmt_get_result($roomStmt);
-    $room = mysqli_fetch_assoc($roomResult);
-    mysqli_stmt_close($roomStmt);
+    $room = fetchKamarForPenghuniAssignment($db, $kamarId);
 
     if (!$room) {
         return 'Kamar yang dipilih tidak ditemukan!';
@@ -162,28 +137,7 @@ function penghuni_validate_room_assignment(mysqli $db, int $kamarId, string $gen
         );
     }
 
-    if ($excludePenghuniId !== null) {
-        $occupantStmt = mysqli_prepare(
-            $db,
-            "SELECT COUNT(*) AS total, GROUP_CONCAT(DISTINCT JenisKelamin ORDER BY JenisKelamin SEPARATOR ',') AS genders
-             FROM penghuni
-             WHERE KamarID = ? AND IsDeleted = 0 AND PenghuniID != ?"
-        );
-        mysqli_stmt_bind_param($occupantStmt, 'ii', $kamarId, $excludePenghuniId);
-    } else {
-        $occupantStmt = mysqli_prepare(
-            $db,
-            "SELECT COUNT(*) AS total, GROUP_CONCAT(DISTINCT JenisKelamin ORDER BY JenisKelamin SEPARATOR ',') AS genders
-             FROM penghuni
-             WHERE KamarID = ? AND IsDeleted = 0"
-        );
-        mysqli_stmt_bind_param($occupantStmt, 'i', $kamarId);
-    }
-
-    mysqli_stmt_execute($occupantStmt);
-    $occupantResult = mysqli_stmt_get_result($occupantStmt);
-    $occupantSummary = mysqli_fetch_assoc($occupantResult);
-    mysqli_stmt_close($occupantStmt);
+    $occupantSummary = fetchPenghuniRoomOccupantSummary($db, $kamarId, $excludePenghuniId);
 
     $occupiedCount = (int) ($occupantSummary['total'] ?? 0);
     $projectedCount = $occupiedCount + 1;
