@@ -845,7 +845,7 @@ a {
   background: transparent;
 }
 
-@media (max-width: 767px) {
+@media screen and (max-width: 767px) {
   .table-panel::before {
     content: '\f0b2\00a0 Geser tabel ke kiri/kanan untuk melihat semua kolom';
     font-family: 'Font Awesome 6 Free', sans-serif;
@@ -864,6 +864,156 @@ a {
   .doremi-table-wrapper .doremi-table,
   .doremi-table-wrapper .table {
     min-width: 600px;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  #report-content {
+    width: 100% !important;
+    padding-top: 7rem !important;
+    padding-right: 0.9rem !important;
+    padding-left: 0.9rem !important;
+    margin-bottom: 1.5rem !important;
+  }
+
+  #report-content .page-title {
+    padding: 1.05rem 1rem !important;
+    border-radius: 20px;
+    font-size: 1.85rem;
+    letter-spacing: 0;
+  }
+
+  #report-content .page-title::before {
+    margin-bottom: 0.65rem;
+    font-size: 0.66rem;
+  }
+
+  #report-content .page-title::after {
+    font-size: 0.9rem;
+    line-height: 1.55;
+  }
+
+  #report-content .no-print {
+    align-items: stretch !important;
+    margin-bottom: 1rem !important;
+  }
+
+  #report-content .no-print > div {
+    width: 100%;
+  }
+
+  #report-content .no-print > div:last-child > :is(a, button) {
+    flex: 1 1 0;
+    justify-content: center;
+    min-height: 2.5rem;
+  }
+
+  #report-content .report-stat-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.85rem !important;
+    margin-bottom: 1rem !important;
+  }
+
+  #report-content [data-gsap="stat-card"],
+  #report-content [data-gsap="panel"] {
+    padding: 1rem !important;
+    border-radius: 18px !important;
+  }
+
+  #report-content [data-gsap="stat-card"] strong {
+    font-size: 1.55rem !important;
+  }
+
+  #report-content [data-gsap="panel"] h5 {
+    align-items: flex-start !important;
+    font-size: 1rem !important;
+    line-height: 1.35;
+  }
+
+  #report-content [data-gsap="panel"] p {
+    font-size: 0.82rem !important;
+    line-height: 1.55 !important;
+  }
+
+  #report-content [data-gsap="panel"] > div:has(> canvas) {
+    height: 210px !important;
+  }
+
+  #report-content .table-panel:has(.report-card-table)::before {
+    display: none;
+  }
+
+  #report-content .table-panel > .doremi-table-wrapper {
+    padding: 0 !important;
+    overflow: visible;
+    background: transparent !important;
+  }
+
+  #report-content .report-card-table,
+  #report-content .report-card-table tbody,
+  #report-content .report-card-table tr,
+  #report-content .report-card-table td {
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  #report-content .report-card-table thead {
+    display: none !important;
+  }
+
+  #report-content .report-card-table tbody tr {
+    margin-bottom: 0.85rem;
+    padding: 0.85rem 0.95rem;
+    border: 1px solid rgba(47, 127, 240, 0.1);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 14px 36px rgba(15, 31, 61, 0.07);
+  }
+
+  #report-content .report-card-table tbody td,
+  #report-content .report-card-table tbody th {
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+    gap: 1rem;
+    padding: 0.62rem 0 !important;
+    border-bottom: 1px solid rgba(47, 127, 240, 0.08) !important;
+    color: #355071 !important;
+    text-align: right !important;
+    white-space: normal !important;
+  }
+
+  #report-content .report-card-table tbody td:last-child,
+  #report-content .report-card-table tbody th:last-child {
+    border-bottom: 0 !important;
+  }
+
+  #report-content .report-card-table tbody td::before,
+  #report-content .report-card-table tbody th::before {
+    content: attr(data-label);
+    flex: 0 0 42%;
+    color: #6e85a6;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-align: left;
+    text-transform: uppercase;
+  }
+
+  #report-content .report-card-table tbody td.row-number-cell {
+    text-align: right !important;
+  }
+
+  #report-content .report-card-table tbody td.row-number-cell::before {
+    content: attr(data-label);
+    color: #6e85a6;
+  }
+
+  #report-content .report-card-table tbody td.row-number-cell::after {
+    content: counter(doremi-row-number);
+    color: #163c7a;
+    font-weight: 800;
   }
 }
 
