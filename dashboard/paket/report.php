@@ -3,6 +3,7 @@ session_start();
 require 'helpers.php';
 paket_require_roles(['SIGAP', 'PENGURUS']);
 require '../../db.php';
+require '../../database/paketReport.php';
 
 $role = $_SESSION['userRole'];
 session_write_close();
@@ -10,32 +11,12 @@ session_write_close();
 $allowedRanges = ['7d', '30d', '6m', 'all'];
 $range = in_array($_GET['range'] ?? '', $allowedRanges) ? $_GET['range'] : '7d';
 
-$whereDate = match ($range) {
-    '7d' => "pk.WaktuSampai >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)",
-    '30d' => "pk.WaktuSampai >= DATE_SUB(CURDATE(), INTERVAL 29 DAY)",
-    '6m' => "pk.WaktuSampai >= DATE_SUB(CURDATE(), INTERVAL 5 MONTH)",
-    'all' => "1=1",
-};
-
 $rangeLabel = match ($range) {
     '7d' => '7 Hari Terakhir',
     '30d' => '30 Hari Terakhir',
     '6m' => '6 Bulan Terakhir',
     'all' => 'Semua Waktu',
 };
-
-/** Latest pickup record per paket (mirrors index.php). */
-$latestPickupJoin = "
-    LEFT JOIN (
-        SELECT pp1.PaketID, pp1.Status, pp1.WaktuPengambilan, pp1.PetugasID AS PickupPetugasID
-        FROM pengambilanpaket pp1
-        INNER JOIN (
-            SELECT PaketID, MAX(PengambilanPaketID) AS LatestID
-            FROM pengambilanpaket
-            GROUP BY PaketID
-        ) latest ON latest.LatestID = pp1.PengambilanPaketID
-    ) pp ON pp.PaketID = pk.PaketID
-";
 
 /** Format a duration given in minutes into a human-friendly string. */
 function paket_format_duration(?int $minutes): string
@@ -74,23 +55,8 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel') {
     $out = fopen('php://output', 'w');
     fputcsv($out, ['No', 'Penghuni', 'NIM', 'Kamar', 'Tipe', 'Pengirim', 'Kurir', 'Status', 'Waktu Sampai', 'Waktu Ambil', 'Durasi Ambil (Menit)', 'Dicatat Oleh'], ';');
 
-    $exportQuery = "
-        SELECT pk.NamaPengirim, pk.Kurir, pk.JenisPaket, pk.WaktuSampai,
-               ph.NamaPenghuni, ph.Nim, k.NomorKamar, pt.NamaPetugas,
-               COALESCE(pp.Status, 'Belum Diambil') AS Status, pp.WaktuPengambilan,
-               CASE WHEN pp.Status = 'Sudah Diambil' AND pp.WaktuPengambilan IS NOT NULL AND pk.WaktuSampai IS NOT NULL
-                    THEN TIMESTAMPDIFF(MINUTE, pk.WaktuSampai, pp.WaktuPengambilan) ELSE NULL END AS Durasi
-        FROM paket pk
-        JOIN penghuni ph    ON pk.PenghuniID = ph.PenghuniID
-        LEFT JOIN kamar k   ON ph.KamarID    = k.KamarID
-        LEFT JOIN petugas pt ON pk.PetugasID = pt.PetugasID
-        $latestPickupJoin
-        WHERE $whereDate
-        ORDER BY pk.WaktuSampai DESC
-    ";
-    $exportRes = mysqli_query($db, $exportQuery);
     $no = 1;
-    while ($row = mysqli_fetch_assoc($exportRes)) {
+    foreach (fetchPaketReportExport($db, $range) as $row) {
         fputcsv($out, [
             $no++,
             $row['NamaPenghuni'],
@@ -106,38 +72,22 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel') {
             $row['NamaPetugas'] ?? '-',
         ], ';');
     }
-    mysqli_free_result($exportRes);
     fclose($out);
     exit;
 }
 
-$res = mysqli_query($db, "
-    SELECT
-        COUNT(*) AS total,
-        SUM(CASE WHEN COALESCE(pp.Status, 'Belum Diambil') = 'Sudah Diambil' THEN 1 ELSE 0 END) AS sudah,
-        SUM(CASE WHEN COALESCE(pp.Status, 'Belum Diambil') = 'Belum Diambil' THEN 1 ELSE 0 END) AS belum,
-        SUM(CASE WHEN COALESCE(pp.Status, 'Belum Diambil') = 'TERTUKAR' THEN 1 ELSE 0 END) AS tertukar,
-        ROUND(AVG(CASE WHEN pp.Status = 'Sudah Diambil' AND pp.WaktuPengambilan IS NOT NULL AND pk.WaktuSampai IS NOT NULL
-            THEN TIMESTAMPDIFF(MINUTE, pk.WaktuSampai, pp.WaktuPengambilan) ELSE NULL END)) AS avg_menit
-    FROM paket pk
-    $latestPickupJoin
-    WHERE $whereDate
-");
-$stats = mysqli_fetch_assoc($res);
-mysqli_free_result($res);
-$avgMinutes = $stats['avg_menit'] !== null ? (int) $stats['avg_menit'] : null;
+$stats = fetchPaketReportStats($db, $range);
+$avgMinutes = ($stats['avg_menit'] ?? null) !== null ? (int) $stats['avg_menit'] : null;
 
 // ── Status distribution (doughnut) ──────────────────────────────────────────
 $statusOrder = ['Sudah Diambil', 'Belum Diambil', 'TERTUKAR'];
 $statusColors = ['Sudah Diambil' => '#10b981', 'Belum Diambil' => '#f59e0b', 'TERTUKAR' => '#ef4444'];
 $statusData = ['Sudah Diambil' => 0, 'Belum Diambil' => 0, 'TERTUKAR' => 0];
-$res = mysqli_query($db, "SELECT COALESCE(pp.Status, 'Belum Diambil') AS s, COUNT(*) AS n FROM paket pk $latestPickupJoin WHERE $whereDate GROUP BY s");
-while ($row = mysqli_fetch_assoc($res)) {
+foreach (fetchPaketReportStatusDist($db, $range) as $row) {
     if (array_key_exists($row['s'], $statusData)) {
         $statusData[$row['s']] = (int) $row['n'];
     }
 }
-mysqli_free_result($res);
 $statusLabels = array_map(fn($k) => $statusMeta[$k]['label'], $statusOrder);
 $statusValues = array_map(fn($k) => $statusData[$k], $statusOrder);
 $statusBgColors = array_map(fn($k) => $statusColors[$k], $statusOrder);
@@ -145,12 +95,10 @@ $statusBgColors = array_map(fn($k) => $statusColors[$k], $statusOrder);
 // ── Trend (line) ─────────────────────────────────────────────────────────────
 if (in_array($range, ['7d', '30d'])) {
     $days = $range === '7d' ? 7 : 30;
-    $res = mysqli_query($db, "SELECT DATE(pk.WaktuSampai) AS d, COUNT(*) AS n FROM paket pk WHERE $whereDate AND pk.WaktuSampai IS NOT NULL GROUP BY d ORDER BY d ASC");
     $trendRaw = [];
-    while ($row = mysqli_fetch_assoc($res)) {
+    foreach (fetchPaketReportTrendDaily($db, $range) as $row) {
         $trendRaw[$row['d']] = (int) $row['n'];
     }
-    mysqli_free_result($res);
     $trendLabels = [];
     $trendValues = [];
     for ($i = $days - 1; $i >= 0; $i--) {
@@ -159,12 +107,10 @@ if (in_array($range, ['7d', '30d'])) {
         $trendValues[] = $trendRaw[$key] ?? 0;
     }
 } else {
-    $res = mysqli_query($db, "SELECT DATE_FORMAT(pk.WaktuSampai, '%Y-%m') AS m, COUNT(*) AS n FROM paket pk WHERE $whereDate AND pk.WaktuSampai IS NOT NULL GROUP BY m ORDER BY m ASC");
     $trendRaw = [];
-    while ($row = mysqli_fetch_assoc($res)) {
+    foreach (fetchPaketReportTrendMonthly($db, $range) as $row) {
         $trendRaw[$row['m']] = (int) $row['n'];
     }
-    mysqli_free_result($res);
     if ($range === '6m') {
         $trendLabels = [];
         $trendValues = [];
@@ -185,32 +131,26 @@ if (in_array($range, ['7d', '30d'])) {
 
 // ── Tipe kiriman distribution (doughnut) ─────────────────────────────────────
 $tipeData = ['Paket' => 0, 'Dokumen' => 0];
-$res = mysqli_query($db, "SELECT pk.JenisPaket AS j, COUNT(*) AS n FROM paket pk WHERE $whereDate GROUP BY j");
-while ($row = mysqli_fetch_assoc($res)) {
+foreach (fetchPaketReportTipeDist($db, $range) as $row) {
     $label = paket_type_label($row['j']);
     if (array_key_exists($label, $tipeData)) {
         $tipeData[$label] += (int) $row['n'];
     }
 }
-mysqli_free_result($res);
 
 // ── Top 5 kurir (horizontal bar) ─────────────────────────────────────────────
 $topKurirLabels = [];
 $topKurirValues = [];
-$res = mysqli_query($db, "SELECT pk.Kurir, COUNT(*) AS n FROM paket pk WHERE $whereDate AND pk.Kurir <> '' GROUP BY pk.Kurir ORDER BY n DESC LIMIT 5");
-while ($row = mysqli_fetch_assoc($res)) {
+foreach (fetchPaketReportTopKurir($db, $range) as $row) {
     $topKurirLabels[] = $row['Kurir'];
     $topKurirValues[] = (int) $row['n'];
 }
-mysqli_free_result($res);
 
 // ── Jam sibuk paket datang (bar) ─────────────────────────────────────────────
 $hourRaw = array_fill(0, 24, 0);
-$res = mysqli_query($db, "SELECT HOUR(pk.WaktuSampai) AS h, COUNT(*) AS n FROM paket pk WHERE $whereDate AND pk.WaktuSampai IS NOT NULL GROUP BY h");
-while ($row = mysqli_fetch_assoc($res)) {
+foreach (fetchPaketReportJamSibuk($db, $range) as $row) {
     $hourRaw[(int) $row['h']] = (int) $row['n'];
 }
-mysqli_free_result($res);
 $hourLabels = [];
 $hourValues = [];
 for ($h = 0; $h < 24; $h++) {
@@ -221,61 +161,19 @@ for ($h = 0; $h < 24; $h++) {
 // ── Top 5 penghuni penerima terbanyak (horizontal bar) ───────────────────────
 $topPenghuniLabels = [];
 $topPenghuniValues = [];
-$res = mysqli_query($db, "
-    SELECT ph.NamaPenghuni, COUNT(*) AS n
-    FROM paket pk
-    JOIN penghuni ph ON pk.PenghuniID = ph.PenghuniID
-    WHERE $whereDate
-    GROUP BY pk.PenghuniID, ph.NamaPenghuni
-    ORDER BY n DESC LIMIT 5
-");
-while ($row = mysqli_fetch_assoc($res)) {
+foreach (fetchPaketReportTopPenghuni($db, $range) as $row) {
     $topPenghuniLabels[] = $row['NamaPenghuni'];
     $topPenghuniValues[] = (int) $row['n'];
 }
-mysqli_free_result($res);
 
 // ── Petugas SIGAP ranking (PENGURUS only) ────────────────────────────────────
 $petugasPerforma = [];
 if ($role === 'PENGURUS') {
-    $res = mysqli_query($db, "
-        SELECT pt.NamaPetugas,
-               COUNT(*) AS total,
-               SUM(CASE WHEN COALESCE(pp.Status, 'Belum Diambil') = 'Sudah Diambil' THEN 1 ELSE 0 END) AS sudah,
-               SUM(CASE WHEN COALESCE(pp.Status, 'Belum Diambil') = 'TERTUKAR' THEN 1 ELSE 0 END) AS tertukar
-        FROM paket pk
-        JOIN petugas pt ON pk.PetugasID = pt.PetugasID
-        $latestPickupJoin
-        WHERE $whereDate AND pt.Jabatan = 'SIGAP' AND pt.IsDeleted = 0
-        GROUP BY pk.PetugasID, pt.NamaPetugas
-        ORDER BY total DESC, sudah DESC
-    ");
-    while ($row = mysqli_fetch_assoc($res)) {
-        $petugasPerforma[] = $row;
-    }
-    mysqli_free_result($res);
+    $petugasPerforma = fetchPaketReportPetugasRanking($db, $range);
 }
 
 // ── Detail rows ──────────────────────────────────────────────────────────────
-$detailRows = [];
-$res = mysqli_query($db, "
-    SELECT pk.PaketID, pk.NamaPengirim, pk.Kurir, pk.JenisPaket, pk.WaktuSampai,
-           ph.NamaPenghuni, ph.Nim, k.NomorKamar, pt.NamaPetugas,
-           COALESCE(pp.Status, 'Belum Diambil') AS Status, pp.WaktuPengambilan,
-           CASE WHEN pp.Status = 'Sudah Diambil' AND pp.WaktuPengambilan IS NOT NULL AND pk.WaktuSampai IS NOT NULL
-                THEN TIMESTAMPDIFF(MINUTE, pk.WaktuSampai, pp.WaktuPengambilan) ELSE NULL END AS Durasi
-    FROM paket pk
-    JOIN penghuni ph     ON pk.PenghuniID = ph.PenghuniID
-    LEFT JOIN kamar k    ON ph.KamarID    = k.KamarID
-    LEFT JOIN petugas pt ON pk.PetugasID  = pt.PetugasID
-    $latestPickupJoin
-    WHERE $whereDate
-    ORDER BY pk.WaktuSampai DESC
-");
-while ($row = mysqli_fetch_assoc($res)) {
-    $detailRows[] = $row;
-}
-mysqli_free_result($res);
+$detailRows = fetchPaketReportDetail($db, $range);
 ?>
 <!DOCTYPE html>
 <html lang="id">

@@ -14,6 +14,7 @@ if ($_SESSION['userRole'] !== 'PENGURUS') {
 }
 require '../../csrf.php';
 require '../../db.php';
+require '../../database/ruangan.php';
 
 $ruanganTypes = ['Ruang Ibadah', 'Ruang Publik', 'Ruang Jemur', 'Lapangan Olahraga', 'Balkon', 'Kamar Mandi'];
 
@@ -65,18 +66,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    $now = date('Y-m-d H:i:s');
-
-    $stmt = mysqli_prepare($db, "UPDATE ruangan SET NamaRuangan = ?, JenisRuangan = ?, Lantai = ?, Keterangan = ?, UpdatedAt = ? WHERE RuanganID = ?");
-    mysqli_stmt_bind_param($stmt, 'sssssi', $nama, $jenis, $lantai, $keterangan, $now, $id);
-
-    if (!mysqli_stmt_execute($stmt)) {
+    try {
+        updateRuangan($db, (int) $id, $nama, $jenis, $lantai, $keterangan);
+    } catch (RuntimeException $e) {
         header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&status=error&message=Terjadi Kesalahan saat mengupdate data!');
-        mysqli_stmt_close($stmt);
         exit;
     }
-
-    mysqli_stmt_close($stmt);
 
     header("Location: /doremi-app/dashboard/ruangan/?status=success&message=Ruangan Berhasil Diupdate!");
     exit;

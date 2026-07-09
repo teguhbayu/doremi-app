@@ -3,6 +3,7 @@ session_start();
 require 'helpers.php';
 maintenance_require_roles(['MAINTENANCE', 'PENGURUS']);
 require '../../db.php';
+require '../../database/maintenanceReport.php';
 
 $role = $_SESSION['userRole'];
 $userId = (int) $_SESSION['userId'];
@@ -11,13 +12,6 @@ session_write_close();
 
 $allowedRanges = ['7d', '30d', '6m', 'all'];
 $range = in_array($_GET['range'] ?? '', $allowedRanges) ? $_GET['range'] : '7d';
-
-$whereDate = match ($range) {
-    '7d' => "m.TanggalLapor >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)",
-    '30d' => "m.TanggalLapor >= DATE_SUB(CURDATE(), INTERVAL 29 DAY)",
-    '6m' => "m.TanggalLapor >= DATE_SUB(CURDATE(), INTERVAL 5 MONTH)",
-    'all' => "1=1",
-};
 
 $rangeLabel = match ($range) {
     '7d' => '7 Hari Terakhir',
@@ -35,25 +29,8 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel') {
     $out = fopen('php://output', 'w');
     fputcsv($out, ['No', 'Pelapor', 'Lokasi / Target', 'Jenis', 'Status', 'Tanggal Lapor', 'Tanggal Selesai', 'Durasi (Hari)', 'Petugas'], ';');
 
-    $exportQuery = "
-        SELECT m.JenisLaporan, m.Deskripsi, m.StatusMaintenance, m.TanggalLapor, m.TanggalSelesai,
-               COALESCE(p.NamaPenghuni, pt.NamaPetugas, 'Staff') AS Pelapor,
-               COALESCE(r.NamaRuangan, i.NamaBarang, '-') AS Lokasi,
-               tech.NamaPetugas AS Petugas,
-               CASE WHEN m.StatusMaintenance = 'Selesai' AND m.TanggalSelesai IS NOT NULL
-                    THEN DATEDIFF(m.TanggalSelesai, m.TanggalLapor) ELSE NULL END AS Durasi
-        FROM maintenance m
-        LEFT JOIN penghuni p   ON m.PenghuniID  = p.PenghuniID
-        LEFT JOIN petugas pt   ON m.PetugasID   = pt.PetugasID
-        LEFT JOIN petugas tech ON m.PetugasID   = tech.PetugasID
-        LEFT JOIN ruangan r    ON m.RuanganID   = r.RuanganID
-        LEFT JOIN inventaris i ON m.InventarisID= i.InventarisID
-        WHERE $whereDate AND m.IsDeleted = 0
-        ORDER BY m.TanggalLapor DESC
-    ";
-    $exportRes = mysqli_query($db, $exportQuery);
     $no = 1;
-    while ($row = mysqli_fetch_assoc($exportRes)) {
+    foreach (fetchMaintenanceReportExport($db, $range) as $row) {
         fputcsv($out, [
             $no++,
             $row['Pelapor'],
@@ -66,23 +43,11 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel') {
             $row['Petugas'] ?? '-',
         ], ';');
     }
-    mysqli_free_result($exportRes);
     fclose($out);
     exit;
 }
 
-$res = mysqli_query($db, "
-    SELECT
-        COUNT(*) AS total,
-        SUM(CASE WHEN m.StatusMaintenance = 'Selesai'  THEN 1 ELSE 0 END) AS selesai,
-        SUM(CASE WHEN m.StatusMaintenance = 'Diproses' THEN 1 ELSE 0 END) AS diproses,
-        SUM(CASE WHEN m.StatusMaintenance = 'Diajukan' THEN 1 ELSE 0 END) AS diajukan,
-        ROUND(AVG(CASE WHEN m.StatusMaintenance = 'Selesai' AND m.TanggalSelesai IS NOT NULL
-            THEN DATEDIFF(m.TanggalSelesai, m.TanggalLapor) ELSE NULL END), 1) AS avg_hari
-    FROM maintenance m WHERE $whereDate AND m.IsDeleted = 0
-");
-$stats = mysqli_fetch_assoc($res);
-mysqli_free_result($res);
+$stats = fetchMaintenanceReportStats($db, $range);
 
 $priorityOrder = ['Kerusakan Darurat / Berat', 'Kerusakan Sedang', 'Kerusakan Ringan'];
 $priorityColors = [
@@ -95,24 +60,20 @@ $pieData = [
     'Kerusakan Sedang' => 0,
     'Kerusakan Ringan' => 0
 ];
-$res = mysqli_query($db, "SELECT m.JenisLaporan, COUNT(*) AS n FROM maintenance m WHERE $whereDate AND m.IsDeleted = 0 GROUP BY m.JenisLaporan");
-while ($row = mysqli_fetch_assoc($res)) {
+foreach (fetchMaintenanceReportPriorityDist($db, $range) as $row) {
     if (array_key_exists($row['JenisLaporan'], $pieData)) {
         $pieData[$row['JenisLaporan']] = (int) $row['n'];
     }
 }
-mysqli_free_result($res);
 $priorityValues = array_map(fn($k) => $pieData[$k], $priorityOrder);
 $priorityBgColors = array_map(fn($k) => $priorityColors[$k], $priorityOrder);
 
 if (in_array($range, ['7d', '30d'])) {
     $days = $range === '7d' ? 7 : 30;
-    $res = mysqli_query($db, "SELECT DATE(m.TanggalLapor) AS d, COUNT(*) AS n FROM maintenance m WHERE $whereDate AND m.IsDeleted = 0 GROUP BY d ORDER BY d ASC");
     $trendRaw = [];
-    while ($row = mysqli_fetch_assoc($res)) {
+    foreach (fetchMaintenanceReportTrendDaily($db, $range) as $row) {
         $trendRaw[$row['d']] = (int) $row['n'];
     }
-    mysqli_free_result($res);
     $trendLabels = [];
     $trendValues = [];
     for ($i = $days - 1; $i >= 0; $i--) {
@@ -121,12 +82,10 @@ if (in_array($range, ['7d', '30d'])) {
         $trendValues[] = $trendRaw[$key] ?? 0;
     }
 } else {
-    $res = mysqli_query($db, "SELECT DATE_FORMAT(m.TanggalLapor, '%Y-%m') AS m, COUNT(*) AS n FROM maintenance m WHERE $whereDate AND m.IsDeleted = 0 GROUP BY m ORDER BY m ASC");
     $trendRaw = [];
-    while ($row = mysqli_fetch_assoc($res)) {
-        $trendRaw[$row['m']] = (int) $row['n'];
+    foreach (fetchMaintenanceReportTrendMonthly($db, $range) as $row) {
+        $trendRaw[$row['bulan']] = (int) $row['n'];
     }
-    mysqli_free_result($res);
     if ($range === '6m') {
         $trendLabels = [];
         $trendValues = [];
@@ -148,77 +107,30 @@ if (in_array($range, ['7d', '30d'])) {
 
 $topRuanganLabels = [];
 $topRuanganValues = [];
-$res = mysqli_query($db, "
-    SELECT r.NamaRuangan, COUNT(*) AS n
-    FROM maintenance m
-    JOIN ruangan r ON m.RuanganID = r.RuanganID
-    WHERE $whereDate AND m.RuanganID IS NOT NULL AND m.IsDeleted = 0
-    GROUP BY m.RuanganID, r.NamaRuangan
-    ORDER BY n DESC LIMIT 5
-");
-while ($row = mysqli_fetch_assoc($res)) {
+foreach (fetchMaintenanceReportTopRuangan($db, $range) as $row) {
     $topRuanganLabels[] = $row['NamaRuangan'];
     $topRuanganValues[] = (int) $row['n'];
 }
-mysqli_free_result($res);
 
 $stackedData = [
     'Kerusakan Darurat / Berat' => ['Diajukan' => 0, 'Diproses' => 0, 'Selesai' => 0],
     'Kerusakan Sedang' => ['Diajukan' => 0, 'Diproses' => 0, 'Selesai' => 0],
     'Kerusakan Ringan' => ['Diajukan' => 0, 'Diproses' => 0, 'Selesai' => 0],
 ];
-$res = mysqli_query($db, "SELECT m.JenisLaporan, m.StatusMaintenance, COUNT(*) AS n FROM maintenance m WHERE $whereDate AND m.IsDeleted = 0 GROUP BY m.JenisLaporan, m.StatusMaintenance");
-while ($row = mysqli_fetch_assoc($res)) {
+foreach (fetchMaintenanceReportStackedStatus($db, $range) as $row) {
     $j = $row['JenisLaporan'];
     $s = $row['StatusMaintenance'];
     if (isset($stackedData[$j][$s])) {
         $stackedData[$j][$s] = (int) $row['n'];
     }
 }
-mysqli_free_result($res);
 
 $petugasPerforma = [];
 if ($role === 'PENGURUS') {
-    $res = mysqli_query($db, "
-        SELECT pt.NamaPetugas,
-               COUNT(m.MaintenanceID) AS total,
-               SUM(CASE WHEN m.StatusMaintenance = 'Selesai' THEN 1 ELSE 0 END) AS selesai,
-               SUM(CASE WHEN m.StatusMaintenance = 'Diproses' THEN 1 ELSE 0 END) AS diproses,
-               ROUND(AVG(CASE WHEN m.StatusMaintenance = 'Selesai' AND m.TanggalSelesai IS NOT NULL
-                   THEN DATEDIFF(m.TanggalSelesai, m.TanggalLapor) ELSE NULL END), 1) AS avg_hari
-        FROM maintenance m
-        JOIN petugas pt ON m.PetugasID = pt.PetugasID
-        WHERE $whereDate AND m.PetugasID IS NOT NULL AND pt.Jabatan = 'MAINTENANCE' AND pt.IsDeleted = 0 AND m.IsDeleted = 0
-        GROUP BY m.PetugasID, pt.NamaPetugas
-        ORDER BY selesai DESC, total DESC
-    ");
-    while ($row = mysqli_fetch_assoc($res)) {
-        $petugasPerforma[] = $row;
-    }
-    mysqli_free_result($res);
+    $petugasPerforma = fetchMaintenanceReportPetugasRanking($db, $range);
 }
 
-$detailRows = [];
-$res = mysqli_query($db, "
-    SELECT m.MaintenanceID, m.JenisLaporan, m.StatusMaintenance, m.TanggalLapor, m.TanggalSelesai, m.Deskripsi,
-           COALESCE(p.NamaPenghuni, rpt.NamaPetugas, 'Staff') AS Pelapor,
-           COALESCE(r.NamaRuangan, i.NamaBarang, '-') AS Lokasi,
-           tech.NamaPetugas AS Petugas,
-           CASE WHEN m.StatusMaintenance = 'Selesai' AND m.TanggalSelesai IS NOT NULL
-                THEN DATEDIFF(m.TanggalSelesai, m.TanggalLapor) ELSE NULL END AS Durasi
-    FROM maintenance m
-    LEFT JOIN penghuni p    ON m.PenghuniID   = p.PenghuniID
-    LEFT JOIN petugas rpt   ON m.PetugasID    = rpt.PetugasID
-    LEFT JOIN petugas tech  ON m.PetugasID    = tech.PetugasID
-    LEFT JOIN ruangan r     ON m.RuanganID    = r.RuanganID
-    LEFT JOIN inventaris i  ON m.InventarisID = i.InventarisID
-    WHERE $whereDate AND m.IsDeleted = 0
-    ORDER BY m.TanggalLapor DESC
-");
-while ($row = mysqli_fetch_assoc($res)) {
-    $detailRows[] = $row;
-}
-mysqli_free_result($res);
+$detailRows = fetchMaintenanceReportDetail($db, $range);
 ?>
 <!DOCTYPE html>
 <html lang="id">

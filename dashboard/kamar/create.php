@@ -9,6 +9,7 @@ if (!isset($_SESSION['userId'])) {
     exit;
 }
 require '../../db.php';
+require '../../database/kamar.php';
 require 'helpers.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -40,30 +41,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    $checkStmt = mysqli_prepare($db, "SELECT KamarID FROM kamar WHERE IsDeleted = 0 AND UPPER(REPLACE(NomorKamar, ' ', '')) = ? LIMIT 1");
-    mysqli_stmt_bind_param($checkStmt, 's', $nomor);
-    mysqli_stmt_execute($checkStmt);
-    $checkResult = mysqli_stmt_get_result($checkStmt);
-    $existingKamar = mysqli_fetch_assoc($checkResult);
-    mysqli_stmt_close($checkStmt);
+    $existingKamar = findKamarDuplicateNomor($db, $nomor);
 
     if ($existingKamar) {
         header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Nomor kamar sudah terdaftar!');
         exit;
     }
 
-    $now = date('Y-m-d H:i:s');
-
-    $stmt = mysqli_prepare($db, "INSERT INTO kamar (NomorKamar, KapasitasPenghuni, Lantai, UpdatedAt, IsDeleted) VALUES (?, ?, ?, ?, 0)");
-    mysqli_stmt_bind_param($stmt, 'siss', $nomor, $kapasitasInt, $lantai, $now);
-
-    if (!mysqli_stmt_execute($stmt)) {
+    try {
+        createKamar($db, $nomor, $kapasitasInt, $lantai);
+    } catch (RuntimeException $e) {
         header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Terjadi Kesalahan saat menyimpan data!');
-        mysqli_stmt_close($stmt);
         exit;
     }
-
-    mysqli_stmt_close($stmt);
 
     header("Location: " . '/doremi-app/dashboard/kamar/' . '?status=success&message=Kamar Berhasil Ditambahkan!');
     exit;

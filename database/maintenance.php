@@ -7,76 +7,31 @@ require_once __DIR__ . '/query.php';
 
 function fetchMaintenanceReportsForRole(mysqli $db, string $role, int $userId): array
 {
-    $where = 'm.IsDeleted = 0';
-    $types = '';
-    $params = [];
-
-    if ($role !== 'MAINTENANCE') {
-        if ($role === 'PENGHUNI') {
-            $where .= ' AND m.PenghuniID = ?';
-        } else {
-            $where .= ' AND m.PetugasID = ? AND m.PenghuniID IS NULL';
-        }
-        $types = 'i';
-        $params[] = $userId;
-    }
-
-    return dbFetchAll(
-        $db,
-        "SELECT m.MaintenanceID, m.PenghuniID, m.PetugasID, m.RuanganID, m.InventarisID,
-                m.TanggalLapor, m.JenisLaporan, m.Deskripsi, m.StatusMaintenance,
-                m.TanggalSelesai, m.Keterangan,
-                (m.FotoLaporan IS NOT NULL AND m.FotoLaporan != '') AS HasFotoLaporan,
-                (m.FotoMaintenance IS NOT NULL AND m.FotoMaintenance != '') AS HasFotoMaintenance,
-                p.NamaPenghuni, p.Nim,
-                pt.NamaPetugas AS NamaReporterPetugas,
-                tech.NamaPetugas AS NamaTeknisi,
-                r.NamaRuangan, r.Lantai AS LantaiRuangan,
-                i.NamaBarang
-         FROM maintenance m
-         LEFT JOIN penghuni p ON m.PenghuniID = p.PenghuniID
-         LEFT JOIN petugas pt ON m.PetugasID = pt.PetugasID
-         LEFT JOIN petugas tech ON m.PetugasID = tech.PetugasID
-         LEFT JOIN ruangan r ON m.RuanganID = r.RuanganID
-         LEFT JOIN inventaris i ON m.InventarisID = i.InventarisID
-         WHERE $where
-         ORDER BY CASE WHEN m.JenisLaporan = 'Kerusakan Darurat / Berat' THEN 1
-                       WHEN m.JenisLaporan = 'Kerusakan Sedang' THEN 2
-                       ELSE 3 END, m.MaintenanceID DESC",
-        $types,
-        $params
-    );
+    return dbFetchAll($db, "CALL sp_getMaintenanceReportsForRole(?, ?)", 'si', [$role, $userId]);
 }
 
 function fetchMaintenanceReportById(mysqli $db, int $maintenanceId): ?array
 {
-    return dbFetchOne(
-        $db,
-        "SELECT * FROM maintenance WHERE MaintenanceID = ? AND IsDeleted = 0 LIMIT 1",
-        'i',
-        [$maintenanceId]
-    );
+    return dbFetchOne($db, "CALL sp_getMaintenanceReportById(?)", 'i', [$maintenanceId]);
 }
 
 function fetchMaintenanceRooms(mysqli $db, bool $onlyActive = true): array
 {
-    $where = $onlyActive ? 'WHERE IsDeleted = 0' : '';
-    return dbFetchAll($db, "SELECT RuanganID, NamaRuangan, Lantai FROM ruangan $where ORDER BY Lantai ASC, NamaRuangan ASC");
+    return dbFetchAll($db, "CALL sp_getMaintenanceRooms(?)", 'i', [$onlyActive ? 1 : 0]);
 }
 
 function fetchMaintenanceInventory(mysqli $db, bool $onlyActive = true): array
 {
-    $where = $onlyActive ? 'WHERE IsDeleted = 0' : '';
-    return dbFetchAll($db, "SELECT InventarisID, NamaBarang FROM inventaris $where ORDER BY NamaBarang ASC");
+    return dbFetchAll($db, "CALL sp_getMaintenanceInventory(?)", 'i', [$onlyActive ? 1 : 0]);
 }
 
 function checkMaintenanceTargetExists(mysqli $db, string $targetType, int $targetId): bool
 {
     if ($targetType === 'ruangan') {
-        return dbFetchOne($db, "SELECT RuanganID FROM ruangan WHERE RuanganID = ? AND IsDeleted = 0 LIMIT 1", 'i', [$targetId]) !== null;
+        return dbFetchOne($db, "CALL sp_checkRuanganActive(?)", 'i', [$targetId]) !== null;
     }
 
-    return dbFetchOne($db, "SELECT InventarisID FROM inventaris WHERE InventarisID = ? AND IsDeleted = 0 LIMIT 1", 'i', [$targetId]) !== null;
+    return dbFetchOne($db, "CALL sp_checkInventarisActive(?)", 'i', [$targetId]) !== null;
 }
 
 function createMaintenanceReport(
@@ -92,10 +47,7 @@ function createMaintenanceReport(
 ): bool {
     dbExecute(
         $db,
-        "INSERT INTO maintenance (
-            PenghuniID, PetugasID, RuanganID, InventarisID,
-            JenisLaporan, Deskripsi, FotoLaporan, TanggalLapor, StatusMaintenance
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Diajukan')",
+        "CALL sp_createMaintenanceReport(?, ?, ?, ?, ?, ?, ?, ?)",
         'iiiissss',
         [$penghuniId, $petugasId, $ruanganId, $inventarisId, $jenisLaporan, $deskripsi, $fotoLaporan, $tanggalLapor]
     );
@@ -114,11 +66,9 @@ function updateMaintenanceReport(
 ): bool {
     dbExecute(
         $db,
-        "UPDATE maintenance
-         SET RuanganID = ?, InventarisID = ?, JenisLaporan = ?, Deskripsi = ?, FotoLaporan = ?
-         WHERE MaintenanceID = ?",
-        'iisssi',
-        [$ruanganId, $inventarisId, $jenisLaporan, $deskripsi, $fotoLaporan, $maintenanceId]
+        "CALL sp_updateMaintenanceReport(?, ?, ?, ?, ?, ?)",
+        'iiisss',
+        [$maintenanceId, $ruanganId, $inventarisId, $jenisLaporan, $deskripsi, $fotoLaporan]
     );
 
     return true;
@@ -126,36 +76,19 @@ function updateMaintenanceReport(
 
 function claimMaintenanceReport(mysqli $db, int $maintenanceId, int $petugasId): int
 {
-    return dbExecute(
-        $db,
-        "UPDATE maintenance
-         SET StatusMaintenance = 'Diproses', PetugasID = ?
-         WHERE MaintenanceID = ? AND IsDeleted = 0 AND StatusMaintenance = 'Diajukan'",
-        'ii',
-        [$petugasId, $maintenanceId]
-    );
+    return dbExecute($db, "CALL sp_claimMaintenanceReport(?, ?)", 'ii', [$petugasId, $maintenanceId]);
 }
 
 function checkMaintenanceTechnicianOwnership(mysqli $db, int $maintenanceId, int $petugasId): bool
 {
-    return dbFetchOne(
-        $db,
-        "SELECT MaintenanceID
-         FROM maintenance
-         WHERE MaintenanceID = ? AND PetugasID = ? AND StatusMaintenance = 'Diproses' AND IsDeleted = 0
-         LIMIT 1",
-        'ii',
-        [$maintenanceId, $petugasId]
-    ) !== null;
+    return dbFetchOne($db, "CALL sp_checkMaintenanceTechnicianOwnership(?, ?)", 'ii', [$maintenanceId, $petugasId]) !== null;
 }
 
 function completeMaintenanceReport(mysqli $db, int $maintenanceId, string $tanggalSelesai, string $keterangan, string $fotoMaintenance): bool
 {
     dbExecute(
         $db,
-        "UPDATE maintenance
-         SET StatusMaintenance = 'Selesai', TanggalSelesai = ?, Keterangan = ?, FotoMaintenance = ?
-         WHERE MaintenanceID = ? AND IsDeleted = 0",
+        "CALL sp_completeMaintenanceReport(?, ?, ?, ?)",
         'sssi',
         [$tanggalSelesai, $keterangan, $fotoMaintenance, $maintenanceId]
     );
@@ -165,7 +98,7 @@ function completeMaintenanceReport(mysqli $db, int $maintenanceId, string $tangg
 
 function deleteMaintenanceReport(mysqli $db, int $maintenanceId): bool
 {
-    dbExecute($db, "UPDATE maintenance SET IsDeleted = 1 WHERE MaintenanceID = ?", 'i', [$maintenanceId]);
+    dbExecute($db, "CALL sp_deleteMaintenanceReport(?)", 'i', [$maintenanceId]);
     return true;
 }
 
