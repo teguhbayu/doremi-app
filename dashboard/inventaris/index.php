@@ -11,13 +11,10 @@ if ($_SESSION['userRole'] !== 'PENGURUS') {
 }
 require '../../csrf.php';
 require '../../db.php';
+require '../../database/inventaris.php';
 
-$query = mysqli_query($db, "SELECT i.*, k.NomorKamar, r.NamaRuangan 
-                            FROM inventaris i 
-                            LEFT JOIN kamar k ON i.KamarID = k.KamarID 
-                            LEFT JOIN ruangan r ON i.RuanganID = r.RuanganID 
-                            WHERE i.IsDeleted = 0;");
-$totalInventaris = mysqli_num_rows($query);
+$inventarisList = fetchAllInventarisWithLokasi($db);
+$totalInventaris = count($inventarisList);
 ?>
 
 
@@ -55,7 +52,7 @@ $totalInventaris = mysqli_num_rows($query);
                     </tr>
                 </thead>
                 <tbody>
-                    <?php while ($inventaris = mysqli_fetch_assoc($query)) { ?>
+                    <?php foreach ($inventarisList as $inventaris) { ?>
                         <tr>
                             <td><?php echo htmlspecialchars($inventaris["NamaBarang"]); ?></td>
                             <td><?php echo htmlspecialchars($inventaris["Jumlah"]); ?></td>

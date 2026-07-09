@@ -14,9 +14,10 @@ if ($_SESSION['userRole'] !== 'PENGURUS') {
 }
 require '../../csrf.php';
 require '../../db.php';
+require '../../database/inventaris.php';
 
-$kamars = mysqli_fetch_all(mysqli_query($db, "SELECT KamarID, NomorKamar FROM kamar WHERE IsDeleted = 0"), MYSQLI_ASSOC);
-$ruangans = mysqli_fetch_all(mysqli_query($db, "SELECT RuanganID, NamaRuangan FROM ruangan WHERE IsDeleted = 0"), MYSQLI_ASSOC);
+$kamars = fetchActiveKamarOptions($db);
+$ruangans = fetchActiveRuanganOptions($db);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_validate($_SERVER['PHP_SELF']);
@@ -42,40 +43,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (str_starts_with($lokasi, 'kamar:')) {
         $kamarId = (int) explode(':', $lokasi)[1];
-        $chk = mysqli_prepare($db, "SELECT KamarID FROM kamar WHERE KamarID = ? AND IsDeleted = 0 LIMIT 1");
-        mysqli_stmt_bind_param($chk, 'i', $kamarId);
-        mysqli_stmt_execute($chk);
-        if (!mysqli_fetch_assoc(mysqli_stmt_get_result($chk))) {
-            mysqli_stmt_close($chk);
+        if (!checkKamarActive($db, $kamarId)) {
             header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Kamar tidak ditemukan!');
             exit;
         }
-        mysqli_stmt_close($chk);
     } elseif (str_starts_with($lokasi, 'ruangan:')) {
         $ruanganId = (int) explode(':', $lokasi)[1];
-        $chk = mysqli_prepare($db, "SELECT RuanganID FROM ruangan WHERE RuanganID = ? AND IsDeleted = 0 LIMIT 1");
-        mysqli_stmt_bind_param($chk, 'i', $ruanganId);
-        mysqli_stmt_execute($chk);
-        if (!mysqli_fetch_assoc(mysqli_stmt_get_result($chk))) {
-            mysqli_stmt_close($chk);
+        if (!checkRuanganActive($db, $ruanganId)) {
             header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Ruangan tidak ditemukan!');
             exit;
         }
-        mysqli_stmt_close($chk);
     }
 
-    $now = date('Y-m-d H:i:s');
-
-    $stmt = mysqli_prepare($db, "INSERT INTO inventaris (RuanganID, KamarID, NamaBarang, Jumlah, Keterangan, UpdatedAt, IsDeleted) VALUES (?, ?, ?, ?, ?, ?, 0)");
-    mysqli_stmt_bind_param($stmt, 'iisiss', $ruanganId, $kamarId, $nama, $jumlah, $keterangan, $now);
-
-    if (!mysqli_stmt_execute($stmt)) {
+    try {
+        createInventaris($db, $ruanganId, $kamarId, $nama, (int) $jumlah, $keterangan);
+    } catch (RuntimeException $e) {
         header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Terjadi Kesalahan saat menyimpan data!');
-        mysqli_stmt_close($stmt);
         exit;
     }
-
-    mysqli_stmt_close($stmt);
 
     header("Location: " . '/doremi-app/dashboard/inventaris/' . '?status=success&message=Inventaris Berhasil Ditambahkan!');
     exit;

@@ -9,19 +9,13 @@ if (!in_array($_SESSION['userRole'] ?? '', ['SIGAP', 'PENGURUS'], true)) {
     exit;
 }
 require '../../db.php';
+require '../../database/inoutReport.php';
 
 $role = $_SESSION['userRole'];
 session_write_close();
 
 $allowedRanges = ['7d', '30d', '6m', 'all'];
 $range = in_array($_GET['range'] ?? '', $allowedRanges) ? $_GET['range'] : '7d';
-
-$whereDate = match ($range) {
-    '7d' => "io.WaktuKeluar >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)",
-    '30d' => "io.WaktuKeluar >= DATE_SUB(CURDATE(), INTERVAL 29 DAY)",
-    '6m' => "io.WaktuKeluar >= DATE_SUB(CURDATE(), INTERVAL 5 MONTH)",
-    'all' => "1=1",
-};
 
 $rangeLabel = match ($range) {
     '7d' => '7 Hari Terakhir',
@@ -62,21 +56,8 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel') {
     $out = fopen('php://output', 'w');
     fputcsv($out, ['No', 'Penghuni', 'NIM', 'Kamar', 'Keperluan', 'Status', 'Waktu Keluar', 'Waktu Masuk', 'Durasi (Menit)', 'Dikonfirmasi Oleh'], ';');
 
-    $exportQuery = "
-        SELECT io.Status, io.Keperluan, io.WaktuKeluar, io.WaktuMasuk,
-               p.NamaPenghuni, p.Nim, k.NomorKamar, pt.NamaPetugas,
-               CASE WHEN io.Status = 'Masuk'
-                    THEN TIMESTAMPDIFF(MINUTE, io.WaktuKeluar, io.WaktuMasuk) ELSE NULL END AS Durasi
-        FROM inoutpenghuni io
-        JOIN penghuni p     ON io.PenghuniID = p.PenghuniID
-        JOIN kamar k        ON p.KamarID     = k.KamarID
-        LEFT JOIN petugas pt ON io.PetugasID = pt.PetugasID AND io.PetugasID <> 0
-        WHERE $whereDate
-        ORDER BY io.WaktuKeluar DESC
-    ";
-    $exportRes = mysqli_query($db, $exportQuery);
     $no = 1;
-    while ($row = mysqli_fetch_assoc($exportRes)) {
+    foreach (fetchInOutReportExport($db, $range) as $row) {
         fputcsv($out, [
             $no++,
             $row['NamaPenghuni'],
@@ -90,36 +71,22 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel') {
             $row['NamaPetugas'] ?? '-',
         ], ';');
     }
-    mysqli_free_result($exportRes);
     fclose($out);
     exit;
 }
 
-$res = mysqli_query($db, "
-    SELECT
-        COUNT(*) AS total,
-        SUM(CASE WHEN io.Status = 'Masuk'   THEN 1 ELSE 0 END) AS selesai,
-        SUM(CASE WHEN io.Status = 'Keluar'  THEN 1 ELSE 0 END) AS diluar,
-        SUM(CASE WHEN io.Status = 'Pending' THEN 1 ELSE 0 END) AS pending,
-        ROUND(AVG(CASE WHEN io.Status = 'Masuk'
-            THEN TIMESTAMPDIFF(MINUTE, io.WaktuKeluar, io.WaktuMasuk) ELSE NULL END)) AS avg_menit
-    FROM inoutpenghuni io WHERE $whereDate
-");
-$stats = mysqli_fetch_assoc($res);
-mysqli_free_result($res);
-$avgMinutes = $stats['avg_menit'] !== null ? (int) $stats['avg_menit'] : null;
+$stats = fetchInOutReportStats($db, $range);
+$avgMinutes = ($stats['avg_menit'] ?? null) !== null ? (int) $stats['avg_menit'] : null;
 
 // ── Status distribution (doughnut) ──────────────────────────────────────────
 $statusOrder = ['Masuk', 'Keluar', 'Pending'];
 $statusColors = ['Masuk' => '#10b981', 'Keluar' => '#ef4444', 'Pending' => '#f59e0b'];
 $statusData = ['Masuk' => 0, 'Keluar' => 0, 'Pending' => 0];
-$res = mysqli_query($db, "SELECT io.Status, COUNT(*) AS n FROM inoutpenghuni io WHERE $whereDate GROUP BY io.Status");
-while ($row = mysqli_fetch_assoc($res)) {
+foreach (fetchInOutReportStatusDist($db, $range) as $row) {
     if (array_key_exists($row['Status'], $statusData)) {
         $statusData[$row['Status']] = (int) $row['n'];
     }
 }
-mysqli_free_result($res);
 $statusLabels = array_map(fn($k) => $statusMeta[$k]['label'], $statusOrder);
 $statusValues = array_map(fn($k) => $statusData[$k], $statusOrder);
 $statusBgColors = array_map(fn($k) => $statusColors[$k], $statusOrder);
@@ -127,12 +94,10 @@ $statusBgColors = array_map(fn($k) => $statusColors[$k], $statusOrder);
 // ── Trend (line) ─────────────────────────────────────────────────────────────
 if (in_array($range, ['7d', '30d'])) {
     $days = $range === '7d' ? 7 : 30;
-    $res = mysqli_query($db, "SELECT DATE(io.WaktuKeluar) AS d, COUNT(*) AS n FROM inoutpenghuni io WHERE $whereDate GROUP BY d ORDER BY d ASC");
     $trendRaw = [];
-    while ($row = mysqli_fetch_assoc($res)) {
+    foreach (fetchInOutReportTrendDaily($db, $range) as $row) {
         $trendRaw[$row['d']] = (int) $row['n'];
     }
-    mysqli_free_result($res);
     $trendLabels = [];
     $trendValues = [];
     for ($i = $days - 1; $i >= 0; $i--) {
@@ -141,12 +106,10 @@ if (in_array($range, ['7d', '30d'])) {
         $trendValues[] = $trendRaw[$key] ?? 0;
     }
 } else {
-    $res = mysqli_query($db, "SELECT DATE_FORMAT(io.WaktuKeluar, '%Y-%m') AS m, COUNT(*) AS n FROM inoutpenghuni io WHERE $whereDate GROUP BY m ORDER BY m ASC");
     $trendRaw = [];
-    while ($row = mysqli_fetch_assoc($res)) {
+    foreach (fetchInOutReportTrendMonthly($db, $range) as $row) {
         $trendRaw[$row['m']] = (int) $row['n'];
     }
-    mysqli_free_result($res);
     if ($range === '6m') {
         $trendLabels = [];
         $trendValues = [];
@@ -167,11 +130,9 @@ if (in_array($range, ['7d', '30d'])) {
 
 // ── Peak hour distribution (bar) — actual exits only ─────────────────────────
 $hourRaw = array_fill(0, 24, 0);
-$res = mysqli_query($db, "SELECT HOUR(io.WaktuKeluar) AS h, COUNT(*) AS n FROM inoutpenghuni io WHERE $whereDate AND io.Status IN ('Keluar', 'Masuk') GROUP BY h");
-while ($row = mysqli_fetch_assoc($res)) {
+foreach (fetchInOutReportPeakHour($db, $range) as $row) {
     $hourRaw[(int) $row['h']] = (int) $row['n'];
 }
-mysqli_free_result($res);
 $hourLabels = [];
 $hourValues = [];
 for ($h = 0; $h < 24; $h++) {
@@ -182,84 +143,35 @@ for ($h = 0; $h < 24; $h++) {
 // ── Top 5 penghuni paling sering keluar (horizontal bar) ─────────────────────
 $topPenghuniLabels = [];
 $topPenghuniValues = [];
-$res = mysqli_query($db, "
-    SELECT p.NamaPenghuni, COUNT(*) AS n
-    FROM inoutpenghuni io
-    JOIN penghuni p ON io.PenghuniID = p.PenghuniID
-    WHERE $whereDate
-    GROUP BY io.PenghuniID, p.NamaPenghuni
-    ORDER BY n DESC LIMIT 5
-");
-while ($row = mysqli_fetch_assoc($res)) {
+foreach (fetchInOutReportTopPenghuni($db, $range) as $row) {
     $topPenghuniLabels[] = $row['NamaPenghuni'];
     $topPenghuniValues[] = (int) $row['n'];
 }
-mysqli_free_result($res);
 
 // ── Gender distribution (doughnut) ───────────────────────────────────────────
 $genderData = ['L' => 0, 'P' => 0];
-$res = mysqli_query($db, "SELECT p.JenisKelamin AS g, COUNT(*) AS n FROM inoutpenghuni io JOIN penghuni p ON io.PenghuniID = p.PenghuniID WHERE $whereDate GROUP BY g");
-while ($row = mysqli_fetch_assoc($res)) {
+foreach (fetchInOutReportGenderDist($db, $range) as $row) {
     if (array_key_exists($row['g'], $genderData)) {
         $genderData[$row['g']] = (int) $row['n'];
     }
 }
-mysqli_free_result($res);
 
 // ── Top keperluan (horizontal bar) ───────────────────────────────────────────
 $topKeperluanLabels = [];
 $topKeperluanValues = [];
-$res = mysqli_query($db, "
-    SELECT io.Keperluan, COUNT(*) AS n
-    FROM inoutpenghuni io
-    WHERE $whereDate AND io.Keperluan <> ''
-    GROUP BY io.Keperluan
-    ORDER BY n DESC LIMIT 5
-");
-while ($row = mysqli_fetch_assoc($res)) {
+foreach (fetchInOutReportTopKeperluan($db, $range) as $row) {
     $topKeperluanLabels[] = $row['Keperluan'];
     $topKeperluanValues[] = (int) $row['n'];
 }
-mysqli_free_result($res);
 
 // ── Petugas SIGAP ranking (PENGURUS only) ────────────────────────────────────
 $petugasPerforma = [];
 if ($role === 'PENGURUS') {
-    $res = mysqli_query($db, "
-        SELECT pt.NamaPetugas,
-               COUNT(*) AS total,
-               SUM(CASE WHEN io.Status = 'Masuk'  THEN 1 ELSE 0 END) AS selesai,
-               SUM(CASE WHEN io.Status = 'Keluar' THEN 1 ELSE 0 END) AS diluar
-        FROM inoutpenghuni io
-        JOIN petugas pt ON io.PetugasID = pt.PetugasID
-        WHERE $whereDate AND io.PetugasID <> 0 AND pt.Jabatan = 'SIGAP' AND pt.IsDeleted = 0
-        GROUP BY io.PetugasID, pt.NamaPetugas
-        ORDER BY total DESC, selesai DESC
-    ");
-    while ($row = mysqli_fetch_assoc($res)) {
-        $petugasPerforma[] = $row;
-    }
-    mysqli_free_result($res);
+    $petugasPerforma = fetchInOutReportPetugasRanking($db, $range);
 }
 
 // ── Detail rows ──────────────────────────────────────────────────────────────
-$detailRows = [];
-$res = mysqli_query($db, "
-    SELECT io.InOutID, io.Status, io.Keperluan, io.WaktuKeluar, io.WaktuMasuk,
-           p.NamaPenghuni, p.Nim, k.NomorKamar, pt.NamaPetugas,
-           CASE WHEN io.Status = 'Masuk'
-                THEN TIMESTAMPDIFF(MINUTE, io.WaktuKeluar, io.WaktuMasuk) ELSE NULL END AS Durasi
-    FROM inoutpenghuni io
-    JOIN penghuni p      ON io.PenghuniID = p.PenghuniID
-    JOIN kamar k         ON p.KamarID     = k.KamarID
-    LEFT JOIN petugas pt ON io.PetugasID  = pt.PetugasID AND io.PetugasID <> 0
-    WHERE $whereDate
-    ORDER BY io.WaktuKeluar DESC
-");
-while ($row = mysqli_fetch_assoc($res)) {
-    $detailRows[] = $row;
-}
-mysqli_free_result($res);
+$detailRows = fetchInOutReportDetail($db, $range);
 ?>
 <!DOCTYPE html>
 <html lang="id">

@@ -9,6 +9,7 @@ if (!isset($_SESSION['userId'])) {
     exit;
 }
 require '../../db.php';
+require '../../database/petugas.php';
 
 $id = $_GET['id'] ?? null;
 if (!$id) {
@@ -16,12 +17,7 @@ if (!$id) {
     exit;
 }
 
-$stmt = mysqli_prepare($db, "SELECT PetugasID, NamaPetugas, Email, Jabatan, NoHP FROM petugas WHERE PetugasID = ? AND IsDeleted = 0 LIMIT 1");
-mysqli_stmt_bind_param($stmt, 'i', $id);
-mysqli_stmt_execute($stmt);
-$result = mysqli_stmt_get_result($stmt);
-$petugas = mysqli_fetch_assoc($result);
-mysqli_stmt_close($stmt);
+$petugas = fetchPetugasById($db, (int) $id);
 
 if (!$petugas) {
     header("Location: /doremi-app/dashboard/petugas/");
@@ -68,18 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    $duplicateCheckStmt = mysqli_prepare(
-        $db,
-        "SELECT PetugasID, Email, NoHP
-         FROM petugas
-         WHERE IsDeleted = 0 AND PetugasID != ? AND (Email = ? OR NoHP = ?)
-         LIMIT 1"
-    );
-    mysqli_stmt_bind_param($duplicateCheckStmt, 'iss', $id, $email, $no);
-    mysqli_stmt_execute($duplicateCheckStmt);
-    $duplicateCheckResult = mysqli_stmt_get_result($duplicateCheckStmt);
-    $duplicatePetugas = mysqli_fetch_assoc($duplicateCheckResult);
-    mysqli_stmt_close($duplicateCheckStmt);
+    $duplicatePetugas = findPetugasDuplicateExcluding($db, (int) $id, $email, $no);
 
     if ($duplicatePetugas) {
         if (($duplicatePetugas['Email'] ?? '') === $email) {
@@ -93,19 +78,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($isChangingPassword) {
         $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-        $stmt = mysqli_prepare($db, "UPDATE petugas SET NamaPetugas = ?, Email = ?, Jabatan = ?, NoHP = ?, Password = ? WHERE PetugasID = ?");
-        mysqli_stmt_bind_param($stmt, 'sssssi', $nama, $email, $jabatan, $no, $hashedPassword, $id);
+        updatePetugasWithPassword($db, (int) $id, $nama, $email, $jabatan, $no, $hashedPassword);
     } else {
-        $stmt = mysqli_prepare($db, "UPDATE petugas SET NamaPetugas = ?, Email = ?, Jabatan = ?, NoHP = ? WHERE PetugasID = ?");
-        mysqli_stmt_bind_param($stmt, 'ssssi', $nama, $email, $jabatan, $no, $id);
+        updatePetugasWithoutPassword($db, (int) $id, $nama, $email, $jabatan, $no);
     }
-
-    if (!mysqli_stmt_execute($stmt)) {
-        mysqli_stmt_close($stmt);
-        exit;
-    }
-
-    mysqli_stmt_close($stmt);
 
     header("Location: /doremi-app/dashboard/petugas/?status=success&message=Petugas Berhasil Diupdate!");
     exit;

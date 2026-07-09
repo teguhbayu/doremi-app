@@ -6,9 +6,10 @@ if (!isset($_SESSION['userId'])) {
     exit;
 }
 require '../../db.php';
+require '../../database/penghuni.php';
 
-$query = mysqli_query($db, "SELECT p.*, k.NomorKamar FROM penghuni p LEFT JOIN kamar k ON p.KamarID = k.KamarID WHERE p.IsDeleted = 0;");
-$totalPenghuni = mysqli_num_rows($query);
+$penghuniList = fetchPenghuniList($db);
+$totalPenghuni = count($penghuniList);
 ?>
 
 
@@ -47,7 +48,7 @@ $totalPenghuni = mysqli_num_rows($query);
                     </tr>
                 </thead>
                 <tbody>
-                    <?php while ($penghuni = mysqli_fetch_assoc($query)) { ?>
+                    <?php foreach ($penghuniList as $penghuni) { ?>
                         <tr>
                             <td><?php echo $penghuni["Nim"]; ?></td>
                             <td class="tw:text-left"><?php echo $penghuni["NamaPenghuni"]; ?></td>

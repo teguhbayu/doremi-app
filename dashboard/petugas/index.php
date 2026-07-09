@@ -6,9 +6,10 @@ if (!isset($_SESSION['userId'])) {
     exit;
 }
 require '../../db.php';
+require '../../database/petugas.php';
 
-$query = mysqli_query($db, "SELECT * FROM petugas WHERE IsDeleted = 0;");
-$totalPetugas = mysqli_num_rows($query);
+$petugasList = fetchAllPetugas($db);
+$totalPetugas = count($petugasList);
 ?>
 
 
@@ -46,7 +47,7 @@ $totalPetugas = mysqli_num_rows($query);
                     </tr>
                 </thead>
                 <tbody>
-                    <?php while ($petugas = mysqli_fetch_assoc($query)) { ?>
+                    <?php foreach ($petugasList as $petugas) { ?>
                         <tr>
                             <td class="tw:text-left"><?php echo $petugas["NamaPetugas"]; ?></td>
                             <td><?php echo $petugas["Jabatan"]; ?></td>

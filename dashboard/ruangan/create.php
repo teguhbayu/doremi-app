@@ -14,6 +14,7 @@ if ($_SESSION['userRole'] !== 'PENGURUS') {
 }
 require '../../csrf.php';
 require '../../db.php';
+require '../../database/ruangan.php';
 
 $ruanganTypes = ['Ruang Ibadah', 'Ruang Publik', 'Ruang Jemur', 'Lapangan Olahraga', 'Balkon', 'Kamar Mandi'];
 
@@ -43,18 +44,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    $now = date('Y-m-d H:i:s');
-
-    $stmt = mysqli_prepare($db, "INSERT INTO ruangan (NamaRuangan, JenisRuangan, Lantai, Keterangan, UpdatedAt, IsDeleted) VALUES (?, ?, ?, ?, ?, 0)");
-    mysqli_stmt_bind_param($stmt, 'sssss', $nama, $jenis, $lantai, $keterangan, $now);
-
-    if (!mysqli_stmt_execute($stmt)) {
+    try {
+        createRuangan($db, $nama, $jenis, $lantai, $keterangan);
+    } catch (RuntimeException $e) {
         header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Terjadi Kesalahan saat menyimpan data!');
-        mysqli_stmt_close($stmt);
         exit;
     }
-
-    mysqli_stmt_close($stmt);
 
     header("Location: " . '/doremi-app/dashboard/ruangan/' . '?status=success&message=Ruangan Berhasil Ditambahkan!');
     exit;

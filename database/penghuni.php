@@ -7,75 +7,33 @@ require_once __DIR__ . '/query.php';
 
 function fetchPenghuniIdentityRows(mysqli $db, int $isDeleted, ?int $excludePenghuniId = null): array
 {
-    $sql = "SELECT PenghuniID, Nim, Email, NoHP FROM penghuni WHERE IsDeleted = ?";
-    $types = 'i';
-    $params = [$isDeleted];
-
-    if ($excludePenghuniId !== null) {
-        $sql .= " AND PenghuniID != ?";
-        $types .= 'i';
-        $params[] = $excludePenghuniId;
-    }
-
-    return dbFetchAll($db, $sql, $types, $params);
+    return dbFetchAll($db, "CALL sp_getPenghuniIdentityRows(?, ?)", 'ii', [$isDeleted, $excludePenghuniId ?? 0]);
 }
 
 function fetchPenghuniById(mysqli $db, int $penghuniId): ?array
 {
-    return dbFetchOne(
-        $db,
-        "SELECT * FROM penghuni WHERE PenghuniID = ? AND IsDeleted = 0 LIMIT 1",
-        'i',
-        [$penghuniId]
-    );
+    return dbFetchOne($db, "CALL sp_getPenghuniByIdFull(?)", 'i', [$penghuniId]);
 }
 
 function fetchActiveKamarWithOccupancy(mysqli $db): array
 {
-    return dbFetchAll(
-        $db,
-        "SELECT
-            k.KamarID,
-            k.NomorKamar,
-            k.Lantai,
-            k.KapasitasPenghuni,
-            COUNT(p.PenghuniID) AS JumlahPenghuniAktual
-        FROM kamar k
-        LEFT JOIN penghuni p ON p.KamarID = k.KamarID AND p.IsDeleted = 0
-        WHERE k.IsDeleted = 0
-        GROUP BY k.KamarID, k.NomorKamar, k.Lantai, k.KapasitasPenghuni
-        ORDER BY k.NomorKamar ASC"
-    );
+    return dbFetchAll($db, "CALL sp_getActiveKamarWithOccupancy()");
 }
 
 function fetchKamarForPenghuniAssignment(mysqli $db, int $kamarId): ?array
 {
-    return dbFetchOne(
-        $db,
-        "SELECT KamarID, NomorKamar, KapasitasPenghuni, Lantai
-         FROM kamar
-         WHERE KamarID = ? AND IsDeleted = 0
-         LIMIT 1",
-        'i',
-        [$kamarId]
-    );
+    return dbFetchOne($db, "CALL sp_getKamarForPenghuniAssignment(?)", 'i', [$kamarId]);
 }
 
 function fetchPenghuniRoomOccupantSummary(mysqli $db, int $kamarId, ?int $excludePenghuniId = null): array
 {
-    $sql = "SELECT COUNT(*) AS total, GROUP_CONCAT(DISTINCT JenisKelamin ORDER BY JenisKelamin SEPARATOR ',') AS genders
-            FROM penghuni
-            WHERE KamarID = ? AND IsDeleted = 0";
-    $types = 'i';
-    $params = [$kamarId];
+    return dbFetchOne($db, "CALL sp_getPenghuniRoomOccupantSummary(?, ?)", 'ii', [$kamarId, $excludePenghuniId ?? 0])
+        ?? ['total' => 0, 'genders' => ''];
+}
 
-    if ($excludePenghuniId !== null) {
-        $sql .= " AND PenghuniID != ?";
-        $types .= 'i';
-        $params[] = $excludePenghuniId;
-    }
-
-    return dbFetchOne($db, $sql, $types, $params) ?? ['total' => 0, 'genders' => ''];
+function fetchPenghuniList(mysqli $db): array
+{
+    return dbFetchAll($db, "CALL sp_getPenghuniList()");
 }
 
 function createPenghuni(

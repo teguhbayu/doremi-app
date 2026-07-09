@@ -10,7 +10,7 @@ alwaysApply: true
 
 Doremi is a PHP-native dormitory management web application. It handles resident management, room assignments, packages, in/out logging, maintenance reports, and inventory for a student dormitory.
 
-As of **June 30, 2026**, the database layer has been migrated away from inline queries: all CRUD operations now go through **Stored Procedures**, formatting/sanitization is handled by **User-Defined Functions (UDFs)**, and field constraints/auto-timestamps are automated via **Triggers**. See [Database Layer](#database-layer-stored-procedures-udfs--triggers) below before writing any new database code.
+As of **June 30, 2026** (batch 1) and **July 9, 2026** (batch 2, completing the migration), the database layer has been fully migrated away from inline queries: **every** CRUD and reporting query in the app now goes through **Stored Procedures**, formatting/sanitization is handled by **User-Defined Functions (UDFs)**, and field constraints/auto-timestamps are automated via **Triggers**. There is no raw `SELECT`/`INSERT`/`UPDATE`/`DELETE` left in any request-flow PHP file (the only exception is `database/dump_to_md.php`, a dev-only CLI schema-dump tool outside the app's request flow). See [Database Layer](#database-layer-stored-procedures-udfs--triggers) below before writing any new database code.
 
 ---
 
@@ -42,10 +42,16 @@ Do not put generic formatting helpers under `database/`; keep them in `utils/`.
 Place database-facing functions under `database/<part>.php`, using camelCase function names:
 
 - `database/auth.php` - `fetchPetugasByEmail`, `fetchPenghuniByEmail`, `findAuthUserByEmail`.
-- `database/paket.php` - package list/detail, package CRUD procedure calls, pickup/review operations, package photo fetching.
-- `database/inout.php` - in/out list fetches and stored-procedure actions.
-- `database/maintenance.php` - maintenance list/detail fetches, room/inventory option fetches, ownership checks, create/update/claim/complete/delete actions, photo fetching.
-- `database/penghuni.php` - resident fetches, room occupancy fetches, duplicate/assignment support queries, create/update/restore procedure calls.
+- `database/petugas.php` - staff list/detail fetches, duplicate-active/duplicate-deleted checks, create/update(with or without password)/restore/delete procedure calls.
+- `database/ruangan.php` - `createRuangan`, `updateRuangan` (reads/delete are called directly from the page via `CALL sp_getAllRuangan()` / `sp_getRuanganById()` / `sp_deleteRuangan()`).
+- `database/kamar.php` - room detail fetch, active-occupant count, duplicate-nomor check, create/update procedure calls (index/detail/delete are called directly from the page via existing procedures).
+- `database/inventaris.php` - full inventory CRUD, active kamar/ruangan option lists, kamar/ruangan-active existence checks used for location validation.
+- `database/paket.php` - package list/detail (including latest-pickup join), package CRUD procedure calls, pickup insert/update/review operations, package photo fetching.
+- `database/inout.php` - in/out list/history fetches and stored-procedure actions.
+- `database/maintenance.php` - maintenance list/detail fetches, room/inventory option fetches, target-existence and technician-ownership checks, create/update/claim/complete/delete actions, photo fetching.
+- `database/penghuni.php` - resident fetches (identity rows, by-id, list, room-occupancy, room-assignment, room-occupant-summary), create/update/restore procedure calls.
+- `database/dashboard.php` - all `dashboard/index.php` stat/summary/trend fetches, split one function per stored procedure (role-scoped counts, gender stats, per-resident summaries, maintenance-team counts/tasks/emergency list/trend charts).
+- `database/paketReport.php` / `database/inoutReport.php` / `database/maintenanceReport.php` - one function per report-page query (export, stats, distributions, trends, top-N rankings, detail rows), each taking the page's `$range` (`'7d'|'30d'|'6m'|'all'`) and forwarding it to the matching stored procedure, which applies the date-range filter server-side.
 - `database/photos.php` - dispatches photo requests by type to the correct domain helper.
 
 Pages should call these helpers instead of embedding `mysqli_prepare`, `mysqli_query`, or repeated SQL directly in the page.
@@ -168,7 +174,7 @@ Current login implementation uses helper functions: `authAttemptPasswordLogin()`
 | Column              | Type        | Notes                                                                |
 | ------------------- | ----------- | --------------------------------------------------------------------- |
 | `KamarID`           | int PK AI   |                                                                         |
-| `NomorKamar`        | varchar(20) |                                                                         |
+| `NomorKamar`        | varchar(2)  | e.g. `"1A"` — lantai digit + one letter, built by `kamar_build_nomor()` in `dashboard/kamar/helpers.php` |
 | `KapasitasPenghuni` | int         | Room capacity                                                          |
 | `UpdatedAt`         | datetime    | Auto-set by `trg_beforeInsertKamar`/`trg_beforeUpdateKamar`            |
 | `IsDeleted`         | tinyint(1)  |                                                                         |
@@ -244,7 +250,7 @@ Current login implementation uses helper functions: `authAttemptPasswordLogin()`
 | `RuanganID`         | int FK → ruangan                                     |                |
 | `InventarisID`      | int FK → inventaris                                  |                |
 | `TanggalLapor`      | datetime                                             |                |
-| `JenisLaporan`      | enum('Kerusakan','Kebersihan','Keluhan')             |                |
+| `JenisLaporan`      | enum('Kerusakan Ringan','Kerusakan Sedang','Kerusakan Darurat / Berat') | Priority scale, not a category — used to sort/prioritize reports |
 | `Deskripsi`         | text                                                  |                |
 | `StatusMaintenance` | enum('Diajukan','Diproses','Selesai','Ditolak')      |                |
 | `TanggalSelesai`    | datetime NULL                                        |                |
@@ -256,7 +262,7 @@ Current login implementation uses helper functions: `authAttemptPasswordLogin()`
 
 ## Database Layer: Stored Procedures, UDFs & Triggers
 
-The database layer migration (June 30, 2026) replaced inline queries with three layers: stored procedures for CRUD, UDFs for sanitization/formatting, and triggers for automatic constraints/timestamps. New database logic should be implemented at this layer, not as raw inline SQL.
+The database layer migration (June 30, 2026, completed July 9, 2026) replaced inline queries with three layers: stored procedures for CRUD, UDFs for sanitization/formatting, and triggers for automatic constraints/timestamps. New database logic should be implemented at this layer, not as raw inline SQL.
 
 ### User-Defined Functions (UDFs)
 
@@ -327,9 +333,84 @@ All stored procedures are prefixed with `sp_` and camel-cased.
 - `sp_deletePaket(id)` — Deletes a package.
 - `sp_countPackagePickupByPaketId(id)` — Checks referencing package pickup records.
 
+**Petugas (Staff) Management**
+- `sp_getAllPetugas()` — Retrieves all active staff.
+- `sp_findPetugasDuplicateActive(email, no_hp)` / `sp_findPetugasDuplicateDeleted(email, no_hp)` — Duplicate-contact checks used before create.
+- `sp_createPetugas(nama, email, password_hash, jabatan, no_hp)` — Inserts a new staff member.
+- `sp_getPetugasById(id)` — Fetches one active staff record.
+- `sp_findPetugasDuplicateExcluding(id, email, no_hp)` — Duplicate-contact check used before update, excluding self.
+- `sp_updatePetugasWithPassword(id, nama, email, jabatan, no_hp, password_hash)` / `sp_updatePetugasWithoutPassword(id, nama, email, jabatan, no_hp)` — Updates profile, with or without changing password.
+- `sp_restorePetugas(id, nama, email, password_hash, jabatan, no_hp)` — Restores a soft-deleted staff member found via the duplicate-deleted check.
+- `sp_deletePetugas(id)` — Soft-deletes a staff member.
+
+**Ruangan (Area) Writes** (reads/delete already listed above)
+- `sp_createRuangan(nama, jenis, lantai, keterangan)` — Adds an area.
+- `sp_updateRuangan(id, nama, jenis, lantai, keterangan)` — Updates an area.
+
+**Kamar (Room) Additional Management** (index/detail/delete already listed above)
+- `sp_getKamarById(id)` — Fetches one room's raw row (used by edit form).
+- `sp_countActivePenghuniByKamar(kamar_id)` — Current occupancy count, used for capacity validation.
+- `sp_findKamarDuplicateNomor(nomor, exclude_id)` — Duplicate `NomorKamar` check; pass `exclude_id = 0` for create, or the room's own ID for edit.
+- `sp_createKamar(nomor, kapasitas, lantai)` / `sp_updateKamar(id, nomor, kapasitas, lantai)` — Create/update a room.
+
+**Inventaris (Inventory) Management**
+- `sp_getAllInventarisWithLokasi()` — Lists active inventory joined with its kamar/ruangan location name.
+- `sp_getActiveKamarOptions()` / `sp_getActiveRuanganOptions()` — Location picker option lists (also reused by maintenance target pickers).
+- `sp_checkKamarActive(kamar_id)` / `sp_checkRuanganActive(ruangan_id)` — Location-exists validation (also reused by `checkMaintenanceTargetExists()` for the `ruangan` case).
+- `sp_getInventarisById(id)` — Fetches one inventory item.
+- `sp_createInventaris(ruangan_id, kamar_id, nama, jumlah, keterangan)` / `sp_updateInventaris(id, ruangan_id, kamar_id, nama, jumlah, keterangan)` — Create/update. Exactly one of `ruangan_id`/`kamar_id` is non-null.
+- `sp_deleteInventaris(id)` — Soft-deletes an inventory item.
+
+**Penghuni (Resident) Reads** (writes already listed above)
+- `sp_getPenghuniIdentityRows(is_deleted, exclude_id)` — Nim/Email/NoHP rows for duplicate checks; pass `exclude_id = 0` when not excluding a row.
+- `sp_getPenghuniList()` — Index page list joined with `NomorKamar`.
+- `sp_getKamarForPenghuniAssignment(kamar_id)` — Room lookup used when assigning a resident to a room.
+- `sp_getPenghuniRoomOccupantSummary(kamar_id, exclude_id)` — Occupant count + gender list for a room, for capacity/gender-mix validation; `exclude_id = 0` when not excluding.
+- `sp_getPenghuniByIdFull(id)` — Full resident row (distinct from `sp_checkPenghuniExist`, which only returns the ID).
+- `sp_getActiveKamarWithOccupancy()` — Room list with live occupancy count, used for the resident assignment dropdown.
+
+**Pengambilanpaket (Package Pickup) Management**
+- `sp_getPaketListForRole(role, user_id)` — Paket list joined with the latest pickup record; SIGAP/PENGURUS see all, PENGHUNI is scoped to `user_id`.
+- `sp_getPaketWithLatestPickup(paket_id, penghuni_id)` — Single paket + latest pickup; pass `penghuni_id = 0` to skip resident scoping.
+- `sp_insertPaketPickup(paket_id, penghuni_id, petugas_id, foto, waktu, status, keterangan)` / `sp_updatePaketPickup(id, penghuni_id, petugas_id, foto, waktu, status, keterangan)` — Create/update a pickup record.
+- `sp_updatePaketPickupReview(id, petugas_id, status, keterangan)` — SIGAP/PENGURUS review of a pickup (e.g. marking `TERTUKAR`).
+
+**InOut Reads** (writes already listed above)
+- `sp_getInOutHistoryForPenghuni(penghuni_id)` — A resident's own in/out history.
+- `sp_getPendingInOutRequests()` / `sp_getOutsideInOutRequests()` / `sp_getAllInOutLogs()` — Staff-facing queue/log views.
+
+**Maintenance Reads & Writes** (photo lookups already listed above)
+- `sp_getMaintenanceReportsForRole(role, user_id)` — Role-scoped report list (MAINTENANCE sees all; PENGHUNI scoped to own reports; other staff scoped to reports they filed with no resident attached), sorted by priority then recency.
+- `sp_getMaintenanceReportById(id)` — Single report.
+- `sp_getMaintenanceRooms(only_active)` / `sp_getMaintenanceInventory(only_active)` — Target picker option lists.
+- `sp_checkInventarisActive(inventaris_id)` — Inventaris-target existence check (mirrors `sp_checkRuanganActive` for the `ruangan` case).
+- `sp_createMaintenanceReport(...)` / `sp_updateMaintenanceReport(...)` — Create/update a report.
+- `sp_claimMaintenanceReport(petugas_id, id)` — MAINTENANCE staff claims a `Diajukan` report (moves it to `Diproses`).
+- `sp_checkMaintenanceTechnicianOwnership(id, petugas_id)` — Verifies the calling technician owns the in-progress report before completing it.
+- `sp_completeMaintenanceReport(tanggal_selesai, keterangan, foto_maintenance, id)` — Marks a report `Selesai`.
+- `sp_deleteMaintenanceReport(id)` — Soft-deletes a report.
+
+**Dashboard Stats** (`dashboard/index.php`)
+- `sp_getDashboardPengurusStats()` — Active-resident/pending-inout/pending-maintenance/pending-pickup counts in one row.
+- `sp_getDashboardGenderStats()` — Resident gender distribution.
+- `sp_getDashboardPenghuniIzinAktif(user_id)` / `sp_getDashboardPenghuniPaketSummary(user_id)` / `sp_getDashboardPenghuniMaintenanceSummary(user_id)` — Per-resident dashboard summaries.
+- `sp_getDashboardMaintenanceCounts(user_id)` — Pending/ongoing/completed/emergency counts for the MAINTENANCE dashboard.
+- `sp_getDashboardMyTasks(user_id)` / `sp_getDashboardEmergencyList()` — Task list + active-emergency list for the MAINTENANCE dashboard.
+- `sp_getMaintenanceStatusPie()` / `sp_getMaintenanceTrendDaily(interval_days)` / `sp_getMaintenanceTrendMonthly()` — Chart data; `interval_days` is `6` for the 7-day chart and `29` for the 30-day chart.
+
+**Report Procedures** (`dashboard/{paket,inout,maintenance}/report.php`)
+
+Each of the three report pages has an identically-shaped set of ~9-11 procedures — export, stats, distribution(s), trend-daily, trend-monthly, top-N ranking(s), and detail — all taking a single `range_param VARCHAR(3)` (`'7d'|'30d'|'6m'|'all'`) and applying the date filter server-side via `WHERE (range_param = '7d' AND ... ) OR (range_param = '30d' AND ...) OR ... OR range_param = 'all'`. `$range` is validated against a 4-value whitelist in PHP before being passed, so this is safe.
+
+- **Paket report**: `sp_getPaketReportExport`, `sp_getPaketReportStats`, `sp_getPaketReportStatusDist`, `sp_getPaketReportTrendDaily`, `sp_getPaketReportTrendMonthly`, `sp_getPaketReportTipeDist`, `sp_getPaketReportTopKurir`, `sp_getPaketReportJamSibuk`, `sp_getPaketReportTopPenghuni`, `sp_getPaketReportPetugasRanking`, `sp_getPaketReportDetail`.
+- **InOut report**: `sp_getInOutReportExport`, `sp_getInOutReportStats`, `sp_getInOutReportStatusDist`, `sp_getInOutReportTrendDaily`, `sp_getInOutReportTrendMonthly`, `sp_getInOutReportPeakHour`, `sp_getInOutReportTopPenghuni`, `sp_getInOutReportGenderDist`, `sp_getInOutReportTopKeperluan`, `sp_getInOutReportPetugasRanking`, `sp_getInOutReportDetail`.
+- **Maintenance report**: `sp_getMaintenanceReportExport`, `sp_getMaintenanceReportStats`, `sp_getMaintenanceReportPriorityDist`, `sp_getMaintenanceReportTrendDaily`, `sp_getMaintenanceReportTrendMonthly`, `sp_getMaintenanceReportTopRuangan`, `sp_getMaintenanceReportStackedStatus`, `sp_getMaintenanceReportPetugasRanking`, `sp_getMaintenanceReportDetail`.
+
 ### Implementation Reference
 
-See the migration script: [20260630_stored_procedures_functions_triggers.sql](file:///C:/xampp/htdocs/doremi-app/database/migrations/20260630_stored_procedures_functions_triggers.sql) for DDL schemas and implementation detail verification.
+See the migration scripts for DDL schemas and implementation detail verification:
+- [20260630_stored_procedures_functions_triggers.sql](file:///C:/xampp/htdocs/doremi-app/database/migrations/20260630_stored_procedures_functions_triggers.sql) — original UDFs/triggers + first batch of procedures (auth, photos, in/out writes, kamar/ruangan reads+delete, penghuni writes, paket master writes).
+- [20260709_stored_procedures_batch2.sql](file:///D:/utils/laragon/www/doremi-app/database/migrations/20260709_stored_procedures_batch2.sql) — second batch, completing the migration: petugas, ruangan/kamar writes, inventaris, penghuni reads, pengambilanpaket, in/out reads, maintenance reads+writes, dashboard, and all three report pages.
 
 ---
 
@@ -350,3 +431,5 @@ See the migration script: [20260630_stored_procedures_functions_triggers.sql](fi
 - Validate all input with `Respect\Validation` before touching the database.
 - Keep `v::alnum()` off email fields — emails contain `@` and `.` which fail alnum checks.
 - Pass a `(object)` cast array to `v::attribute()` schemas, not a raw string variable.
+- For report-page date ranges, whitelist `$range` against `['7d', '30d', '6m', 'all']` in PHP (as the existing report pages do) and pass it straight through as a stored-procedure `VARCHAR(3)` param — implement the date filter as `WHERE (range_param = '7d' AND ...) OR ... OR range_param = 'all'` inside the procedure, not as an interpolated SQL fragment built in PHP.
+- For optional "exclude this row" ID parameters (duplicate checks, occupant-summary checks), use a `0` sentinel for "no exclusion" (e.g. `sp_findKamarDuplicateNomor(nomor, exclude_id)` with `exclude_id = 0` on create) rather than a nullable/optional SQL fragment, since all primary keys are auto-increment `> 0`.

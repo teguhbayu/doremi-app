@@ -19,19 +19,17 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 csrf_validate('/doremi-app/dashboard/inventaris/');
 
 require '../../db.php';
+require '../../database/inventaris.php';
 
 $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
 
 if ($id) {
-    $stmt = mysqli_prepare($db, "UPDATE inventaris SET IsDeleted = 1 WHERE InventarisID = ?");
-    mysqli_stmt_bind_param($stmt, "i", $id);
-
-    if (mysqli_stmt_execute($stmt)) {
+    try {
+        deleteInventaris($db, (int) $id);
         header("Location: /doremi-app/dashboard/inventaris/?status=success&message=Inventaris Berhasil Dihapus!");
-    } else {
+    } catch (RuntimeException $e) {
         header("Location: /doremi-app/dashboard/inventaris/?status=error&message=Gagal Menghapus Inventaris!");
     }
-    mysqli_stmt_close($stmt);
 } else {
     header("Location: /doremi-app/dashboard/inventaris/");
 }

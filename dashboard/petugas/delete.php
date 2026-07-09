@@ -7,19 +7,17 @@ if (!isset($_SESSION['userId'])) {
 }
 
 require '../../db.php';
+require '../../database/petugas.php';
 
 $id = $_GET['id'] ?? null;
 
 if ($id) {
-    $stmt = mysqli_prepare($db, "UPDATE petugas SET IsDeleted = 1 WHERE PetugasID = ?");
-    mysqli_stmt_bind_param($stmt, "i", $id);
-
-    if (mysqli_stmt_execute($stmt)) {
+    try {
+        deletePetugas($db, (int) $id);
         header("Location: /doremi-app/dashboard/petugas/?status=success&message=Petugas Berhasil Dihapus!");
-    } else {
+    } catch (RuntimeException $e) {
         header("Location: /doremi-app/dashboard/petugas/?status=error&message=Gagal Menghapus Petugas!");
     }
-    mysqli_stmt_close($stmt);
 } else {
     header("Location: /doremi-app/dashboard/petugas/");
 }

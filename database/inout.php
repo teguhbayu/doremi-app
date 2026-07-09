@@ -7,16 +7,7 @@ require_once __DIR__ . '/query.php';
 
 function fetchInOutHistoryForPenghuni(mysqli $db, int $penghuniId): array
 {
-    return dbFetchAll(
-        $db,
-        "SELECT io.*, p.NamaPetugas
-         FROM inoutpenghuni io
-         LEFT JOIN petugas p ON io.PetugasID = p.PetugasID
-         WHERE io.PenghuniID = ?
-         ORDER BY io.InOutID DESC",
-        'i',
-        [$penghuniId]
-    );
+    return dbFetchAll($db, "CALL sp_getInOutHistoryForPenghuni(?)", 'i', [$penghuniId]);
 }
 
 function countActiveInOutRequests(mysqli $db, int $penghuniId): int
@@ -26,41 +17,17 @@ function countActiveInOutRequests(mysqli $db, int $penghuniId): int
 
 function fetchPendingInOutRequests(mysqli $db): array
 {
-    return dbFetchAll(
-        $db,
-        "SELECT io.*, pe.NamaPenghuni, pe.Nim, k.NomorKamar
-         FROM inoutpenghuni io
-         JOIN penghuni pe ON io.PenghuniID = pe.PenghuniID
-         JOIN kamar k ON pe.KamarID = k.KamarID
-         WHERE io.Status = 'Pending'
-         ORDER BY io.InOutID ASC"
-    );
+    return dbFetchAll($db, "CALL sp_getPendingInOutRequests()");
 }
 
 function fetchOutsideInOutRequests(mysqli $db): array
 {
-    return dbFetchAll(
-        $db,
-        "SELECT io.*, pe.NamaPenghuni, pe.Nim, k.NomorKamar
-         FROM inoutpenghuni io
-         JOIN penghuni pe ON io.PenghuniID = pe.PenghuniID
-         JOIN kamar k ON pe.KamarID = k.KamarID
-         WHERE io.Status = 'Keluar'
-         ORDER BY io.WaktuKeluar ASC"
-    );
+    return dbFetchAll($db, "CALL sp_getOutsideInOutRequests()");
 }
 
 function fetchAllInOutLogs(mysqli $db): array
 {
-    return dbFetchAll(
-        $db,
-        "SELECT io.*, pe.NamaPenghuni, pe.Nim, k.NomorKamar, pt.NamaPetugas
-         FROM inoutpenghuni io
-         JOIN penghuni pe ON io.PenghuniID = pe.PenghuniID
-         JOIN kamar k ON pe.KamarID = k.KamarID
-         LEFT JOIN petugas pt ON io.PetugasID = pt.PetugasID
-         ORDER BY io.InOutID DESC"
-    );
+    return dbFetchAll($db, "CALL sp_getAllInOutLogs()");
 }
 
 function createInOutRequest(mysqli $db, int $penghuniId, string $keperluan, string $waktuKeluar, string $waktuMasuk): bool

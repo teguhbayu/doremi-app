@@ -9,6 +9,7 @@ if (!isset($_SESSION['userId'])) {
     exit;
 }
 require '../../db.php';
+require '../../database/kamar.php';
 require 'helpers.php';
 
 $id = $_GET['id'] ?? null;
@@ -17,24 +18,14 @@ if (!$id) {
     exit;
 }
 
-$stmt = mysqli_prepare($db, "SELECT * FROM kamar WHERE KamarID = ? LIMIT 1");
-mysqli_stmt_bind_param($stmt, 'i', $id);
-mysqli_stmt_execute($stmt);
-$result = mysqli_stmt_get_result($stmt);
-$kamar = mysqli_fetch_assoc($result);
-mysqli_stmt_close($stmt);
+$kamar = fetchKamarById($db, (int) $id);
 
 if (!$kamar) {
     header("Location: /doremi-app/dashboard/kamar/");
     exit;
 }
 
-$occupancyStmt = mysqli_prepare($db, "SELECT COUNT(*) AS total FROM penghuni WHERE KamarID = ? AND IsDeleted = 0");
-mysqli_stmt_bind_param($occupancyStmt, 'i', $id);
-mysqli_stmt_execute($occupancyStmt);
-$occupancyResult = mysqli_stmt_get_result($occupancyStmt);
-$currentOccupancy = (int) (mysqli_fetch_assoc($occupancyResult)['total'] ?? 0);
-mysqli_stmt_close($occupancyStmt);
+$currentOccupancy = countActivePenghuniByKamar($db, (int) $id);
 
 $normalizedCurrentNomor = kamar_normalize_segment((string) ($kamar['NomorKamar'] ?? ''));
 $currentLantai = trim((string) ($kamar['Lantai'] ?? ''));
@@ -79,30 +70,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    $checkStmt = mysqli_prepare($db, "SELECT KamarID FROM kamar WHERE IsDeleted = 0 AND UPPER(REPLACE(NomorKamar, ' ', '')) = ? AND KamarID != ? LIMIT 1");
-    mysqli_stmt_bind_param($checkStmt, 'si', $nomor, $id);
-    mysqli_stmt_execute($checkStmt);
-    $checkResult = mysqli_stmt_get_result($checkStmt);
-    $existingKamar = mysqli_fetch_assoc($checkResult);
-    mysqli_stmt_close($checkStmt);
+    $existingKamar = findKamarDuplicateNomor($db, $nomor, (int) $id);
 
     if ($existingKamar) {
         header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&status=error&message=Nomor kamar sudah terdaftar!');
         exit;
     }
 
-    $now = date('Y-m-d H:i:s');
-
-    $stmt = mysqli_prepare($db, "UPDATE kamar SET NomorKamar = ?, KapasitasPenghuni = ?, Lantai = ?, UpdatedAt = ? WHERE KamarID = ?");
-    mysqli_stmt_bind_param($stmt, 'sissi', $nomor, $kapasitasInt, $lantai, $now, $id);
-
-    if (!mysqli_stmt_execute($stmt)) {
+    try {
+        updateKamar($db, (int) $id, $nomor, $kapasitasInt, $lantai);
+    } catch (RuntimeException $e) {
         header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&status=error&message=Terjadi Kesalahan saat mengupdate data!');
-        mysqli_stmt_close($stmt);
         exit;
     }
-
-    mysqli_stmt_close($stmt);
 
     header("Location: /doremi-app/dashboard/kamar/?status=success&message=Kamar Berhasil Diupdate!");
     exit;
