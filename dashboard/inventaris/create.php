@@ -110,20 +110,20 @@ $old = pullOldFormInput();
                 </div>
                 <div class="mb-3">
                     <label for="jumlahBarang" class="form-label">Jumlah</label>
-                    <input type="number" name="jumlahBarang" class="form-control" id="jumlahBarang" min="0" max="999999" value="<?= htmlspecialchars($old['jumlahBarang'] ?? '') ?>" required>
+                    <input type="number" name="jumlahBarang" class="form-control" id="jumlahBarang" min="0" max="999999" value="<?= htmlspecialchars($old['jumlah'] ?? '') ?>" required>
                 </div>
                 <div class="mb-3">
                     <label for="lokasiBarang" class="form-label">Lokasi</label>
                     <select class="form-select" name="lokasiBarang" id="lokasiBarang" required>
-                        <option disabled <?= empty($old['lokasiBarang']) ? 'selected' : '' ?>>Pilih Lokasi</option>
+                        <option disabled <?= empty($old['lokasi']) ? 'selected' : '' ?>>Pilih Lokasi</option>
                         <optgroup label="Kamar">
                             <?php foreach ($kamars as $k): ?>
-                                <option value="kamar:<?= $k['KamarID'] ?>" <?= ($old['lokasiBarang'] ?? '') === 'kamar:' . $k['KamarID'] ? 'selected' : '' ?>>Kamar <?= $k['NomorKamar'] ?></option>
+                                <option value="kamar:<?= $k['KamarID'] ?>" <?= ($old['lokasi'] ?? '') === 'kamar:' . $k['KamarID'] ? 'selected' : '' ?>>Kamar <?= $k['NomorKamar'] ?></option>
                             <?php endforeach; ?>
                         </optgroup>
                         <optgroup label="Ruangan">
                             <?php foreach ($ruangans as $r): ?>
-                                <option value="ruangan:<?= $r['RuanganID'] ?>" <?= ($old['lokasiBarang'] ?? '') === 'ruangan:' . $r['RuanganID'] ? 'selected' : '' ?>><?= $r['NamaRuangan'] ?></option>
+                                <option value="ruangan:<?= $r['RuanganID'] ?>" <?= ($old['lokasi'] ?? '') === 'ruangan:' . $r['RuanganID'] ? 'selected' : '' ?>><?= $r['NamaRuangan'] ?></option>
                             <?php endforeach; ?>
                         </optgroup>
                     </select>
