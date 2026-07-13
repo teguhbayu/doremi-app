@@ -243,6 +243,11 @@ a {
   display: none;
 }
 
+.dashboard-sidebar__title.is-active {
+  color: #fff;
+  border-top-color: rgba(47, 127, 240, 0.6);
+}
+
 .dashboard-sidebar__link:hover {
   background: rgba(255, 255, 255, 0.08);
   color: #fff;

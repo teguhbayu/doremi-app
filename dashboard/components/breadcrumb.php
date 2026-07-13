@@ -8,6 +8,9 @@ if ($relativePath === '' || $relativePath === 'index.php') {
 }
 
 $segments = array_values(array_filter(explode('/', $relativePath)));
+if (!empty($segments) && end($segments) === 'index.php') {
+    array_pop($segments);
+}
 $moduleMap = [
     'petugas' => 'Petugas',
     'penghuni' => 'Penghuni',
@@ -70,7 +73,7 @@ if ($isModuleIndex) {
     <?php if ($isModuleIndex): ?>
         <div class="tw:inline-flex tw:items-center tw:gap-3 tw:flex-wrap">
             <a href="<?= htmlspecialchars($dashboardBasePath . '/') ?>" class="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:min-h-12 tw:px-4 tw:py-[0.85rem] tw:rounded-2xl tw:border tw:border-[rgba(22,60,122,0.12)] tw:font-extrabold tw:no-underline tw:text-slate-900 tw:bg-[rgba(255,255,255,0.82)] tw:hover:bg-gray-50 tw:transition-all tw:text-sm">
-                <i class="iconsax" icon-name="arrow-left-2"></i>
+                <i class="iconsax" icon-name="arrow-left"></i>
                 <span>Kembali ke Home</span>
             </a>
         </div>

@@ -5,6 +5,7 @@ paket_require_roles(['PENGHUNI']);
 require '../../db.php';
 require_once '../../database/paket.php';
 require_once '../../utils/format.php';
+require_once '../../utils/old_input.php';
 
 $paketId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 if (!$paketId) {
@@ -34,6 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $petugasId < 1
         || !in_array($status, ['Sudah Diambil'], true)
     ) {
+        setOldFormInput($_POST);
         paket_redirect($_SERVER['PHP_SELF'] . '?id=' . $paketId, 'error', 'Data pengambilan paket tidak valid.');
     }
 
@@ -43,6 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $paket['FotoPengambilan'] ?? null
         );
     } catch (RuntimeException $exception) {
+        setOldFormInput($_POST);
         paket_redirect($_SERVER['PHP_SELF'] . '?id=' . $paketId, 'error', $exception->getMessage());
     }
 
@@ -56,13 +59,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         savePaketPickup($db, $pengambilanPaketId, $paketId, $userId, $petugasId, $fotoPengambilan, $waktuPengambilan, $status, $keterangan);
     } catch (RuntimeException) {
+        setOldFormInput($_POST);
         paket_redirect($_SERVER['PHP_SELF'] . '?id=' . $paketId, 'error', 'Gagal menyimpan data pengambilan paket.');
     }
 
     paket_redirect('/doremi-app/dashboard/paket/', 'success', $successMessage);
 }
 
-$keteranganValue = trim((string) ($paket['Keterangan'] ?? ''));
+$old = pullOldFormInput();
+$keteranganValue = $old['keterangan'] ?? trim((string) ($paket['Keterangan'] ?? ''));
 $fotoWajib = empty($paket['FotoPengambilan']);
 $statusMeta = paket_status_meta($paket['Status'] ?? 'Belum Diambil');
 ?>
@@ -82,7 +87,7 @@ $statusMeta = paket_status_meta($paket['Status'] ?? 'Belum Diambil');
 
             <div class="page-toolbar" data-note="<?= $isLocked ? 'Catatan pengambilan sudah final' : 'Pencatatan pengambilan pertama' ?>">
                 <a href="index.php" class="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:min-h-12 tw:px-4 tw:py-[0.85rem] tw:rounded-2xl tw:border tw:border-[rgba(22,60,122,0.12)] tw:font-extrabold tw:no-underline tw:text-slate-900 tw:bg-[rgba(255,255,255,0.82)] tw:hover:bg-gray-50 tw:transition-all tw:text-sm">
-                    <i class="iconsax tw:text-xl" icon-name="arrow-left-2"></i>
+                    <i class="iconsax tw:text-xl" icon-name="arrow-left"></i>
                     <span>Kembali</span>
                 </a>
             </div>

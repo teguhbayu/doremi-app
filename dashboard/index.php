@@ -47,6 +47,19 @@ if ($role === 'PENGHUNI') {
     $diprosesAtauSelesai = $maintenanceSummary['Diproses'] + $maintenanceSummary['Selesai'];
 }
 
+if ($role === 'SIGAP') {
+    $pendingConfirmation = mysqli_fetch_assoc(mysqli_query($db, "SELECT COUNT(*) as total FROM inoutpenghuni WHERE Status = 'Pending'"))['total'];
+    $currentlyOutside = mysqli_fetch_assoc(mysqli_query($db, "SELECT COUNT(*) as total FROM inoutpenghuni WHERE Status = 'Keluar'"))['total'];
+    $pendingPackagePickupSigap = mysqli_fetch_assoc(mysqli_query(
+        $db,
+        "SELECT COUNT(*) AS total
+         FROM paket pk
+         $latestPickupDashboardSubquery
+         WHERE pp.PengambilanPaketID IS NULL OR pp.Status = 'Belum Diambil'"
+    ))['total'];
+    $packagesToday = mysqli_fetch_assoc(mysqli_query($db, "SELECT COUNT(*) as total FROM paket WHERE DATE(WaktuSampai) = CURDATE()"))['total'];
+}
+
 // AMBIL DATA DASHBOARD KHUSUS TIM MAINTENANCE
 if ($role === 'MAINTENANCE') {
     $myTasks = fetchDashboardMyTasks($db, $userId);
@@ -263,7 +276,56 @@ if ($role === 'MAINTENANCE') {
                     </div>
                 </div>
 
-                <!-- 3. BLOK STATS UNTUK MAINTENANCE TEAM -->
+            <!-- 3. BLOK STATS UNTUK SIGAP -->
+            <?php elseif ($role === 'SIGAP'): ?>
+                <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:lg:grid-cols-4 tw:gap-6 tw:mb-10">
+                    <div data-gsap="stat-card" class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.85)] tw:shadow-sm">
+                        <div class="tw:flex tw:items-center tw:gap-4">
+                            <div class="tw:w-[3.4rem] tw:h-[3.4rem] tw:inline-flex tw:items-center tw:justify-center tw:rounded-[20px] tw:flex-shrink-0 tw:text-amber-700 tw:bg-[rgba(250,236,207,0.82)]">
+                                <i class="iconsax tw:text-3xl" icon-name="clock"></i>
+                            </div>
+                            <div>
+                                <span class="tw:block tw:text-slate-500 tw:text-[0.72rem] tw:font-extrabold tw:tracking-[0.08em] tw:uppercase">Menunggu Konfirmasi</span>
+                                <strong class="tw:block tw:mt-[0.3rem] tw:text-[1.9rem] tw:leading-none tw:text-slate-900 tw:font-bold" data-count="<?= $pendingConfirmation ?>">0</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div data-gsap="stat-card" class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.85)] tw:shadow-sm">
+                        <div class="tw:flex tw:items-center tw:gap-4">
+                            <div class="tw:w-[3.4rem] tw:h-[3.4rem] tw:inline-flex tw:items-center tw:justify-center tw:rounded-[20px] tw:flex-shrink-0 tw:text-red-700 tw:bg-[rgba(245,221,218,0.82)]">
+                                <i class="iconsax tw:text-3xl" icon-name="logout-1"></i>
+                            </div>
+                            <div>
+                                <span class="tw:block tw:text-slate-500 tw:text-[0.72rem] tw:font-extrabold tw:tracking-[0.08em] tw:uppercase">Sedang di Luar</span>
+                                <strong class="tw:block tw:mt-[0.3rem] tw:text-[1.9rem] tw:leading-none tw:text-slate-900 tw:font-bold" data-count="<?= $currentlyOutside ?>">0</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div data-gsap="stat-card" class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.85)] tw:shadow-sm">
+                        <div class="tw:flex tw:items-center tw:gap-4">
+                            <div class="tw:w-[3.4rem] tw:h-[3.4rem] tw:inline-flex tw:items-center tw:justify-center tw:rounded-[20px] tw:flex-shrink-0 tw:text-emerald-800 tw:bg-[rgba(220,244,239,0.82)]">
+                                <i class="iconsax tw:text-3xl" icon-name="box-time"></i>
+                            </div>
+                            <div>
+                                <span class="tw:block tw:text-slate-500 tw:text-[0.72rem] tw:font-extrabold tw:tracking-[0.08em] tw:uppercase">Paket Belum Diambil</span>
+                                <strong class="tw:block tw:mt-[0.3rem] tw:text-[1.9rem] tw:leading-none tw:text-slate-900 tw:font-bold" data-count="<?= $pendingPackagePickupSigap ?>">0</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div data-gsap="stat-card" class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.85)] tw:shadow-sm">
+                        <div class="tw:flex tw:items-center tw:gap-4">
+                            <div class="tw:w-[3.4rem] tw:h-[3.4rem] tw:inline-flex tw:items-center tw:justify-center tw:rounded-[20px] tw:flex-shrink-0 tw:text-primary tw:bg-accent/80">
+                                <i class="iconsax tw:text-3xl" icon-name="box-1"></i>
+                            </div>
+                            <div>
+                                <span class="tw:block tw:text-slate-500 tw:text-[0.72rem] tw:font-extrabold tw:tracking-[0.08em] tw:uppercase">Paket Tercatat Hari Ini</span>
+                                <strong class="tw:block tw:mt-[0.3rem] tw:text-[1.9rem] tw:leading-none tw:text-slate-900 tw:font-bold" data-count="<?= $packagesToday ?>">0</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            <!-- 4. BLOK STATS UNTUK MAINTENANCE TEAM -->
             <?php elseif ($role === 'MAINTENANCE'): ?>
                 <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:lg:grid-cols-4 tw:gap-6 tw:mb-10">
                     <div data-gsap="stat-card"
@@ -481,7 +543,51 @@ if ($role === 'MAINTENANCE') {
                     </div>
                 </div>
 
-                <!-- 4. BERANDA DINAMIS KHUSUS UNTUK MAINTENANCE TEAM -->
+            <!-- BERANDA RINGKASAN UNTUK SIGAP -->
+            <?php elseif ($role === 'SIGAP'): ?>
+                <div class="tw:grid tw:grid-cols-1 tw:lg:grid-cols-2 tw:gap-8">
+                    <div data-gsap="panel" class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.88)] tw:shadow-sm">
+                        <h5 class="tw:m-0 tw:text-[1.2rem] tw:text-slate-900">Ringkasan Izin Keluar</h5>
+                        <p class="tw:m-0 tw:text-slate-500 tw:leading-[1.75] tw:text-sm">Pantau permintaan izin keluar penghuni yang menunggu konfirmasi dan yang masih berada di luar asrama.</p>
+                        <div class="tw:grid tw:gap-[0.85rem]">
+                            <div class="tw:p-4 tw:rounded-[18px] tw:bg-[rgba(255,255,255,0.80)] tw:border tw:border-[rgba(22,60,122,0.08)]">
+                                <span class="tw:block tw:mb-[0.3rem] tw:text-slate-500 tw:text-xs tw:font-bold">Menunggu konfirmasi</span>
+                                <strong><?= $pendingConfirmation ?> permintaan</strong>
+                                <p>Konfirmasi keberangkatan penghuni yang mengajukan izin keluar.</p>
+                            </div>
+                            <div class="tw:p-4 tw:rounded-[18px] tw:bg-[rgba(255,255,255,0.80)] tw:border tw:border-[rgba(22,60,122,0.08)]">
+                                <span class="tw:block tw:mb-[0.3rem] tw:text-slate-500 tw:text-xs tw:font-bold">Sedang di luar</span>
+                                <strong><?= $currentlyOutside ?> penghuni</strong>
+                                <p>Belum konfirmasi masuk kembali ke asrama.</p>
+                            </div>
+                        </div>
+                        <div class="tw:inline-flex tw:items-center tw:gap-3 tw:flex-wrap tw:mt-4">
+                            <a href="/doremi-app/dashboard/inout/" class="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:min-h-12 tw:px-4 tw:py-[0.85rem] tw:rounded-2xl tw:border tw:border-[rgba(22,60,122,0.12)] tw:font-extrabold tw:no-underline tw:text-slate-900 tw:bg-[rgba(255,255,255,0.82)] tw:hover:bg-gray-50 tw:transition-all tw:text-sm">Buka Konfirmasi In/Out</a>
+                        </div>
+                    </div>
+
+                    <div data-gsap="panel" class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.88)] tw:shadow-sm">
+                        <h5 class="tw:m-0 tw:text-[1.2rem] tw:text-slate-900">Ringkasan Paket</h5>
+                        <p class="tw:m-0 tw:text-slate-500 tw:leading-[1.75] tw:text-sm">Lihat paket yang masih menunggu diambil penghuni dan aktivitas pencatatan paket hari ini.</p>
+                        <div class="tw:grid tw:gap-[0.85rem]">
+                            <div class="tw:p-4 tw:rounded-[18px] tw:bg-[rgba(255,255,255,0.80)] tw:border tw:border-[rgba(22,60,122,0.08)]">
+                                <span class="tw:block tw:mb-[0.3rem] tw:text-slate-500 tw:text-xs tw:font-bold">Belum diambil</span>
+                                <strong><?= $pendingPackagePickupSigap ?> paket</strong>
+                                <p>Ingatkan penghuni untuk segera mengambil paketnya.</p>
+                            </div>
+                            <div class="tw:p-4 tw:rounded-[18px] tw:bg-[rgba(255,255,255,0.80)] tw:border tw:border-[rgba(22,60,122,0.08)]">
+                                <span class="tw:block tw:mb-[0.3rem] tw:text-slate-500 tw:text-xs tw:font-bold">Tercatat hari ini</span>
+                                <strong><?= $packagesToday ?> paket</strong>
+                                <p>Jumlah paket yang Anda catat masuk hari ini.</p>
+                            </div>
+                        </div>
+                        <div class="tw:inline-flex tw:items-center tw:gap-3 tw:flex-wrap tw:mt-4">
+                            <a href="/doremi-app/dashboard/paket/" class="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:min-h-12 tw:px-4 tw:py-[0.85rem] tw:rounded-2xl tw:border tw:border-[rgba(22,60,122,0.12)] tw:font-extrabold tw:no-underline tw:text-slate-900 tw:bg-[rgba(255,255,255,0.82)] tw:hover:bg-gray-50 tw:transition-all tw:text-sm">Buka Menu Paket</a>
+                        </div>
+                    </div>
+                </div>
+
+            <!-- 4. BERANDA DINAMIS KHUSUS UNTUK MAINTENANCE TEAM -->
             <?php elseif ($role === 'MAINTENANCE'): ?>
 
                 <!-- Baris 1: Laporan Darurat Aktif -->

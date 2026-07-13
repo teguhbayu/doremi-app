@@ -6,6 +6,7 @@ if (!isset($_SESSION['userId'])) {
 }
 
 require '../../db.php';
+require '../../utils/old_input.php';
 require_once '../../database/inout.php';
 require_once '../../utils/format.php';
 require_once 'validation.php';
@@ -16,6 +17,7 @@ if ($action === 'create_request') {
     $requestInput = collectInOutRequestInput($_POST);
     $validationMessage = validateInOutRequestInput($requestInput);
     if ($validationMessage !== null) {
+        setOldFormInput($_POST);
         header("Location: index.php?status=error&message=" . urlencode($validationMessage));
         exit;
     }
@@ -31,6 +33,7 @@ if ($action === 'create_request') {
         createInOutRequest($db, $userId, $requestInput['keperluan'], $dateTimes['waktuKeluar'], $dateTimes['waktuMasuk']);
         header("Location: index.php?status=success&message=Permintaan izin keluar berhasil dikirim!");
     } catch (RuntimeException) {
+        setOldFormInput($_POST);
         header("Location: index.php?status=error&message=Gagal mengirim permintaan!");
     }
 }

@@ -5,6 +5,7 @@ require 'helpers.php';
 maintenance_require_roles(['PENGURUS', 'PENGHUNI', 'SIGAP', 'SERVANDA', 'MAINTENANCE']);
 require '../../csrf.php';
 require '../../db.php';
+require '../../utils/old_input.php';
 require_once '../../database/maintenance.php';
 require 'validation.php';
 
@@ -40,6 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $reportInput = collectMaintenanceReportInput($_POST);
     $validationMessage = validateMaintenanceReportInput($db, $reportInput);
     if ($validationMessage !== null) {
+        setOldFormInput($_POST);
         maintenance_redirect($_SERVER['PHP_SELF'] . '?id=' . $id, 'error', $validationMessage);
     }
     $targetIds = resolveMaintenanceTargetIds($reportInput);
@@ -47,6 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $fotoLaporan = maintenance_store_photo($_FILES['fotoLaporan'] ?? [], $report['FotoLaporan']);
     } catch (RuntimeException $e) {
+        setOldFormInput($_POST);
         maintenance_redirect($_SERVER['PHP_SELF'] . '?id=' . $id, 'error', $e->getMessage());
     }
 
@@ -62,12 +65,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         );
         maintenance_redirect('index.php', 'success', 'Laporan kerusakan berhasil diperbarui!');
     } catch (RuntimeException) {
+        setOldFormInput($_POST);
         maintenance_redirect($_SERVER['PHP_SELF'] . '?id=' . $id, 'error', 'Terjadi kesalahan sistem saat menyimpan perubahan.');
     }
 }
 
-$currentTargetType = !empty($report['RuanganID']) ? 'ruangan' : 'inventaris';
-$currentTargetValue = !empty($report['RuanganID']) ? $report['RuanganID'] : $report['InventarisID'];
+$old = pullOldFormInput();
+$currentTargetType = $old['targetType'] ?? (!empty($report['RuanganID']) ? 'ruangan' : 'inventaris');
+$currentTargetValue = $old['targetValue'] ?? (!empty($report['RuanganID']) ? $report['RuanganID'] : $report['InventarisID']);
+$currentJenisLaporan = $old['jenisLaporan'] ?? $report['JenisLaporan'];
+$currentDeskripsi = $old['deskripsi'] ?? $report['Deskripsi'];
 ?>
 
 <!DOCTYPE html>
@@ -85,7 +92,7 @@ $currentTargetValue = !empty($report['RuanganID']) ? $report['RuanganID'] : $rep
 
             <div class="page-toolbar" data-note="Hanya laporan berstatus diajukan yang dapat diperbarui">
                 <a href="index.php" class="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:min-h-12 tw:px-4 tw:py-[0.85rem] tw:rounded-2xl tw:border tw:border-[rgba(22,60,122,0.12)] tw:font-extrabold tw:no-underline tw:text-slate-900 tw:bg-[rgba(255,255,255,0.82)] tw:hover:bg-gray-50 tw:transition-all tw:text-sm">
-                    <i class="iconsax tw:text-xl" icon-name="arrow-left-2"></i>
+                    <i class="iconsax tw:text-xl" icon-name="arrow-left"></i>
                     <span>Kembali</span>
                 </a>
             </div>
@@ -122,9 +129,9 @@ $currentTargetValue = !empty($report['RuanganID']) ? $report['RuanganID'] : $rep
                       <div class="mb-4">
                                 <label class="form-label tw:font-semibold">Skala Prioritas / Tingkat Kerusakan</label>
                                 <select name="jenisLaporan" class="form-select" required>
-                                    <option value="Kerusakan Ringan" <?= $report['JenisLaporan'] === 'Kerusakan Ringan' ? 'selected' : '' ?>>Kerusakan Ringan (Low Priority)</option>
-                                    <option value="Kerusakan Sedang" <?= $report['JenisLaporan'] === 'Kerusakan Sedang' ? 'selected' : '' ?>>Kerusakan Sedang (Medium Priority)</option>
-                                    <option value="Kerusakan Darurat / Berat" <?= $report['JenisLaporan'] === 'Kerusakan Darurat / Berat' ? 'selected' : '' ?>>Kerusakan Darurat / Berat (EMERGENCY)</option>
+                                    <option value="Kerusakan Ringan" <?= $currentJenisLaporan === 'Kerusakan Ringan' ? 'selected' : '' ?>>Kerusakan Ringan (Low Priority)</option>
+                                    <option value="Kerusakan Sedang" <?= $currentJenisLaporan === 'Kerusakan Sedang' ? 'selected' : '' ?>>Kerusakan Sedang (Medium Priority)</option>
+                                    <option value="Kerusakan Darurat / Berat" <?= $currentJenisLaporan === 'Kerusakan Darurat / Berat' ? 'selected' : '' ?>>Kerusakan Darurat / Berat (EMERGENCY)</option>
                                 </select>
                             </div>
 
@@ -166,7 +173,7 @@ $currentTargetValue = !empty($report['RuanganID']) ? $report['RuanganID'] : $rep
 
                             <div class="mb-4 tw:col-span-full">
                                 <label class="form-label tw:font-semibold">Deskripsi Kerusakan</label>
-                                <textarea name="deskripsi" class="form-control" rows="4" required><?= htmlspecialchars($report['Deskripsi']) ?></textarea>
+                                <textarea name="deskripsi" class="form-control" rows="4" required><?= htmlspecialchars($currentDeskripsi) ?></textarea>
                             </div>
 
                             <div class="mb-4 tw:col-span-full">

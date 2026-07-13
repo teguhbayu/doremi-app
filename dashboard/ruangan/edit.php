@@ -15,6 +15,8 @@ if ($_SESSION['userRole'] !== 'PENGURUS') {
 require '../../csrf.php';
 require '../../db.php';
 require '../../database/ruangan.php';
+require '../../utils/old_input.php';
+require_once '../../utils/validation_helpers.php';
 
 $ruanganTypes = ['Ruang Ibadah', 'Ruang Publik', 'Ruang Jemur', 'Lapangan Olahraga', 'Balkon', 'Kamar Mandi'];
 
@@ -47,13 +49,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $lantai = trim($_POST['lantaiRuangan'] ?? '');
     $keterangan = trim($_POST['keteranganRuangan'] ?? '');
 
-    $ruanganSchema = v::keySet(
-        v::key('nama', v::stringType()->length(1, 100)),
-        v::key('jenis', v::in($ruanganTypes)),
-        v::key('lantai', v::in(['1', '2', '3', '4', '5', '6', '7', '1 Gedung Sekretariat', '2 Gedung Sekretariat'])),
-        v::key('keterangan', v::stringType()->length(0, 500))
-    );
-
     $postData = [
         'nama' => $nama,
         'jenis' => $jenis,
@@ -61,14 +56,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'keterangan' => $keterangan,
     ];
 
-    if (!$ruanganSchema->validate($postData)) {
-        header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&status=error&message=Data Ruangan Tidak Valid!');
+    $fieldError = firstFieldError($postData, [
+        'nama' => ['label' => 'Nama Ruangan', 'rule' => v::stringType()->length(1, 100)],
+        'jenis' => ['label' => 'Jenis Ruangan', 'rule' => v::in($ruanganTypes)],
+        'lantai' => ['label' => 'Lantai', 'rule' => v::in(['1', '2', '3', '4', '5', '6', '7', '1 Gedung Sekretariat', '2 Gedung Sekretariat'])],
+        'keterangan' => ['label' => 'Keterangan', 'rule' => v::stringType()->length(0, 500)],
+    ]);
+
+    if ($fieldError !== null) {
+        setOldFormInput($postData);
+        header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&status=error&message=' . urlencode($fieldError));
         exit;
     }
 
     try {
         updateRuangan($db, (int) $id, $nama, $jenis, $lantai, $keterangan);
     } catch (RuntimeException $e) {
+        setOldFormInput($postData);
         header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&status=error&message=Terjadi Kesalahan saat mengupdate data!');
         exit;
     }
@@ -76,6 +80,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header("Location: /doremi-app/dashboard/ruangan/?status=success&message=Ruangan Berhasil Diupdate!");
     exit;
 }
+
+$old = pullOldFormInput();
+$formData = [
+    'nama' => $old['nama'] ?? $ruangan['NamaRuangan'],
+    'jenis' => $old['jenis'] ?? $ruangan['JenisRuangan'],
+    'lantai' => $old['lantai'] ?? $ruangan['Lantai'],
+    'keterangan' => $old['keterangan'] ?? $ruangan['Keterangan'],
+];
 ?>
 
 <!DOCTYPE html>
@@ -92,12 +104,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </h1>
             <div class="page-toolbar" data-note="Perubahan tersimpan ke data ruangan">
                 <a href="index.php" class="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:min-h-12 tw:px-4 tw:py-[0.85rem] tw:rounded-2xl tw:border tw:border-[rgba(22,60,122,0.12)] tw:font-extrabold tw:no-underline tw:text-slate-900 tw:bg-[rgba(255,255,255,0.82)] tw:hover:bg-gray-50 tw:transition-all tw:text-sm">
-                    <i class="iconsax" icon-name="arrow-left-2"></i>
+                    <i class="iconsax" icon-name="arrow-left"></i>
                     <span>Kembali ke daftar</span>
                 </a>
             </div>
 
-            <form method="POST" class="tw:grid tw:grid-cols-1 tw:lg:grid-cols-2 tw:gap-4 tw:p-[1.45rem] tw:rounded-[24px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.88)] tw:shadow-sm" x-data="<?= htmlspecialchars(json_encode(['nama' => $ruangan['NamaRuangan'] ?? '', 'keterangan' => $ruangan['Keterangan'] ?? ''])) ?>">
+            <form method="POST" class="tw:grid tw:grid-cols-1 tw:lg:grid-cols-2 tw:gap-4 tw:p-[1.45rem] tw:rounded-[24px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.88)] tw:shadow-sm" x-data="<?= htmlspecialchars(json_encode(['nama' => $formData['nama'] ?? '', 'keterangan' => $formData['keterangan'] ?? ''])) ?>">
                 <?php echo csrf_field(); ?>
               <div class="mb-3">
                     <label for="namaRuangan" class="form-label">Nama Ruangan</label>
@@ -110,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <label for="jenisRuangan" class="form-label">Jenis Ruangan</label>
                     <select class="form-select" name="jenisRuangan" id="jenisRuangan" required>
                         <?php foreach ($ruanganTypes as $jenisRuangan): ?>
-                            <option value="<?= htmlspecialchars($jenisRuangan) ?>" <?= $ruangan['JenisRuangan'] === $jenisRuangan ? 'selected' : '' ?>>
+                            <option value="<?= htmlspecialchars($jenisRuangan) ?>" <?= $formData['jenis'] === $jenisRuangan ? 'selected' : '' ?>>
                                 <?= htmlspecialchars($jenisRuangan) ?>
                             </option>
                         <?php endforeach; ?>
@@ -119,16 +131,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="mb-3">
                     <label for="lantaiRuangan" class="form-label">Lantai</label>
                     <select class="form-select" name="lantaiRuangan" id="lantaiRuangan" required>
-                        <option value="" disabled <?= empty($ruangan['Lantai']) ? 'selected' : '' ?>>Pilih Lantai</option>
-                        <option value="1" <?= $ruangan['Lantai'] == '1' ? 'selected' : '' ?>>Lantai 1</option>
-                        <option value="2" <?= $ruangan['Lantai'] == '2' ? 'selected' : '' ?>>Lantai 2</option>
-                        <option value="3" <?= $ruangan['Lantai'] == '3' ? 'selected' : '' ?>>Lantai 3</option>
-                        <option value="4" <?= $ruangan['Lantai'] == '4' ? 'selected' : '' ?>>Lantai 4</option>
-                        <option value="5" <?= $ruangan['Lantai'] == '5' ? 'selected' : '' ?>>Lantai 5</option>
-                        <option value="6" <?= $ruangan['Lantai'] == '6' ? 'selected' : '' ?>>Lantai 6</option>
-                        <option value="7" <?= $ruangan['Lantai'] == '7' ? 'selected' : '' ?>>Lantai 7</option>
-                        <option value="1 Gedung Sekretariat" <?= $ruangan['Lantai'] == '1 Gedung Sekretariat' ? 'selected' : '' ?>>Lantai 1 Gedung Sekretariat</option>
-                        <option value="2 Gedung Sekretariat" <?= $ruangan['Lantai'] == '2 Gedung Sekretariat' ? 'selected' : '' ?>>Lantai 2 Gedung Sekretariat</option>
+                        <option value="" disabled <?= empty($formData['lantai']) ? 'selected' : '' ?>>Pilih Lantai</option>
+                        <option value="1" <?= $formData['lantai'] == '1' ? 'selected' : '' ?>>Lantai 1</option>
+                        <option value="2" <?= $formData['lantai'] == '2' ? 'selected' : '' ?>>Lantai 2</option>
+                        <option value="3" <?= $formData['lantai'] == '3' ? 'selected' : '' ?>>Lantai 3</option>
+                        <option value="4" <?= $formData['lantai'] == '4' ? 'selected' : '' ?>>Lantai 4</option>
+                        <option value="5" <?= $formData['lantai'] == '5' ? 'selected' : '' ?>>Lantai 5</option>
+                        <option value="6" <?= $formData['lantai'] == '6' ? 'selected' : '' ?>>Lantai 6</option>
+                        <option value="7" <?= $formData['lantai'] == '7' ? 'selected' : '' ?>>Lantai 7</option>
+                        <option value="1 Gedung Sekretariat" <?= $formData['lantai'] == '1 Gedung Sekretariat' ? 'selected' : '' ?>>Lantai 1 Gedung Sekretariat</option>
+                        <option value="2 Gedung Sekretariat" <?= $formData['lantai'] == '2 Gedung Sekretariat' ? 'selected' : '' ?>>Lantai 2 Gedung Sekretariat</option>
                     </select>
                 </div>
                 <div class="mb-3">

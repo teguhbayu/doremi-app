@@ -5,6 +5,7 @@ paket_require_roles(['SIGAP']);
 require '../../db.php';
 require_once '../../database/paket.php';
 require_once '../../utils/format.php';
+require_once '../../utils/old_input.php';
 require 'validation.php';
 
 $paketId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
@@ -28,6 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $validationMessage = validatePaketReviewInput($reviewInput, $petugasSigapId);
     if ($validationMessage !== null) {
+        setOldFormInput($_POST);
         paket_redirect($_SERVER['PHP_SELF'] . '?id=' . $paketId, 'error', $validationMessage);
     }
 
@@ -37,16 +39,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         updatePaketPickupReview($db, $pengambilanPaketId, $petugasSigapId, $reviewInput['status'], $keterangan);
     } catch (RuntimeException) {
+        setOldFormInput($_POST);
         paket_redirect($_SERVER['PHP_SELF'] . '?id=' . $paketId, 'error', 'Gagal memperbarui status paket.');
     }
 
     paket_redirect('/doremi-app/dashboard/paket/', 'success', 'Status paket berhasil diperbarui.');
 }
 
-$selectedStatus = in_array($paket['Status'] ?? '', ['Sudah Diambil', 'TERTUKAR'], true)
-    ? $paket['Status']
+$old = pullOldFormInput();
+$submittedStatus = $old['status'] ?? ($paket['Status'] ?? '');
+$selectedStatus = in_array($submittedStatus, ['Sudah Diambil', 'TERTUKAR'], true)
+    ? $submittedStatus
     : 'Sudah Diambil';
-$keteranganValue = ($paket['Keterangan'] ?? '-') === '-' ? '' : $paket['Keterangan'];
+$keteranganValue = $old['keterangan'] ?? (($paket['Keterangan'] ?? '-') === '-' ? '' : $paket['Keterangan']);
 $statusMeta = paket_status_meta($paket['Status'] ?? 'Belum Diambil');
 ?>
 
@@ -65,7 +70,7 @@ $statusMeta = paket_status_meta($paket['Status'] ?? 'Belum Diambil');
 
             <div class="page-toolbar" data-note="Validasi akhir status pengambilan paket">
                 <a href="index.php" class="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:min-h-12 tw:px-4 tw:py-[0.85rem] tw:rounded-2xl tw:border tw:border-[rgba(22,60,122,0.12)] tw:font-extrabold tw:no-underline tw:text-slate-900 tw:bg-[rgba(255,255,255,0.82)] tw:hover:bg-gray-50 tw:transition-all tw:text-sm">
-                    <i class="iconsax tw:text-xl" icon-name="arrow-left-2"></i>
+                    <i class="iconsax tw:text-xl" icon-name="arrow-left"></i>
                     <span>Kembali</span>
                 </a>
             </div>
