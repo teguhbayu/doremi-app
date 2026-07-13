@@ -79,12 +79,27 @@ $totalReports = count($reports);
                                     </td>
                                     
                                     <td>
-                                        <?php if ($r['JenisLaporan'] === 'Kerusakan Darurat / Berat'): ?>
-                                            <span class="badge bg-danger text-white tw:text-xs">Darurat</span>
-                                        <?php elseif ($r['JenisLaporan'] === 'Kerusakan Sedang'): ?>
-                                            <span class="badge bg-warning text-dark tw:text-xs">Sedang</span>
+                                        <?php
+                                            $urgencyBadgeClass = match ($r['JenisLaporan']) {
+                                                'Kerusakan Darurat / Berat' => 'badge bg-danger text-white tw:text-xs',
+                                                'Kerusakan Sedang' => 'badge bg-warning text-dark tw:text-xs',
+                                                default => 'badge bg-success text-white tw:text-xs',
+                                            };
+                                            $urgencyLabel = match ($r['JenisLaporan']) {
+                                                'Kerusakan Darurat / Berat' => 'Darurat',
+                                                'Kerusakan Sedang' => 'Sedang',
+                                                default => 'Ringan',
+                                            };
+                                            $canEditUrgency = $role === 'MAINTENANCE' && in_array($r['StatusMaintenance'], ['Diajukan', 'Diproses'], true);
+                                        ?>
+                                        <?php if ($canEditUrgency): ?>
+                                            <button type="button" class="<?= $urgencyBadgeClass ?> tw:border-0 tw:cursor-pointer tw:inline-flex tw:items-center tw:gap-1 tw:hover:opacity-80 tw:transition-opacity"
+                                                    data-bs-toggle="modal" data-bs-target="#urgencyModal<?= $r['MaintenanceID'] ?>" title="Klik untuk ubah tingkat urgensi">
+                                                <?= $urgencyLabel ?>
+                                                <i class="iconsax tw:text-[0.7rem]" icon-name="edit-2"></i>
+                                            </button>
                                         <?php else: ?>
-                                            <span class="badge bg-success text-white tw:text-xs">Ringan</span>
+                                            <span class="<?= $urgencyBadgeClass ?>"><?= $urgencyLabel ?></span>
                                         <?php endif; ?>
                                     </td>
                                     <td><?= formatDateTime($r['TanggalLapor'] ?? null, 'd M Y') ?></td>
@@ -167,7 +182,7 @@ $totalReports = count($reports);
                                                             <label class="tw:text-xs tw:text-slate-500 tw:mb-1 tw:block">Foto Masalah</label>
                                                             <div class="tw:relative tw:w-full tw:h-60 tw:bg-slate-100 tw:rounded-lg tw:overflow-hidden tw:border">
                                                                 <div class="image-skeleton tw:absolute tw:inset-0 tw:bg-slate-100 tw:animate-pulse tw:flex tw:items-center tw:justify-center">
-                                                                    <i class="iconsax tw:text-4xl tw:text-slate-400" icon-name="gallery"></i>
+                                                                    <i class="iconsax tw:text-4xl tw:text-slate-400" icon-name="picture"></i>
                                                                 </div>
                                                                 <img data-src="../get_photo.php?type=maintenance_laporan&id=<?= $r['MaintenanceID'] ?>" src="" alt="Foto Laporan" class="image-target tw:absolute tw:inset-0 tw:w-full tw:h-full tw:object-cover tw:opacity-0 tw:transition-opacity tw:duration-300">
                                                             </div>
@@ -195,7 +210,7 @@ $totalReports = count($reports);
                                                                     <label class="tw:text-xs tw:text-emerald-600 tw:mb-1 tw:block">Foto Bukti Perbaikan</label>
                                                                     <div class="tw:relative tw:w-full tw:h-60 tw:bg-slate-100 tw:rounded-lg tw:overflow-hidden tw:border tw:border-emerald-100">
                                                                         <div class="image-skeleton tw:absolute tw:inset-0 tw:bg-slate-100 tw:animate-pulse tw:flex tw:items-center tw:justify-center">
-                                                                            <i class="iconsax tw:text-4xl tw:text-slate-400" icon-name="gallery"></i>
+                                                                            <i class="iconsax tw:text-4xl tw:text-slate-400" icon-name="picture"></i>
                                                                         </div>
                                                                         <img data-src="../get_photo.php?type=maintenance_perbaikan&id=<?= $r['MaintenanceID'] ?>" src="" alt="Foto Perbaikan" class="image-target tw:absolute tw:inset-0 tw:w-full tw:h-full tw:object-cover tw:opacity-0 tw:transition-opacity tw:duration-300">
                                                                     </div>
@@ -240,6 +255,40 @@ $totalReports = count($reports);
                                                     <div class="modal-footer">
                                                         <button type="button" class="btn btn-secondary tw:rounded-lg" data-bs-dismiss="modal">Batal</button>
                                                         <button type="submit" class="btn btn-success tw:rounded-lg">Simpan Selesai</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php endif; ?>
+
+
+                                <?php if ($role === 'MAINTENANCE' && in_array($r['StatusMaintenance'], ['Diajukan', 'Diproses'], true)): ?>
+                                    <div class="modal fade text-start" id="urgencyModal<?= $r['MaintenanceID'] ?>" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Ubah Tingkat Urgensi</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <form action="process.php" method="POST">
+                                                    <div class="modal-body">
+                                                        <?php echo csrf_field(); ?>
+                                                        <input type="hidden" name="action" value="update_urgency">
+                                                        <input type="hidden" name="id" value="<?= $r['MaintenanceID'] ?>">
+
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Skala Prioritas / Tingkat Kerusakan</label>
+                                                            <select name="jenisLaporan" class="form-select" required>
+                                                                <option value="Kerusakan Ringan" <?= $r['JenisLaporan'] === 'Kerusakan Ringan' ? 'selected' : '' ?>>Kerusakan Ringan (Low Priority)</option>
+                                                                <option value="Kerusakan Sedang" <?= $r['JenisLaporan'] === 'Kerusakan Sedang' ? 'selected' : '' ?>>Kerusakan Sedang (Medium Priority)</option>
+                                                                <option value="Kerusakan Darurat / Berat" <?= $r['JenisLaporan'] === 'Kerusakan Darurat / Berat' ? 'selected' : '' ?>>Kerusakan Darurat / Berat (EMERGENCY)</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary tw:rounded-lg" data-bs-dismiss="modal">Batal</button>
+                                                        <button type="submit" class="btn btn-primary tw:rounded-lg">Simpan Urgensi</button>
                                                     </div>
                                                 </form>
                                             </div>

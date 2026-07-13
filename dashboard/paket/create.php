@@ -3,6 +3,7 @@ session_start();
 require 'helpers.php';
 paket_require_roles(['SIGAP']);
 require '../../db.php';
+require '../../utils/old_input.php';
 require_once '../../database/paket.php';
 require 'validation.php';
 
@@ -12,6 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $paketInput = collectPaketInput($_POST);
     $validationMessage = validatePaketInput($db, $paketInput);
     if ($validationMessage !== null) {
+        setOldFormInput($_POST);
         paket_redirect($_SERVER['PHP_SELF'], 'error', $validationMessage);
     }
 
@@ -28,10 +30,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             (int) $paketInput['penghuniId']
         );
     } catch (RuntimeException) {
+        setOldFormInput($_POST);
         paket_redirect($_SERVER['PHP_SELF'], 'error', 'Gagal menyimpan data paket.');
     }
 
     paket_redirect('/doremi-app/dashboard/paket/', 'success', 'Data paket berhasil ditambahkan.');
+}
+
+$old = pullOldFormInput();
+$oldPenghuniLabel = '';
+if (!empty($old['penghuniId'])) {
+    foreach ($penghuniList as $penghuni) {
+        if ((int) $penghuni['PenghuniID'] === (int) $old['penghuniId']) {
+            $oldPenghuniLabel = paket_penghuni_option_label($penghuni);
+            break;
+        }
+    }
 }
 ?>
 
@@ -50,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <div class="page-toolbar" data-note="Form paket baru">
                 <a href="index.php" class="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:min-h-12 tw:px-4 tw:py-[0.85rem] tw:rounded-2xl tw:border tw:border-[rgba(22,60,122,0.12)] tw:font-extrabold tw:no-underline tw:text-slate-900 tw:bg-[rgba(255,255,255,0.82)] tw:hover:bg-gray-50 tw:transition-all tw:text-sm">
-                    <i class="iconsax tw:text-xl" icon-name="arrow-left-2"></i>
+                    <i class="iconsax tw:text-xl" icon-name="arrow-left"></i>
                     <span>Kembali</span>
                 </a>
             </div>
@@ -64,14 +78,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="mb-3">
                     <label for="waktuSampai" class="form-label">Waktu Sampai</label>
                     <input type="datetime-local" name="waktuSampai" class="form-control" id="waktuSampai"
-                        value="<?= date('Y-m-d\TH:i') ?>" required>
+                        value="<?= htmlspecialchars($old['waktuSampai'] ?? date('Y-m-d\TH:i')) ?>" required>
                 </div>
 
                 <div class="mb-3 tw:col-span-full">
                     <label for="penghuniSearch" class="form-label">Penghuni Tujuan</label>
                     <input type="text" class="form-control" id="penghuniSearch" list="penghuniOptions"
+                        value="<?= htmlspecialchars($oldPenghuniLabel) ?>"
                         placeholder="Ketik nama, NIM, atau kamar penghuni" autocomplete="off" required>
-                    <input type="hidden" name="penghuniId" id="penghuniId">
+                    <input type="hidden" name="penghuniId" id="penghuniId" value="<?= htmlspecialchars($old['penghuniId'] ?? '') ?>">
                     <datalist id="penghuniOptions">
                         <?php foreach ($penghuniList as $penghuni): ?>
                             <option value="<?= htmlspecialchars(paket_penghuni_option_label($penghuni)) ?>" data-id="<?= (int) $penghuni['PenghuniID'] ?>"></option>
@@ -83,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <label for="jenisPaket" class="form-label">Tipe Kiriman</label>
                     <select name="jenisPaket" class="form-select" id="jenisPaket" required>
                         <?php foreach (paket_allowed_types() as $type): ?>
-                            <option value="<?= htmlspecialchars($type) ?>" <?= $type === 'Paket' ? 'selected' : '' ?>>
+                            <option value="<?= htmlspecialchars($type) ?>" <?= ($old['jenisPaket'] ?? 'Paket') === $type ? 'selected' : '' ?>>
                                 <?= htmlspecialchars($type) ?>
                             </option>
                         <?php endforeach; ?>
@@ -93,11 +108,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="mb-3">
                     <label for="namaPengirim" class="form-label">Nama Pengirim</label>
                     <input type="text" name="namaPengirim" class="form-control" id="namaPengirim" maxlength="100"
-                        required>
+                        value="<?= htmlspecialchars($old['namaPengirim'] ?? '') ?>" required>
                 </div>
                 <div class="mb-3">
                     <label for="kurir" class="form-label">Kurir</label>
-                    <input type="text" name="kurir" class="form-control" id="kurir" maxlength="50" required>
+                    <input type="text" name="kurir" class="form-control" id="kurir" maxlength="50"
+                        value="<?= htmlspecialchars($old['kurir'] ?? '') ?>" required>
                 </div>
 
                 <div class="tw:col-span-full tw:flex tw:justify-end tw:mt-2">

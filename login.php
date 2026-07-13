@@ -1,6 +1,7 @@
 <?php
 session_start();
 require './db.php';
+require 'utils/old_input.php';
 require_once 'database/auth.php';
 require_once 'auth/helpers.php';
 require_once 'auth/validation.php';
@@ -16,11 +17,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $loginInput = collectLoginInput($_POST);
     $validationMessage = validateLoginInput($loginInput);
     if ($validationMessage !== null) {
+        setOldFormInput(['email' => $loginInput['email']]);
         authRedirectToLoginError($validationMessage, $_SERVER['PHP_SELF']);
     }
 
     $authUser = authAttemptPasswordLogin($db, $loginInput['email'], $loginInput['password']);
     if ($authUser === null) {
+        setOldFormInput(['email' => $loginInput['email']]);
         authRedirectToLoginError('Email atau Password Tidak Valid!', $_SERVER['PHP_SELF']);
     }
 
@@ -28,6 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     authRedirectToDashboard();
 }
 
+$old = pullOldFormInput();
 $login_url = $client->createAuthUrl();
 ?>
 
@@ -79,7 +83,7 @@ $login_url = $client->createAuthUrl();
                             <div class="auth-input-wrap">
                                 <i class="iconsax auth-input-icon tw:text-xl" icon-name="user-1"></i>
                                 <input id="email" name="email" type="email" required class="auth-input"
-                                    placeholder="email" />
+                                    value="<?= htmlspecialchars($old['email'] ?? '') ?>" placeholder="email" />
                             </div>
                         </div>
 

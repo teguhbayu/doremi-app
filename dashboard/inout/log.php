@@ -27,7 +27,7 @@ $totalLogs = count($logRows);
             </h1>
             <div class="page-toolbar" data-note="<?= $totalLogs ?> transaksi tercatat">
                 <a href="index.php" class="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:min-h-12 tw:px-4 tw:py-[0.85rem] tw:rounded-2xl tw:border tw:border-[rgba(22,60,122,0.12)] tw:font-extrabold tw:no-underline tw:text-slate-900 tw:bg-[rgba(255,255,255,0.82)] tw:hover:bg-gray-50 tw:transition-all tw:text-sm">
-                    <i class="iconsax" icon-name="arrow-left-2"></i>
+                    <i class="iconsax" icon-name="arrow-left"></i>
                     <span>Kembali ke konfirmasi</span>
                 </a>
             </div>

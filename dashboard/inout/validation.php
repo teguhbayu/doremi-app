@@ -14,8 +14,16 @@ function collectInOutRequestInput(array $source): array
 
 function validateInOutRequestInput(array $input): ?string
 {
-    if (empty($input['keperluan']) || empty($input['waktuKeluarTime']) || empty($input['waktuMasukTime'])) {
-        return 'Semua field harus diisi!';
+    if (empty($input['waktuKeluarTime'])) {
+        return 'Kolom Rencana Keluar wajib diisi.';
+    }
+
+    if (empty($input['waktuMasukTime'])) {
+        return 'Kolom Rencana Masuk wajib diisi.';
+    }
+
+    if (empty($input['keperluan'])) {
+        return 'Kolom Keperluan wajib diisi.';
     }
 
     if (textLength($input['keperluan']) > 20) {

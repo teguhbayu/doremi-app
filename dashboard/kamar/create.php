@@ -9,6 +9,8 @@ if (!isset($_SESSION['userId'])) {
     exit;
 }
 require '../../db.php';
+require '../../utils/old_input.php';
+require_once '../../utils/validation_helpers.php';
 require 'helpers.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -17,25 +19,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $lantai = trim($_POST['lantaiKamar'] ?? '');
     $nomor = kamar_build_nomor($lantai, $bagianKamar);
 
-    $kamarSchema = v::keySet(
-        v::key('bagian', v::regex('/^[A-Z]$/')),
-        v::key('kapasitas', v::digit()),
-        v::key('lantai', v::in(kamar_allowed_floors()))
-    );
-
     $postData = [
         'bagian' => $bagianKamar,
         'kapasitas' => $kapasitas,
         'lantai' => $lantai,
     ];
 
-    if (!$kamarSchema->validate($postData)) {
-        header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Data Kamar tidak Valid!');
+    $fieldError = firstFieldError($postData, [
+        'lantai' => ['label' => 'Lantai', 'rule' => v::in(kamar_allowed_floors())],
+        'bagian' => ['label' => 'Kamar', 'rule' => v::regex('/^[A-Z]$/')],
+        'kapasitas' => ['label' => 'Kapasitas Kamar', 'rule' => v::digit()],
+    ]);
+
+    if ($fieldError !== null) {
+        setOldFormInput($_POST);
+        header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=' . urlencode($fieldError));
         exit;
     }
 
     $kapasitasInt = (int) $kapasitas;
     if ($kapasitasInt < 1 || $kapasitasInt > 4) {
+        setOldFormInput($_POST);
         header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Kapasitas kamar minimal 1 dan maksimal 4 penghuni!');
         exit;
     }
@@ -48,6 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     mysqli_stmt_close($checkStmt);
 
     if ($existingKamar) {
+        setOldFormInput($_POST);
         header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Nomor kamar sudah terdaftar!');
         exit;
     }
@@ -58,6 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     mysqli_stmt_bind_param($stmt, 'siss', $nomor, $kapasitasInt, $lantai, $now);
 
     if (!mysqli_stmt_execute($stmt)) {
+        setOldFormInput($_POST);
         header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Terjadi Kesalahan saat menyimpan data!');
         mysqli_stmt_close($stmt);
         exit;
@@ -69,6 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
+$old = pullOldFormInput();
 ?>
 
 
@@ -86,16 +93,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </h1>
             <div class="page-toolbar" data-note="Form kamar baru">
                 <a href="index.php" class="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:min-h-12 tw:px-4 tw:py-[0.85rem] tw:rounded-2xl tw:border tw:border-[rgba(22,60,122,0.12)] tw:font-extrabold tw:no-underline tw:text-slate-900 tw:bg-[rgba(255,255,255,0.82)] tw:hover:bg-gray-50 tw:transition-all tw:text-sm">
-                    <i class="iconsax" icon-name="arrow-left-2"></i>
+                    <i class="iconsax" icon-name="arrow-left"></i>
                     <span>Kembali ke daftar</span>
                 </a>
             </div>
 
-            <form method="POST" class="tw:grid tw:grid-cols-1 tw:lg:grid-cols-2 tw:gap-4 tw:p-[1.45rem] tw:rounded-[24px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.88)] tw:shadow-sm">
+            <form method="POST" class="tw:grid tw:grid-cols-1 tw:lg:grid-cols-2 tw:gap-4 tw:p-[1.45rem] tw:rounded-[24px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.88)] tw:shadow-sm"
+                x-data="{ lantai: '<?= htmlspecialchars($old['lantaiKamar'] ?? '') ?>', bagian: '<?= htmlspecialchars($old['bagianKamar'] ?? '') ?>' }">
                 <div class="mb-3">
                     <label for="lantaiKamar" class="form-label">Lantai</label>
-                    <select class="form-select" name="lantaiKamar" id="lantaiKamar" required>
-                        <option value="" disabled selected>Pilih Lantai</option>
+                    <select class="form-select" name="lantaiKamar" id="lantaiKamar" x-model="lantai" required>
+                        <option value="" disabled>Pilih Lantai</option>
                         <option value="1">Lantai 1</option>
                         <option value="2">Lantai 2</option>
                         <option value="3">Lantai 3</option>
@@ -108,16 +116,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="mb-3">
                     <label for="bagianKamar" class="form-label">Kamar</label>
                     <input type="text" name="bagianKamar" class="form-control" id="bagianKamar" maxlength="1"
-                        pattern="[A-Za-z]" title="Kolom kamar hanya boleh diisi 1 huruf." required>
+                        pattern="[A-Za-z]" title="Kolom kamar hanya boleh diisi 1 huruf." required
+                        x-model="bagian" @input="bagian = bagian.replace(/[^A-Za-z]/g, '').slice(0, 1).toUpperCase()">
                 </div>
                 <div class="mb-3">
                     <label for="nomorKamarPreview" class="form-label">Nomor Kamar</label>
-                    <input type="text" class="form-control" id="nomorKamarPreview" placeholder="Nomor kamar otomatis" readonly>
+                    <input type="text" class="form-control" id="nomorKamarPreview" placeholder="Nomor kamar otomatis" readonly
+                        :value="lantai && bagian ? lantai + bagian : ''">
                 </div>
                 <div class="mb-3">
                     <label for="kapasitasKamar" class="form-label">Kapasitas Kamar</label>
                     <input type="number" name="kapasitasKamar" class="form-control" id="kapasitasKamar" min="1"
-                        max="4" required>
+                        max="4" value="<?= htmlspecialchars($old['kapasitasKamar'] ?? '') ?>" required>
                     <div class="form-text">Kapasitas kamar minimal 1 dan maksimal 4 penghuni.</div>
                 </div>
                 <div class="tw:col-span-full tw:flex tw:justify-end tw:mt-2">
@@ -134,30 +144,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </main>
     <?php require '../../bootstrap.php'; ?>
     <?php require '../../validation_alert.php'; ?>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const lantaiInput = document.getElementById('lantaiKamar');
-            const bagianInput = document.getElementById('bagianKamar');
-            const nomorPreviewInput = document.getElementById('nomorKamarPreview');
-
-            const syncNomorKamar = () => {
-                const lantai = (lantaiInput?.value || '').trim();
-                const bagian = ((bagianInput?.value || '').match(/[A-Za-z]/)?.[0] || '').toUpperCase();
-
-                if (bagianInput) {
-                    bagianInput.value = bagian;
-                }
-
-                if (nomorPreviewInput) {
-                    nomorPreviewInput.value = lantai && bagian ? `${lantai}${bagian}` : '';
-                }
-            };
-
-            lantaiInput?.addEventListener('change', syncNomorKamar);
-            bagianInput?.addEventListener('input', syncNomorKamar);
-            syncNomorKamar();
-        });
-    </script>
 </body>
 
 </html>

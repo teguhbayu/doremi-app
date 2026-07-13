@@ -9,6 +9,7 @@ csrf_validate('index.php');
 
 require '../../db.php';
 require_once '../../database/maintenance.php';
+require 'validation.php';
 
 $action = $_POST['action'] ?? '';
 $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
@@ -57,6 +58,21 @@ elseif ($action === 'complete') {
         maintenance_redirect('index.php', 'success', 'Perbaikan selesai! Laporan berhasil diperbarui.');
     } catch (RuntimeException) {
         maintenance_redirect('index.php', 'error', 'Terjadi kesalahan sistem saat memperbarui status selesai.');
+    }
+}
+
+elseif ($action === 'update_urgency') {
+    $jenisLaporan = trim($_POST['jenisLaporan'] ?? '');
+    $validationMessage = validateMaintenanceUrgencyInput($jenisLaporan);
+    if ($validationMessage !== null) {
+        maintenance_redirect('index.php', 'error', $validationMessage);
+    }
+
+    try {
+        updateMaintenanceUrgency($db, $id, $jenisLaporan);
+        maintenance_redirect('index.php', 'success', 'Tingkat urgensi laporan berhasil diperbarui.');
+    } catch (RuntimeException) {
+        maintenance_redirect('index.php', 'error', 'Terjadi kesalahan sistem saat memperbarui urgensi.');
     }
 } else {
     maintenance_redirect('index.php');

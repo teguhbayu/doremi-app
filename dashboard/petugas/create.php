@@ -9,6 +9,8 @@ if (!isset($_SESSION['userId'])) {
     exit;
 }
 require '../../db.php';
+require '../../utils/old_input.php';
+require_once '../../utils/validation_helpers.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nama = trim($_POST['namaPetugas'] ?? '');
@@ -17,20 +19,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $jabatan = trim($_POST['jabatanPetugas'] ?? '');
     $password = trim($_POST['passwordPetugas'] ?? '');
     $confirmPassword = trim($_POST['confirmPasswordPetugas'] ?? '');
-
-    $petugasSchema = v::keySet(
-        v::key('nama', v::stringType()->length(3, 100))
-        ,
-        v::key('email', v::email()->length(3, 100))
-        ,
-        v::key('no', v::digit()->length(10, 16))
-        ,
-        v::key('jabatan', v::alpha()->in(["PENGURUS", "SIGAP", "SERVANDA", "MAINTENANCE"]))
-        ,
-        v::key('password', v::length(8, 100))
-        ,
-        v::key('confirmPassword', v::length(8, 100))
-    );
 
     $postData = [
         'nama' => $nama,
@@ -41,15 +29,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'confirmPassword' => $confirmPassword,
     ];
 
+    // Password fields are excluded from the flashed old-input so a plaintext
+    // password never gets echoed back into the page after a failed submit.
+    $oldInput = ['nama' => $nama, 'email' => $email, 'no' => $no, 'jabatan' => $jabatan];
 
-    if (!$petugasSchema->validate($postData)) {
-        $_SESSION['form_data'] = $postData;
-        header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Petugas Baru tidak Valid!');
+    $fieldError = firstFieldError($postData, [
+        'nama' => ['label' => 'Nama Petugas', 'rule' => v::stringType()->length(3, 100)],
+        'email' => ['label' => 'Email Petugas', 'rule' => v::email()->length(3, 100)],
+        'no' => ['label' => 'No. HP', 'rule' => v::digit()->length(10, 16)],
+        'jabatan' => ['label' => 'Jabatan', 'rule' => v::alpha()->in(["PENGURUS", "SIGAP", "SERVANDA", "MAINTENANCE"])],
+        'password' => ['label' => 'Password', 'rule' => v::length(8, 100)],
+        'confirmPassword' => ['label' => 'Konfirmasi Password', 'rule' => v::length(8, 100)],
+    ]);
+
+    if ($fieldError !== null) {
+        setOldFormInput($oldInput);
+        header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=' . urlencode($fieldError));
         exit;
     }
 
     if ($password !== $confirmPassword) {
-        $_SESSION['form_data'] = $postData;
+        setOldFormInput($oldInput);
         header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Password Tidak Cocok!');
         exit;
     }
@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     mysqli_stmt_close($activeCheckStmt);
 
     if ($activePetugas) {
-        $_SESSION['form_data'] = $postData;
+        setOldFormInput($oldInput);
 
         if (($activePetugas['Email'] ?? '') === $email) {
             header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Email petugas sudah terdaftar!');
@@ -101,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         )));
 
         if (count($candidateIds) > 1) {
-            $_SESSION['form_data'] = $postData;
+            setOldFormInput($oldInput);
             header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Email atau No. HP terkait dengan data petugas terhapus yang berbeda. Gunakan data lain atau edit data lama.');
             exit;
         }
@@ -119,15 +119,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         mysqli_stmt_bind_param($restoreStmt, 'sssssi', $nama, $email, $hashedPassword, $jabatan, $no, $restoredDeletedPetugasId);
 
         if (!mysqli_stmt_execute($restoreStmt)) {
-            $_SESSION['form_data'] = $postData;
+            setOldFormInput($oldInput);
             mysqli_stmt_close($restoreStmt);
             header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Gagal memulihkan data petugas yang pernah dihapus!');
             exit;
         }
 
         mysqli_stmt_close($restoreStmt);
-        unset($_SESSION['form_data']);
-
         header("Location: " . '/doremi-app/dashboard/petugas/' . '?status=success&message=Petugas berhasil ditambahkan kembali dari data yang pernah dihapus!');
         exit;
     }
@@ -136,29 +134,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     mysqli_stmt_bind_param($stmt, 'sssss', $nama, $email, $hashedPassword, $jabatan, $no);
 
     if (!mysqli_stmt_execute($stmt)) {
-        $_SESSION['form_data'] = $postData;
+        setOldFormInput($oldInput);
         header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Terjadi Kesalahan saat menambahkan petugas!');
         mysqli_stmt_close($stmt);
         exit;
     }
 
     mysqli_stmt_close($stmt);
-    unset($_SESSION['form_data']);
 
     header("Location: " . '/doremi-app/dashboard/petugas/' . '?status=success&message=Petugas Berhasil Ditambahkan!');
     exit;
 }
 
 // Retrieve form data from session if it exists (after a failed submission)
-$formData = $_SESSION['form_data'] ?? [
+$formData = pullOldFormInput() ?: [
     'nama' => '',
     'email' => '',
     'no' => '',
     'jabatan' => 'Pilih Salah Satu',
-    'password' => '',
-    'confirmPassword' => ''
 ];
-unset($_SESSION['form_data']); // Clear the data after retrieving
 
 ?>
 
@@ -177,7 +171,7 @@ unset($_SESSION['form_data']); // Clear the data after retrieving
             </h1>
             <div class="page-toolbar" data-note="Form akun petugas baru">
                 <a href="index.php" class="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:min-h-12 tw:px-4 tw:py-[0.85rem] tw:rounded-2xl tw:border tw:border-[rgba(22,60,122,0.12)] tw:font-extrabold tw:no-underline tw:text-slate-900 tw:bg-[rgba(255,255,255,0.82)] tw:hover:bg-gray-50 tw:transition-all tw:text-sm">
-                    <i class="iconsax" icon-name="arrow-left-2"></i>
+                    <i class="iconsax" icon-name="arrow-left"></i>
                     <span>Kembali ke daftar</span>
                 </a>
             </div>
@@ -208,12 +202,12 @@ unset($_SESSION['form_data']); // Clear the data after retrieving
                 </div>
                 <div class="mb-3">
                     <label for="passwordPetugas" class="form-label">Password</label>
-                    <input type="password" name="passwordPetugas" x-model="password" class="form-control" id="passwordPetugas" minlength="8" autocomplete="new-password" required>
+                    <input type="password" name="passwordPetugas" class="form-control" id="passwordPetugas" minlength="8" autocomplete="new-password" required>
                     <span class="form-hint">Saran: pakai minimal 8 karakter dengan kombinasi huruf besar, huruf kecil, dan angka.</span>
                 </div>
                 <div class="mb-3">
                     <label for="confirmPasswordPetugas" class="form-label">Konfirmasi Password</label>
-                    <input type="password" name="confirmPasswordPetugas" x-model="confirmPassword" class="form-control" minlength="8" autocomplete="new-password"
+                    <input type="password" name="confirmPasswordPetugas" class="form-control" minlength="8" autocomplete="new-password"
                         id="confirmPasswordPetugas" required>
                 </div>
                 <div class="tw:col-span-full tw:flex tw:justify-end tw:mt-2">

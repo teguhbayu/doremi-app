@@ -16,15 +16,24 @@ function collectPaketInput(array $source): array
 
 function validatePaketInput(mysqli $db, array $input): ?string
 {
-    if (
-        $input['jenisPaket'] === null
-        || !paket_is_valid_length($input['namaPengirim'], 1, 100)
-        || !paket_is_valid_length($input['kurir'], 1, 50)
-        || $input['penghuniId'] === false
-        || $input['penghuniId'] === null
-        || $input['waktuSampai'] === null
-    ) {
-        return 'Data paket tidak valid.';
+    if ($input['jenisPaket'] === null) {
+        return 'Kolom Tipe Kiriman wajib diisi.';
+    }
+
+    if (!paket_is_valid_length($input['namaPengirim'], 1, 100)) {
+        return $input['namaPengirim'] === '' ? 'Kolom Nama Pengirim wajib diisi.' : 'Kolom Nama Pengirim tidak valid.';
+    }
+
+    if (!paket_is_valid_length($input['kurir'], 1, 50)) {
+        return $input['kurir'] === '' ? 'Kolom Kurir wajib diisi.' : 'Kolom Kurir tidak valid.';
+    }
+
+    if ($input['penghuniId'] === false || $input['penghuniId'] === null) {
+        return 'Kolom Penghuni Tujuan wajib diisi.';
+    }
+
+    if ($input['waktuSampai'] === null) {
+        return 'Kolom Waktu Sampai wajib diisi.';
     }
 
     if (!checkPenghuniExists($db, (int) $input['penghuniId'])) {

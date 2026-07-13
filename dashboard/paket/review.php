@@ -65,7 +65,7 @@ $statusMeta = paket_status_meta($paket['Status'] ?? 'Belum Diambil');
 
             <div class="page-toolbar" data-note="Validasi akhir status pengambilan paket">
                 <a href="index.php" class="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:min-h-12 tw:px-4 tw:py-[0.85rem] tw:rounded-2xl tw:border tw:border-[rgba(22,60,122,0.12)] tw:font-extrabold tw:no-underline tw:text-slate-900 tw:bg-[rgba(255,255,255,0.82)] tw:hover:bg-gray-50 tw:transition-all tw:text-sm">
-                    <i class="iconsax tw:text-xl" icon-name="arrow-left-2"></i>
+                    <i class="iconsax tw:text-xl" icon-name="arrow-left"></i>
                     <span>Kembali</span>
                 </a>
             </div>

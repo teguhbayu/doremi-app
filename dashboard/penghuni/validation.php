@@ -3,6 +3,8 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
     die('Access denied');
 }
 
+require_once __DIR__ . '/../../utils/validation_helpers.php';
+
 use Respect\Validation\Validator as v;
 
 function collectPenghuniInput(array $source): array
@@ -39,19 +41,17 @@ function validatePenghuniInputSchema(array $input, bool $requirePassword): ?stri
         ? v::length(8, 100)
         : v::optional(v::length(8, 100));
 
-    $schema = v::keySet(
-        v::key('nama', v::stringType()->length(3, 100)),
-        v::key('nim', v::stringType()),
-        v::key('email', v::email()->length(3, 100)),
-        v::key('no', v::stringType()),
-        v::key('jk', v::in(['L', 'P'])),
-        v::key('kamarId', v::numericVal()),
-        v::key('alamat', v::stringType()->length(3, 255)),
-        v::key('password', $passwordValidator),
-        v::key('confirmPassword', $passwordValidator)
-    );
-
-    return $schema->validate($input) ? null : 'Data Penghuni tidak Valid!';
+    return firstFieldError($input, [
+        'nama' => ['label' => 'Nama Penghuni', 'rule' => v::stringType()->length(3, 100)],
+        'nim' => ['label' => 'NIM', 'rule' => v::stringType()],
+        'email' => ['label' => 'Email', 'rule' => v::email()->length(3, 100)],
+        'no' => ['label' => 'No. HP', 'rule' => v::stringType()],
+        'jk' => ['label' => 'Jenis Kelamin', 'rule' => v::in(['L', 'P'])],
+        'kamarId' => ['label' => 'Kamar', 'rule' => v::numericVal()],
+        'alamat' => ['label' => 'Alamat', 'rule' => v::stringType()->length(3, 255)],
+        'password' => ['label' => 'Password', 'rule' => $passwordValidator],
+        'confirmPassword' => ['label' => 'Konfirmasi Password', 'rule' => $passwordValidator],
+    ]);
 }
 
 function validatePenghuniCommonInput(
