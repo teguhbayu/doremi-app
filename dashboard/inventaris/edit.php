@@ -15,6 +15,8 @@ if ($_SESSION['userRole'] !== 'PENGURUS') {
 require '../../csrf.php';
 require '../../db.php';
 require '../../database/inventaris.php';
+require '../../utils/old_input.php';
+require_once '../../utils/validation_helpers.php';
 
 $id = $_GET['id'] ?? null;
 if (!$id) {
@@ -39,15 +41,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $lokasi = $_POST['lokasiBarang'] ?? '';
     $keterangan = trim($_POST['keteranganBarang'] ?? '');
 
-    $inventarisSchema = v::keySet(
-        v::key('nama', v::stringType()->length(1, 100)),
-        v::key('jumlah', v::numericVal()->min(0)->max(999999)),
-        v::key('lokasi', v::stringType()->length(1, 50)),
-        v::key('keterangan', v::stringType()->length(0, 500))
-    );
+    $postData = ['nama' => $nama, 'jumlah' => $jumlah, 'lokasi' => $lokasi, 'keterangan' => $keterangan];
 
-    if (!$inventarisSchema->validate(['nama' => $nama, 'jumlah' => $jumlah, 'lokasi' => $lokasi, 'keterangan' => $keterangan])) {
-        header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&status=error&message=Data Inventaris Tidak Valid!');
+    $fieldError = firstFieldError($postData, [
+        'nama' => ['label' => 'Nama Barang', 'rule' => v::stringType()->length(1, 100)],
+        'jumlah' => ['label' => 'Jumlah', 'rule' => v::numericVal()->min(0)->max(999999)],
+        'lokasi' => ['label' => 'Lokasi', 'rule' => v::stringType()->length(1, 50)],
+        'keterangan' => ['label' => 'Keterangan', 'rule' => v::stringType()->length(0, 500)],
+    ]);
+
+    if ($fieldError !== null) {
+        setOldFormInput($postData);
+        header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&status=error&message=' . urlencode($fieldError));
         exit;
     }
 
@@ -57,12 +62,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (str_starts_with($lokasi, 'kamar:')) {
         $kamarId = (int) explode(':', $lokasi)[1];
         if (!checkKamarActive($db, $kamarId)) {
+            setOldFormInput($postData);
             header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&status=error&message=Kamar tidak ditemukan!');
             exit;
         }
     } elseif (str_starts_with($lokasi, 'ruangan:')) {
         $ruanganId = (int) explode(':', $lokasi)[1];
         if (!checkRuanganActive($db, $ruanganId)) {
+            setOldFormInput($postData);
             header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&status=error&message=Ruangan tidak ditemukan!');
             exit;
         }
@@ -71,6 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         updateInventaris($db, (int) $id, $ruanganId, $kamarId, $nama, (int) $jumlah, $keterangan);
     } catch (RuntimeException $e) {
+        setOldFormInput($postData);
         header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&status=error&message=Terjadi Kesalahan saat mengupdate data!');
         exit;
     }
@@ -78,6 +86,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header("Location: /doremi-app/dashboard/inventaris/?status=success&message=Inventaris Berhasil Diupdate!");
     exit;
 }
+
+$old = pullOldFormInput();
+$currentLokasi = $old['lokasi'] ?? '';
+if ($currentLokasi === '') {
+    if ($inventaris['KamarID']) $currentLokasi = "kamar:" . $inventaris['KamarID'];
+    if ($inventaris['RuanganID']) $currentLokasi = "ruangan:" . $inventaris['RuanganID'];
+}
+$formData = [
+    'nama' => $old['nama'] ?? $inventaris['NamaBarang'],
+    'jumlah' => $old['jumlah'] ?? $inventaris['Jumlah'],
+    'keterangan' => $old['keterangan'] ?? $inventaris['Keterangan'],
+];
 ?>
 
 <!DOCTYPE html>
@@ -94,12 +114,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </h1>
             <div class="page-toolbar" data-note="Perubahan akan langsung memperbarui data inventaris">
                 <a href="index.php" class="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:min-h-12 tw:px-4 tw:py-[0.85rem] tw:rounded-2xl tw:border tw:border-[rgba(22,60,122,0.12)] tw:font-extrabold tw:no-underline tw:text-slate-900 tw:bg-[rgba(255,255,255,0.82)] tw:hover:bg-gray-50 tw:transition-all tw:text-sm">
-                    <i class="iconsax" icon-name="arrow-left-2"></i>
+                    <i class="iconsax" icon-name="arrow-left"></i>
                     <span>Kembali ke daftar</span>
                 </a>
             </div>
 
-            <form method="POST" class="tw:grid tw:grid-cols-1 tw:lg:grid-cols-2 tw:gap-4 tw:p-[1.45rem] tw:rounded-[24px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.88)] tw:shadow-sm" x-data="<?= htmlspecialchars(json_encode(['nama' => $inventaris['NamaBarang'] ?? '', 'keterangan' => $inventaris['Keterangan'] ?? ''])) ?>">
+            <form method="POST" class="tw:grid tw:grid-cols-1 tw:lg:grid-cols-2 tw:gap-4 tw:p-[1.45rem] tw:rounded-[24px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.88)] tw:shadow-sm" x-data="<?= htmlspecialchars(json_encode(['nama' => $formData['nama'] ?? '', 'keterangan' => $formData['keterangan'] ?? ''])) ?>">
                 <?php echo csrf_field(); ?>
               <div class="mb-3">
                     <label for="namaBarang" class="form-label">Nama Barang</label>
@@ -111,16 +131,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="mb-3">
                     <label for="jumlahBarang" class="form-label">Jumlah</label>
                     <input type="number" name="jumlahBarang" class="form-control" id="jumlahBarang"
-                        value="<?= htmlspecialchars($inventaris['Jumlah']) ?>" min="0" max="999999" required>
+                        value="<?= htmlspecialchars($formData['jumlah']) ?>" min="0" max="999999" required>
                 </div>
                 <div class="mb-3">
                     <label for="lokasiBarang" class="form-label">Lokasi</label>
                     <select class="form-select" name="lokasiBarang" id="lokasiBarang" required>
-                        <?php 
-                            $currentLokasi = "";
-                            if ($inventaris['KamarID']) $currentLokasi = "kamar:" . $inventaris['KamarID'];
-                            if ($inventaris['RuanganID']) $currentLokasi = "ruangan:" . $inventaris['RuanganID'];
-                        ?>
                         <optgroup label="Kamar">
                             <?php foreach ($kamars as $k): ?>
                                 <option value="kamar:<?= $k['KamarID'] ?>" <?= $currentLokasi == "kamar:".$k['KamarID'] ? 'selected' : '' ?>>

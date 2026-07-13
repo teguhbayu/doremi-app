@@ -36,7 +36,7 @@ $belumDiambil = $paketSummary['belumDiambil'];
                 <div class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.85)] tw:shadow-sm">
                     <div class="tw:flex tw:items-center tw:gap-4">
                         <div class="tw:w-[3.4rem] tw:h-[3.4rem] tw:inline-flex tw:items-center tw:justify-center tw:rounded-[20px] tw:flex-shrink-0 tw:text-primary tw:bg-accent/80">
-                            <i class="iconsax tw:text-3xl" icon-name="box-1"></i>
+                            <i class="iconsax tw:text-3xl" icon-name="box"></i>
                         </div>
                         <div>
                             <span class="tw:block tw:text-slate-500 tw:text-[0.72rem] tw:font-extrabold tw:tracking-[0.08em] tw:uppercase">Total Paket</span>
@@ -69,7 +69,7 @@ $belumDiambil = $paketSummary['belumDiambil'];
                 <div class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.85)] tw:shadow-sm">
                     <div class="tw:flex tw:items-center tw:gap-4">
                         <div class="tw:w-[3.4rem] tw:h-[3.4rem] tw:inline-flex tw:items-center tw:justify-center tw:rounded-[20px] tw:flex-shrink-0 tw:text-red-700 tw:bg-[rgba(245,221,218,0.82)]">
-                            <i class="iconsax tw:text-3xl" icon-name="danger"></i>
+                            <i class="iconsax tw:text-3xl" icon-name="warning-triangle"></i>
                         </div>
                         <div>
                             <span class="tw:block tw:text-slate-500 tw:text-[0.72rem] tw:font-extrabold tw:tracking-[0.08em] tw:uppercase">Tertukar</span>

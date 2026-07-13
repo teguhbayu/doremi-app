@@ -7,6 +7,7 @@ if (!isset($_SESSION['userId'])) {
     exit;
 }
 require '../../db.php';
+require '../../utils/old_input.php';
 require 'helpers.php';
 require 'validation.php';
 
@@ -33,6 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $input = collectPenghuniInput($_POST);
     $validationMessage = validateEditPenghuniInput($db, $input, $kamarMap, (int) $id);
     if ($validationMessage !== null) {
+        setOldFormInput(penghuniFormData($input));
         header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&status=error&message=' . urlencode($validationMessage));
         exit;
     }
@@ -48,6 +50,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header("Location: /doremi-app/dashboard/penghuni/?status=success&message=Penghuni Berhasil Diupdate!");
     exit;
 }
+
+$old = pullOldFormInput();
+$formData = [
+    'nim' => $old['nim'] ?? $penghuni['Nim'],
+    'nama' => $old['nama'] ?? $penghuni['NamaPenghuni'],
+    'email' => $old['email'] ?? $penghuni['Email'],
+    'no' => $old['no'] ?? $penghuni['NoHP'],
+    'jk' => $old['jk'] ?? $penghuni['JenisKelamin'],
+    'kamarId' => $old['kamarId'] ?? $penghuni['KamarID'],
+    'alamat' => $old['alamat'] ?? $penghuni['Alamat'],
+];
 ?>
 
 <!DOCTYPE html>
@@ -64,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </h1>
             <div class="page-toolbar" data-note="Kosongkan password jika hanya ingin mengubah profil penghuni">
                 <a href="index.php" class="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:min-h-12 tw:px-4 tw:py-[0.85rem] tw:rounded-2xl tw:border tw:border-[rgba(22,60,122,0.12)] tw:font-extrabold tw:no-underline tw:text-slate-900 tw:bg-[rgba(255,255,255,0.82)] tw:hover:bg-gray-50 tw:transition-all tw:text-sm">
-                    <i class="iconsax" icon-name="arrow-left-2"></i>
+                    <i class="iconsax" icon-name="arrow-left"></i>
                     <span>Kembali ke daftar</span>
                 </a>
             </div>
@@ -74,38 +87,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <label for="nimPenghuni" class="form-label">NIM</label>
                     <input type="text" name="nimPenghuni" class="form-control" id="nimPenghuni"
                         minlength="<?= penghuni_nim_min_length() ?>" maxlength="<?= penghuni_nim_max_length() ?>"
-                        value="<?= htmlspecialchars($penghuni['Nim']) ?>" required>
+                        value="<?= htmlspecialchars($formData['nim']) ?>" required>
                     <span class="form-hint">Gunakan <?= penghuni_nim_min_length() ?>-<?= penghuni_nim_max_length() ?> karakter tanpa spasi agar validasi NIM sesuai batas database.</span>
                 </div>
                 <div class="mb-3">
                     <label for="namaPenghuni" class="form-label">Nama Penghuni</label>
                     <input type="text" name="namaPenghuni" class="form-control" id="namaPenghuni"
-                        value="<?= htmlspecialchars($penghuni['NamaPenghuni']) ?>" required>
+                        value="<?= htmlspecialchars($formData['nama']) ?>" required>
                 </div>
                 <div class="mb-3">
                     <label for="emailPenghuni" class="form-label">Email</label>
                     <input type="email" name="emailPenghuni" class="form-control" id="emailPenghuni"
-                        value="<?= htmlspecialchars($penghuni['Email']) ?>" required>
+                        value="<?= htmlspecialchars($formData['email']) ?>" required>
                 </div>
                 <div class="mb-3">
                     <label for="noPenghuni" class="form-label">No. HP</label>
                     <input type="text" name="noPenghuni" class="form-control" id="noPenghuni" inputmode="numeric"
                         pattern="[0-9]{10,16}" maxlength="16"
-                        value="<?= htmlspecialchars($penghuni['NoHP']) ?>" required>
+                        value="<?= htmlspecialchars($formData['no']) ?>" required>
                     <span class="form-hint">Masukkan 10-16 digit angka aktif tanpa spasi atau simbol.</span>
                 </div>
                 <div class="mb-3">
                     <label for="jkPenghuni" class="form-label">Jenis Kelamin</label>
                     <select class="form-select" name="jkPenghuni" id="jkPenghuni" required>
-                        <option value="L" <?= $penghuni['JenisKelamin'] === 'L' ? 'selected' : '' ?>>Laki-laki</option>
-                        <option value="P" <?= $penghuni['JenisKelamin'] === 'P' ? 'selected' : '' ?>>Perempuan</option>
+                        <option value="L" <?= $formData['jk'] === 'L' ? 'selected' : '' ?>>Laki-laki</option>
+                        <option value="P" <?= $formData['jk'] === 'P' ? 'selected' : '' ?>>Perempuan</option>
                     </select>
                 </div>
                 <div class="mb-3">
                     <label for="kamarPenghuni" class="form-label">Kamar</label>
                     <select class="form-select" name="kamarPenghuni" id="kamarPenghuni" required>
                         <?php foreach ($kamars as $kamar): ?>
-                            <option value="<?= $kamar['KamarID'] ?>" <?= $penghuni['KamarID'] == $kamar['KamarID'] ? 'selected' : '' ?>>
+                            <option value="<?= $kamar['KamarID'] ?>" <?= $formData['kamarId'] == $kamar['KamarID'] ? 'selected' : '' ?>>
                                 <?= $kamar['NomorKamar'] ?> - Lantai <?= $kamar['Lantai'] ?>
                                 (<?= $kamar['JumlahPenghuniAktual'] ?>/<?= $kamar['KapasitasPenghuni'] ?> terisi)
                             </option>
@@ -114,7 +127,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
                 <div class="mb-3">
                     <label for="alamatPenghuni" class="form-label">Alamat</label>
-                    <textarea name="alamatPenghuni" class="form-control" id="alamatPenghuni" rows="3" required><?= htmlspecialchars($penghuni['Alamat']) ?></textarea>
+                    <textarea name="alamatPenghuni" class="form-control" id="alamatPenghuni" rows="3" required><?= htmlspecialchars($formData['alamat']) ?></textarea>
                 </div>
                 <div class="mb-3">
                     <label for="passwordPenghuni" class="form-label">Password Baru <span

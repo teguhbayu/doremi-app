@@ -74,6 +74,18 @@ function updateMaintenanceReport(
     return true;
 }
 
+function updateMaintenanceUrgency(mysqli $db, int $maintenanceId, string $jenisLaporan): bool
+{
+    dbExecute(
+        $db,
+        "UPDATE maintenance SET JenisLaporan = ? WHERE MaintenanceID = ? AND IsDeleted = 0",
+        'si',
+        [$jenisLaporan, $maintenanceId]
+    );
+
+    return true;
+}
+
 function claimMaintenanceReport(mysqli $db, int $maintenanceId, int $petugasId): int
 {
     return dbExecute($db, "CALL sp_claimMaintenanceReport(?, ?)", 'ii', [$petugasId, $maintenanceId]);

@@ -7,6 +7,7 @@ if (!isset($_SESSION['userId'])) {
     exit;
 }
 require '../../db.php';
+require '../../utils/old_input.php';
 require 'helpers.php';
 require 'validation.php';
 
@@ -21,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $formData = penghuniFormData($input);
     $validationMessage = validateCreatePenghuniInput($db, $input, $kamarMap);
     if ($validationMessage !== null) {
-        $_SESSION['form_data'] = $formData;
+        setOldFormInput($formData);
         header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=' . urlencode($validationMessage));
         exit;
     }
@@ -37,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         )));
 
         if (count($candidateIds) > 1) {
-            $_SESSION['form_data'] = $formData;
+            setOldFormInput($formData);
             header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Data NIM, email, atau No. HP terkait dengan data penghuni terhapus yang berbeda. Gunakan data lain atau edit data lama.');
             exit;
         }
@@ -49,12 +50,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             restorePenghuni($db, $restoredDeletedPenghuniId, (int) $input['kamarId'], $input['nama'], $input['nim'], $input['jk'], $input['no'], $input['email'], $hashedPassword, $input['alamat']);
         } catch (RuntimeException) {
-            $_SESSION['form_data'] = $formData;
+            setOldFormInput($formData);
             header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Gagal memulihkan data penghuni yang pernah dihapus!');
             exit;
         }
-
-        unset($_SESSION['form_data']);
 
         header("Location: " . '/doremi-app/dashboard/penghuni/' . '?status=success&message=Penghuni berhasil ditambahkan kembali dari data yang pernah dihapus!');
         exit;
@@ -63,18 +62,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         createPenghuni($db, (int) $input['kamarId'], $input['nama'], $input['nim'], $input['jk'], $input['no'], $input['email'], $hashedPassword, $input['alamat']);
     } catch (RuntimeException) {
-        $_SESSION['form_data'] = $formData;
+        setOldFormInput($formData);
         header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Terjadi Kesalahan saat menyimpan data!');
         exit;
     }
-
-    unset($_SESSION['form_data']);
 
     header("Location: " . '/doremi-app/dashboard/penghuni/' . '?status=success&message=Penghuni Berhasil Ditambahkan!');
     exit;
 }
 
-$formData = $_SESSION['form_data'] ?? [
+$formData = pullOldFormInput() ?: [
     'nama' => '',
     'nim' => '',
     'email' => '',
@@ -83,7 +80,6 @@ $formData = $_SESSION['form_data'] ?? [
     'kamarId' => '',
     'alamat' => '',
 ];
-unset($_SESSION['form_data']);
 
 ?>
 
@@ -102,7 +98,7 @@ unset($_SESSION['form_data']);
             </h1>
             <div class="page-toolbar" data-note="Pastikan kamar sesuai kapasitas dan jenis kelamin penghuni">
                 <a href="index.php" class="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:min-h-12 tw:px-4 tw:py-[0.85rem] tw:rounded-2xl tw:border tw:border-[rgba(22,60,122,0.12)] tw:font-extrabold tw:no-underline tw:text-slate-900 tw:bg-[rgba(255,255,255,0.82)] tw:hover:bg-gray-50 tw:transition-all tw:text-sm">
-                    <i class="iconsax" icon-name="arrow-left-2"></i>
+                    <i class="iconsax" icon-name="arrow-left"></i>
                     <span>Kembali ke daftar</span>
                 </a>
             </div>

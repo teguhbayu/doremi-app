@@ -30,10 +30,12 @@ switch ($_SESSION["userRole"]) {
         $menus = [
             ["title" => "Home", "target" => "/doremi-app/dashboard/", "icon" => "home-2"],
             ["title" => "Konfirmasi In/Out", "target" => "/doremi-app/dashboard/inout/", "icon" => "shield-tick"],
-            ["title" => "Laporan Izin Keluar", "target" => "/doremi-app/dashboard/inout/report.php", "icon" => "fa-solid fa-chart-line"],
             ["title" => "Paket", "target" => "/doremi-app/dashboard/paket/", "icon" => "box"],
-            ["title" => "Laporan Paket", "target" => "/doremi-app/dashboard/paket/report.php", "icon" => "fa-solid fa-chart-column"],
             ["title" => "Lapor Kerusakan", "target" => "/doremi-app/dashboard/maintenance/", "icon" => "setting-2"],
+            ["title" => "Laporan", "target" => "#", "icon" => "fa-solid fa-file-lines", "children" => [
+                ["title" => "Laporan Izin Keluar", "target" => "/doremi-app/dashboard/inout/report.php", "icon" => "fa-solid fa-chart-line"],
+                ["title" => "Laporan Paket", "target" => "/doremi-app/dashboard/paket/report.php", "icon" => "fa-solid fa-chart-column"]
+            ]],
         ];
         break;
     case "SERVANDA":
@@ -90,9 +92,26 @@ switch ($_SESSION["userRole"]) {
                     <?php
                     $currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
+                    // Single longest-prefix-match search across top-level items AND submenu
+                    // children together, so a more specific child target (e.g. .../maintenance/report.php)
+                    // always wins over a shorter parent-level target that happens to be its prefix
+                    // (e.g. .../maintenance/) instead of both lighting up at once.
                     $bestMatchIndex = -1;
+                    $bestMatchChildIndex = null;
                     $longestMatchLen = 0;
                     foreach ($menus as $idx => $menu) {
+                        if (isset($menu['children']) && is_array($menu['children'])) {
+                            foreach ($menu['children'] as $cIdx => $child) {
+                                $target = $child['target'];
+                                if (str_starts_with($currentPath, $target) && strlen($target) > $longestMatchLen) {
+                                    $longestMatchLen = strlen($target);
+                                    $bestMatchIndex = $idx;
+                                    $bestMatchChildIndex = $cIdx;
+                                }
+                            }
+                            continue;
+                        }
+
                         $target = $menu["target"];
                         $isMatch = false;
                         if ($target == "/doremi-app/dashboard/") {
@@ -101,21 +120,24 @@ switch ($_SESSION["userRole"]) {
                             $isMatch = str_starts_with($currentPath, $target);
                         }
 
-                        if ($isMatch) {
-                            $matchLen = strlen($target);
-                            if ($matchLen > $longestMatchLen) {
-                                $longestMatchLen = $matchLen;
-                                $bestMatchIndex = $idx;
-                            }
+                        if ($isMatch && strlen($target) > $longestMatchLen) {
+                            $longestMatchLen = strlen($target);
+                            $bestMatchIndex = $idx;
+                            $bestMatchChildIndex = null;
                         }
                     }
 
                     foreach ($menus as $idx => $menu) {
-                        $isActive = ($idx === $bestMatchIndex);
+                        $isActive = ($idx === $bestMatchIndex && $bestMatchChildIndex === null);
                         if (isset($menu['children']) && is_array($menu['children'])) {
+                            $submenuActive = ($idx === $bestMatchIndex);
+                            $childActiveMap = [];
+                            foreach ($menu['children'] as $cIdx => $child) {
+                                $childActiveMap[$cIdx] = ($idx === $bestMatchIndex && $cIdx === $bestMatchChildIndex);
+                            }
                 ?>
                 <div class="dashboard-sidebar__submenu">
-                    <div class="dashboard-sidebar__title <?= $isActive ? 'is-active' : '' ?>">
+                    <div class="dashboard-sidebar__title <?= $submenuActive ? 'is-active' : '' ?>">
                         <?php if (str_starts_with($menu["icon"], 'fa-')) { ?>
                             <i class="<?= htmlspecialchars($menu["icon"]) ?>"></i>
                         <?php } else { ?>
@@ -124,7 +146,7 @@ switch ($_SESSION["userRole"]) {
                         <span><?= htmlspecialchars($menu["title"]) ?></span>
                     </div>
                     <?php foreach ($menu['children'] as $cIdx => $child) { ?>
-                        <a @click="sidebarOpen = false" class="dashboard-sidebar__link"
+                        <a @click="sidebarOpen = false" class="dashboard-sidebar__link <?= $childActiveMap[$cIdx] ? 'is-active' : '' ?>"
                             href="<?= htmlspecialchars($child["target"]) ?>">
                             <?php if (str_starts_with($child["icon"], 'fa-')) { ?>
                                 <i class="<?= htmlspecialchars($child["icon"]) ?>"></i>

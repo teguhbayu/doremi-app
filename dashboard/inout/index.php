@@ -6,6 +6,7 @@ if (!isset($_SESSION['userId'])) {
 }
 
 require '../../db.php';
+require '../../utils/old_input.php';
 require_once '../../database/inout.php';
 require_once '../../utils/format.php';
 $role = $_SESSION['userRole'];
@@ -14,6 +15,7 @@ if ($role === 'PENGHUNI') {
     $historyRows = fetchInOutHistoryForPenghuni($db, $userId);
     $activeRequestCount = countActiveInOutRequests($db, $userId);
     $hasActiveRequest = $activeRequestCount > 0;
+    $old = pullOldFormInput();
 }
 
 if ($role === 'SIGAP') {
@@ -66,17 +68,17 @@ if ($role === 'SIGAP') {
                                     <div>
                                         <label class="form-label">Rencana Keluar (Waktu)</label>
                                         <input type="time" name="waktuKeluar" class="form-control" min="<?= $currentTime ?>"
-                                            max="22:00" required>
+                                            max="22:00" value="<?= htmlspecialchars($old['waktuKeluar'] ?? '') ?>" required>
                                     </div>
                                     <div>
                                         <label class="form-label">Rencana Masuk (Waktu)</label>
                                         <input type="time" name="waktuMasuk" class="form-control" min="<?= $currentTime ?>"
-                                            max="22:00" required>
+                                            max="22:00" value="<?= htmlspecialchars($old['waktuMasuk'] ?? '') ?>" required>
                                     </div>
                                     <div>
                                         <label class="form-label">Keperluan</label>
                                         <textarea name="keperluan" class="form-control" rows="3"
-                                            placeholder="Contoh: Belanja, Fotokopi" maxlength="20" required></textarea>
+                                            placeholder="Contoh: Belanja, Fotokopi" maxlength="20" required><?= htmlspecialchars($old['keperluan'] ?? '') ?></textarea>
                                         <span class="form-hint">Keperluan wajib diisi dan dibatasi maksimal 20 karakter.</span>
                                     </div>
                                     <button type="submit"

@@ -59,7 +59,7 @@ $sisaKapasitas = max(0, (int) $kamar['KapasitasPenghuni'] - (int) $kamar['Jumlah
                 <div class="tw:flex tw:flex-wrap tw:gap-3">
                     <a href="index.php"
                         class="tw:bg-white tw:text-slate-700 tw:px-4 tw:py-3 tw:rounded-xl tw:border tw:border-slate-200 tw:hover:bg-slate-50 tw:transition-all tw:inline-flex tw:items-center tw:gap-2 tw:no-underline">
-                        <i class="iconsax tw:text-xl" icon-name="arrow-left-2"></i>
+                        <i class="iconsax tw:text-xl" icon-name="arrow-left"></i>
                         <span>Kembali</span>
                     </a>
                     <a href="edit.php?id=<?= (int) $kamar['KamarID'] ?>"

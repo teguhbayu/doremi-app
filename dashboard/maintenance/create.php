@@ -5,6 +5,7 @@ require 'helpers.php';
 maintenance_require_roles(['PENGURUS', 'PENGHUNI', 'SIGAP', 'SERVANDA', 'MAINTENANCE']);
 require '../../csrf.php';
 require '../../db.php';
+require '../../utils/old_input.php';
 require_once '../../database/maintenance.php';
 require 'validation.php';
 
@@ -19,6 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $reportInput = collectMaintenanceReportInput($_POST);
     $validationMessage = validateMaintenanceReportInput($db, $reportInput);
     if ($validationMessage !== null) {
+        setOldFormInput($_POST);
         maintenance_redirect('create.php', 'error', $validationMessage);
     }
     $targetIds = resolveMaintenanceTargetIds($reportInput);
@@ -36,6 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $fotoBase64 = maintenance_store_photo($_FILES['foto_laporan'] ?? []);
     } catch (RuntimeException $e) {
+        setOldFormInput($_POST);
         maintenance_redirect('create.php', 'error', $e->getMessage());
     }
 
@@ -53,9 +56,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         );
         maintenance_redirect('index.php', 'success', 'Laporan kerusakan berhasil dibuat.');
     } catch (RuntimeException) {
+        setOldFormInput($_POST);
         maintenance_redirect('create.php', 'error', 'Terjadi kesalahan sistem saat mengirim laporan.');
     }
 }
+
+$old = pullOldFormInput();
 ?>
 
 <!DOCTYPE html>
@@ -75,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </h1>
             <div class="page-toolbar" data-note="Form laporan maintenance baru">
                 <a href="index.php" class="page-secondary-btn">
-                    <i class="iconsax" icon-name="arrow-left-2"></i>
+                    <i class="iconsax" icon-name="arrow-left"></i>
                     <span>Kembali ke daftar</span>
                 </a>
             </div>
@@ -85,54 +91,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                
                 <div class="tw:lg:col-span-2">
-                    <form action="create.php" method="POST" enctype="multipart/form-data" class="tw:grid tw:grid-cols-1 tw:lg:grid-cols-2 tw:gap-4 tw:p-[1.45rem] tw:rounded-[24px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.88)] tw:shadow-sm">
-                        
+                    <form action="create.php" method="POST" enctype="multipart/form-data" class="tw:grid tw:grid-cols-1 tw:lg:grid-cols-2 tw:gap-4 tw:p-[1.45rem] tw:rounded-[24px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.88)] tw:shadow-sm" x-data="{ targetType: '<?= htmlspecialchars($old['target_tipe'] ?? 'ruangan') ?>' }">
+
                         <?php echo csrf_field(); ?>
-                        
+
                         <div class="mb-3 tw:col-span-full">
                             <label for="skala_prioritas" class="form-label">Skala Prioritas (Berbasis Kriteria OSHA)</label>
                             <select name="skala_prioritas" id="skala_prioritas" class="form-select" required onchange="verifyPriority()">
-                                <option value="" disabled selected>-- Pilih Kategori Kerusakan --</option>
-                                <option value="Kerusakan Ringan" data-osha="convenience">Kerusakan Ringan (Non-Urgent / Kenyamanan)</option>
-                                <option value="Kerusakan Sedang" data-osha="serious">Kerusakan Sedang (Urgent / Keamanan & Sanitasi Dasar)</option>
-                                <option value="Kerusakan Darurat / Berat" data-osha="imminent">Darurat (Emergency / Ancaman Keselamatan Jiwa & Fisik)</option>
+                                <option value="" disabled <?= empty($old['skala_prioritas']) ? 'selected' : '' ?>>-- Pilih Kategori Kerusakan --</option>
+                                <option value="Kerusakan Ringan" data-osha="convenience" <?= ($old['skala_prioritas'] ?? '') === 'Kerusakan Ringan' ? 'selected' : '' ?>>Kerusakan Ringan (Non-Urgent / Kenyamanan)</option>
+                                <option value="Kerusakan Sedang" data-osha="serious" <?= ($old['skala_prioritas'] ?? '') === 'Kerusakan Sedang' ? 'selected' : '' ?>>Kerusakan Sedang (Urgent / Keamanan & Sanitasi Dasar)</option>
+                                <option value="Kerusakan Darurat / Berat" data-osha="imminent" <?= ($old['skala_prioritas'] ?? '') === 'Kerusakan Darurat / Berat' ? 'selected' : '' ?>>Darurat (Emergency / Ancaman Keselamatan Jiwa & Fisik)</option>
                             </select>
-                            
-                        
+
+
                             <div id="osha-helper" class="tw:mt-2 tw:p-3 tw:rounded-xl tw:text-xs tw:hidden tw:border"></div>
                         </div>
 
-                        
+
                         <div class="mb-3 tw:col-span-full">
                             <label class="form-label">Target Lokasi Laporan</label>
                             <div class="tw:flex tw:gap-4 tw:mt-1 tw:mb-3">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="target_tipe" id="target_ruangan" value="ruangan" checked onchange="toggleTargetType('ruangan')">
+                                    <input class="form-check-input" type="radio" name="target_tipe" id="target_ruangan" value="ruangan" x-model="targetType">
                                     <label class="form-check-label" for="target_ruangan">Ruangan</label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="target_tipe" id="target_inventaris" value="inventaris" onchange="toggleTargetType('inventaris')">
+                                    <input class="form-check-input" type="radio" name="target_tipe" id="target_inventaris" value="inventaris" x-model="targetType">
                                     <label class="form-check-label" for="target_inventaris">Inventaris / Barang</label>
                                 </div>
                             </div>
 
-                        
-                            <div id="ruangan-container">
-                                <select name="ruangan_id" id="ruangan_id" class="form-select" required>
-                                    <option value="" disabled selected>Pilih Ruangan</option>
+
+                            <div x-show="targetType === 'ruangan'">
+                                <select name="ruangan_id" id="ruangan_id" class="form-select" :required="targetType === 'ruangan'">
+                                    <option value="" disabled <?= empty($old['ruangan_id']) ? 'selected' : '' ?>>Pilih Ruangan</option>
                                     <?php foreach ($rooms as $r): ?>
-                                        <option value="<?= $r['RuanganID'] ?>">
+                                        <option value="<?= $r['RuanganID'] ?>" <?= (string) ($old['ruangan_id'] ?? '') === (string) $r['RuanganID'] ? 'selected' : '' ?>>
                                             <?= htmlspecialchars($r['NamaRuangan']) ?> (Lantai <?= htmlspecialchars($r['Lantai']) ?>)
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
 
-                            <div id="inventaris-container" class="tw:hidden">
-                                <select name="inventaris_id" id="inventaris_id" class="form-select">
-                                    <option value="" disabled selected>Pilih Inventaris / Barang</option>
+                            <div x-show="targetType === 'inventaris'">
+                                <select name="inventaris_id" id="inventaris_id" class="form-select" :required="targetType === 'inventaris'">
+                                    <option value="" disabled <?= empty($old['inventaris_id']) ? 'selected' : '' ?>>Pilih Inventaris / Barang</option>
                                     <?php foreach ($inventory as $i): ?>
-                                        <option value="<?= $i['InventarisID'] ?>">
+                                        <option value="<?= $i['InventarisID'] ?>" <?= (string) ($old['inventaris_id'] ?? '') === (string) $i['InventarisID'] ? 'selected' : '' ?>>
                                             <?= htmlspecialchars($i['NamaBarang']) ?>
                                         </option>
                                     <?php endforeach; ?>
@@ -140,13 +146,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </div>
                         </div>
 
-                        
+
                         <div class="mb-3 tw:col-span-full">
                             <label for="deskripsi" class="form-label">Deskripsi Masalah</label>
-                            <textarea name="deskripsi" id="deskripsi" maxlength="1000" class="form-control" rows="4" required 
-                                      placeholder="Jelaskan kronologi dan letak kerusakan..." oninput="updateCharCount(this)"></textarea>
+                            <textarea name="deskripsi" id="deskripsi" maxlength="1000" class="form-control" rows="4" required
+                                      placeholder="Jelaskan kronologi dan letak kerusakan..." oninput="updateCharCount(this)"><?= htmlspecialchars($old['deskripsi'] ?? '') ?></textarea>
                             <div class="tw:text-xs tw:text-gray-500 tw:text-right tw:mt-1">
-                                <span id="charCount">0</span> / 1000 karakter
+                                <span id="charCount"><?= mb_strlen($old['deskripsi'] ?? '') ?></span> / 1000 karakter
                             </div>
                         </div>
 
@@ -224,28 +230,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     select.value = "Kerusakan Ringan";
                     verifyPriority();
                 }
-            }
-        }
-
-        // Fungsi Toggling Pilihan Lokasi Target (Ruangan vs Inventaris)
-        function toggleTargetType(type) {
-            const ruanganContainer = document.getElementById('ruangan-container');
-            const inventarisContainer = document.getElementById('inventaris-container');
-            const ruanganSelect = document.getElementById('ruangan_id');
-            const inventarisSelect = document.getElementById('inventaris_id');
-
-            if (type === 'ruangan') {
-                ruanganContainer.classList.remove('tw:hidden');
-                inventarisContainer.classList.add('tw:hidden');
-                ruanganSelect.setAttribute('required', 'required');
-                inventarisSelect.removeAttribute('required');
-                inventarisSelect.value = "";
-            } else {
-                ruanganContainer.classList.add('tw:hidden');
-                inventarisContainer.classList.remove('tw:hidden');
-                inventarisSelect.setAttribute('required', 'required');
-                ruanganSelect.removeAttribute('required');
-                ruanganSelect.value = "";
             }
         }
 

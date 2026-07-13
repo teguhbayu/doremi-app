@@ -3,6 +3,8 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
     die('Access denied');
 }
 
+require_once __DIR__ . '/../../utils/validation_helpers.php';
+
 use Respect\Validation\Validator as v;
 
 function collectMaintenanceReportInput(array $source): array
@@ -26,21 +28,30 @@ function collectMaintenanceReportInput(array $source): array
 
 function validateMaintenanceReportInput(mysqli $db, array $input): ?string
 {
-    $schema = v::keySet(
-        v::key('jenisLaporan', v::in(['Kerusakan Ringan', 'Kerusakan Sedang', 'Kerusakan Darurat / Berat'])),
-        v::key('targetType', v::in(['ruangan', 'inventaris'])),
-        v::key('targetValue', v::numericVal()),
-        v::key('deskripsi', v::stringType()->length(1, 1000))
-    );
+    $fieldError = firstFieldError($input, [
+        'jenisLaporan' => ['label' => 'Skala Prioritas', 'rule' => v::in(['Kerusakan Ringan', 'Kerusakan Sedang', 'Kerusakan Darurat / Berat'])],
+        'targetType' => ['label' => 'Tipe Target', 'rule' => v::in(['ruangan', 'inventaris'])],
+        'targetValue' => ['label' => 'Target Lokasi', 'rule' => v::numericVal()],
+        'deskripsi' => ['label' => 'Deskripsi', 'rule' => v::stringType()->length(1, 1000)],
+    ]);
 
-    if (!$schema->validate($input)) {
-        return 'Data input tidak valid.';
+    if ($fieldError !== null) {
+        return $fieldError;
     }
 
     if (!checkMaintenanceTargetExists($db, $input['targetType'], (int) $input['targetValue'])) {
         return $input['targetType'] === 'ruangan'
             ? 'Ruangan yang dipilih tidak ditemukan.'
             : 'Inventaris yang dipilih tidak ditemukan.';
+    }
+
+    return null;
+}
+
+function validateMaintenanceUrgencyInput(string $jenisLaporan): ?string
+{
+    if (!in_array($jenisLaporan, ['Kerusakan Ringan', 'Kerusakan Sedang', 'Kerusakan Darurat / Berat'], true)) {
+        return 'Kolom Tingkat Urgensi tidak valid.';
     }
 
     return null;
