@@ -579,7 +579,7 @@ DROP PROCEDURE IF EXISTS sp_getMaintenanceReportsForRole;
 -- QUERY_SEPARATOR
 CREATE PROCEDURE sp_getMaintenanceReportsForRole(IN role_param VARCHAR(20), IN user_id_param INT)
 BEGIN
-    SELECT m.MaintenanceID, m.PenghuniID, m.PetugasID, m.RuanganID, m.InventarisID,
+    SELECT m.MaintenanceID, m.PenghuniID, m.PetugasID, m.TeknisiID, m.RuanganID, m.InventarisID,
            m.TanggalLapor, m.JenisLaporan, m.Deskripsi, m.StatusMaintenance,
            m.TanggalSelesai, m.Keterangan,
            (m.FotoLaporan IS NOT NULL AND m.FotoLaporan != '') AS HasFotoLaporan,
@@ -592,7 +592,7 @@ BEGIN
     FROM maintenance m
     LEFT JOIN penghuni p ON m.PenghuniID = p.PenghuniID
     LEFT JOIN petugas pt ON m.PetugasID = pt.PetugasID
-    LEFT JOIN petugas tech ON m.PetugasID = tech.PetugasID
+    LEFT JOIN petugas tech ON m.TeknisiID = tech.PetugasID
     LEFT JOIN ruangan r ON m.RuanganID = r.RuanganID
     LEFT JOIN inventaris i ON m.InventarisID = i.InventarisID
     WHERE m.IsDeleted = 0
@@ -606,6 +606,7 @@ BEGIN
                   ELSE 3 END, m.MaintenanceID DESC;
 END;
 -- QUERY_SEPARATOR
+
 
 DROP PROCEDURE IF EXISTS sp_getMaintenanceReportById;
 -- QUERY_SEPARATOR
@@ -691,7 +692,7 @@ DROP PROCEDURE IF EXISTS sp_claimMaintenanceReport;
 CREATE PROCEDURE sp_claimMaintenanceReport(IN petugas_id_param INT, IN id_param INT)
 BEGIN
     UPDATE maintenance
-    SET StatusMaintenance = 'Diproses', PetugasID = petugas_id_param
+    SET StatusMaintenance = 'Diproses', TeknisiID = petugas_id_param
     WHERE MaintenanceID = id_param AND IsDeleted = 0 AND StatusMaintenance = 'Diajukan';
 END;
 -- QUERY_SEPARATOR
@@ -702,7 +703,7 @@ CREATE PROCEDURE sp_checkMaintenanceTechnicianOwnership(IN id_param INT, IN petu
 BEGIN
     SELECT MaintenanceID
     FROM maintenance
-    WHERE MaintenanceID = id_param AND PetugasID = petugas_id_param AND StatusMaintenance = 'Diproses' AND IsDeleted = 0
+    WHERE MaintenanceID = id_param AND TeknisiID = petugas_id_param AND StatusMaintenance = 'Diproses' AND IsDeleted = 0
     LIMIT 1;
 END;
 -- QUERY_SEPARATOR
@@ -1466,8 +1467,8 @@ CREATE PROCEDURE sp_getDashboardMaintenanceCounts(IN user_id_param INT)
 BEGIN
     SELECT
         (SELECT COUNT(*) FROM maintenance WHERE StatusMaintenance = 'Diajukan' AND IsDeleted = 0) AS pendingTasks,
-        (SELECT COUNT(*) FROM maintenance WHERE StatusMaintenance = 'Diproses' AND PetugasID = user_id_param AND IsDeleted = 0) AS myOngoingTasks,
-        (SELECT COUNT(*) FROM maintenance WHERE StatusMaintenance = 'Selesai' AND PetugasID = user_id_param AND IsDeleted = 0) AS myCompletedTasks,
+        (SELECT COUNT(*) FROM maintenance WHERE StatusMaintenance = 'Diproses' AND TeknisiID = user_id_param AND IsDeleted = 0) AS myOngoingTasks,
+        (SELECT COUNT(*) FROM maintenance WHERE StatusMaintenance = 'Selesai' AND TeknisiID = user_id_param AND IsDeleted = 0) AS myCompletedTasks,
         (SELECT COUNT(*) FROM maintenance WHERE JenisLaporan = 'Kerusakan Darurat / Berat' AND StatusMaintenance != 'Selesai' AND IsDeleted = 0) AS activeEmergencyTasks;
 END;
 -- QUERY_SEPARATOR
@@ -1484,7 +1485,7 @@ BEGIN
     LEFT JOIN penghuni p ON m.PenghuniID = p.PenghuniID
     LEFT JOIN petugas pt ON m.PetugasID = pt.PetugasID
     LEFT JOIN inventaris i ON m.InventarisID = i.InventarisID
-    WHERE m.StatusMaintenance = 'Diproses' AND m.PetugasID = user_id_param AND m.IsDeleted = 0
+    WHERE m.StatusMaintenance = 'Diproses' AND m.TeknisiID = user_id_param AND m.IsDeleted = 0
     ORDER BY m.MaintenanceID DESC
     LIMIT 5;
 END;

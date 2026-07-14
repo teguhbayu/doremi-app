@@ -479,7 +479,7 @@ BEGIN
     FROM maintenance m
     LEFT JOIN penghuni p ON m.PenghuniID = p.PenghuniID
     LEFT JOIN petugas pt ON m.PetugasID = pt.PetugasID
-    LEFT JOIN petugas tech ON m.PetugasID = tech.PetugasID
+    LEFT JOIN petugas tech ON m.TeknisiID = tech.PetugasID
     LEFT JOIN ruangan r ON m.RuanganID = r.RuanganID
     LEFT JOIN inventaris i ON m.InventarisID = i.InventarisID
     WHERE m.IsDeleted = 0
@@ -618,8 +618,8 @@ BEGIN
            ROUND(AVG(CASE WHEN m.StatusMaintenance = 'Selesai' AND m.TanggalSelesai IS NOT NULL
                THEN DATEDIFF(m.TanggalSelesai, m.TanggalLapor) ELSE NULL END), 1) AS avg_hari
     FROM maintenance m
-    JOIN petugas pt ON m.PetugasID = pt.PetugasID
-    WHERE m.PetugasID IS NOT NULL AND pt.Jabatan = 'MAINTENANCE' AND pt.IsDeleted = 0 AND m.IsDeleted = 0
+    JOIN petugas pt ON m.TeknisiID = pt.PetugasID
+    WHERE m.TeknisiID IS NOT NULL AND pt.Jabatan = 'MAINTENANCE' AND pt.IsDeleted = 0 AND m.IsDeleted = 0
       AND (
           (range_param = '7d' AND m.TanggalLapor >= DATE_SUB(CURDATE(), INTERVAL 6 DAY))
           OR (range_param = '30d' AND m.TanggalLapor >= DATE_SUB(CURDATE(), INTERVAL 29 DAY))
@@ -627,7 +627,7 @@ BEGIN
           OR (range_param = 'custom' AND m.TanggalLapor >= start_date_param AND m.TanggalLapor < DATE_ADD(end_date_param, INTERVAL 1 DAY))
           OR range_param = 'all'
       )
-    GROUP BY m.PetugasID, pt.NamaPetugas
+    GROUP BY m.TeknisiID, pt.NamaPetugas
     ORDER BY selesai DESC, total DESC;
 END;
 -- QUERY_SEPARATOR
@@ -645,7 +645,7 @@ BEGIN
     FROM maintenance m
     LEFT JOIN penghuni p ON m.PenghuniID = p.PenghuniID
     LEFT JOIN petugas rpt ON m.PetugasID = rpt.PetugasID
-    LEFT JOIN petugas tech ON m.PetugasID = tech.PetugasID
+    LEFT JOIN petugas tech ON m.TeknisiID = tech.PetugasID
     LEFT JOIN ruangan r ON m.RuanganID = r.RuanganID
     LEFT JOIN inventaris i ON m.InventarisID = i.InventarisID
     WHERE m.IsDeleted = 0
