@@ -108,7 +108,7 @@ $belumDiambil = $paketSummary['belumDiambil'];
                                 <?php $statusMeta = paket_status_meta($status); ?>
                                 <?php $isPickupLocked = !empty($paket['PengambilanPaketID']) && paket_is_final_status($status); ?>
                                 <tr>
-                                    <td class="tw:text-start">
+                                    <td class="tw:text-start tw:max-w-48 tw:truncate" title="<?php if ($role === 'SIGAP'): ?><?= htmlspecialchars($paket['NamaPenghuni']) ?> (<?= htmlspecialchars($paket['Nim']) ?>)<?php else: ?><?= htmlspecialchars($paket['NamaPetugasPaket'] ?? '') ?><?php endif; ?>">
                                         <?php if ($role === 'SIGAP'): ?>
                                             <div class="tw:font-semibold tw:text-slate-900">
                                                 <?= htmlspecialchars($paket['NamaPenghuni']) ?>
@@ -133,8 +133,8 @@ $belumDiambil = $paketSummary['belumDiambil'];
                                             <?= htmlspecialchars(paket_type_label($paket['JenisPaket'] ?? null)) ?>
                                         </span>
                                     </td>
-                                    <td><?= htmlspecialchars($paket['NamaPengirim']) ?></td>
-                                    <td><?= htmlspecialchars($paket['Kurir']) ?></td>
+                                    <td class="tw:max-w-48 tw:truncate" title="<?= htmlspecialchars($paket['NamaPengirim']) ?>"><?= htmlspecialchars($paket['NamaPengirim']) ?></td>
+                                    <td class="tw:max-w-48 tw:truncate" title="<?= htmlspecialchars($paket['Kurir']) ?>"><?= htmlspecialchars($paket['Kurir']) ?></td>
                                     <td>
                                         <?= formatDateTime($paket['WaktuSampai'] ?? null) ?>
                                     </td>

@@ -21,7 +21,8 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
                     text: urlParams.get("message") ?? "",
                 });
                 setTimeout(() => {
-                    url.search = '';
+                    url.searchParams.delete('status');
+                    url.searchParams.delete('message');
                     window.history.replaceState(null, '', url.toString());
                 }, 3000)
                 break;
@@ -33,7 +34,8 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
                     text: urlParams.get("message") ?? "",
                 });
                 setTimeout(() => {
-                    url.search = '';
+                    url.searchParams.delete('status');
+                    url.searchParams.delete('message');
                     window.history.replaceState(null, '', url.toString());
                 }, 3000)
                 break;
