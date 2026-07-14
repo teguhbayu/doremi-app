@@ -121,7 +121,7 @@ $belumDiambil = $paketSummary['belumDiambil'];
                                             </div>
                                         <?php else: ?>
                                             <div class="tw:font-semibold tw:text-slate-900">
-                                                Dicatat oleh <?= htmlspecialchars($paket['NamaPetugasPaket']) ?>
+                                                Dicatat oleh <?= htmlspecialchars($paket['NamaPetugas']) ?>
                                             </div>
                                             <div class="tw:text-sm tw:text-slate-500">
                                                 <?= !empty($paket['NomorKamar']) ? 'Kamar ' . htmlspecialchars($paket['NomorKamar']) : 'Kamar belum terdata' ?>
