@@ -695,6 +695,10 @@
     border-style: var(--tw-border-style) !important;
     border-width: 1px !important;
   }
+  .tw\:border-0 {
+    border-style: var(--tw-border-style) !important;
+    border-width: 0px !important;
+  }
   .tw\:border-2 {
     border-style: var(--tw-border-style) !important;
     border-width: 2px !important;
@@ -1151,6 +1155,9 @@
     font-size: var(--tw-text-xs) !important;
     line-height: var(--tw-leading, var(--tw-text-xs--line-height)) !important;
   }
+  .tw\:text-\[0\.7rem\] {
+    font-size: 0.7rem !important;
+  }
   .tw\:text-\[0\.72rem\] {
     font-size: 0.72rem !important;
   }
@@ -1558,6 +1565,13 @@
     &:hover {
       @media (hover: hover) {
         color: var(--tw-color-white) !important;
+      }
+    }
+  }
+  .tw\:hover\:opacity-80 {
+    &:hover {
+      @media (hover: hover) {
+        opacity: 80% !important;
       }
     }
   }
