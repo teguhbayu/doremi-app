@@ -392,6 +392,7 @@ All stored procedures are prefixed with `sp_` and camel-cased.
 
 **Dashboard Stats** (`dashboard/index.php`)
 - `sp_getDashboardPengurusStats()` — Active-resident/pending-inout/pending-maintenance/pending-pickup counts in one row.
+- `sp_getDashboardSigapStats()` — SIGAP pending in/out confirmations, current outside-resident count, pending package pickups, and today's package count in one row.
 - `sp_getDashboardGenderStats()` — Resident gender distribution.
 - `sp_getDashboardPenghuniIzinAktif(user_id)` / `sp_getDashboardPenghuniPaketSummary(user_id)` / `sp_getDashboardPenghuniMaintenanceSummary(user_id)` — Per-resident dashboard summaries.
 - `sp_getDashboardMaintenanceCounts(user_id)` — Pending/ongoing/completed/emergency counts for the MAINTENANCE dashboard.

@@ -15,6 +15,16 @@ function fetchDashboardPengurusStats(mysqli $db): array
     ];
 }
 
+function fetchDashboardSigapStats(mysqli $db): array
+{
+    return dbFetchOne($db, "CALL sp_getDashboardSigapStats()") ?? [
+        'pendingConfirmation' => 0,
+        'currentlyOutside' => 0,
+        'pendingPackagePickup' => 0,
+        'packagesToday' => 0,
+    ];
+}
+
 function fetchDashboardGenderStats(mysqli $db): array
 {
     return dbFetchAll($db, "CALL sp_getDashboardGenderStats()");
