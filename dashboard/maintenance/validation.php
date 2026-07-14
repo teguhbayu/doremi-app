@@ -9,13 +9,17 @@ use Respect\Validation\Validator as v;
 
 function collectMaintenanceReportInput(array $source): array
 {
-    $targetType = trim($source['targetType'] ?? $source['target_tipe'] ?? 'ruangan');
-    $targetValue = trim($source['targetValue'] ?? '');
+    $ruanganId = trim($source['ruangan_id'] ?? '');
+    $inventarisId = trim($source['inventaris_id'] ?? '');
 
+    $targetType = trim($source['targetType'] ?? $source['target_tipe'] ?? '');
+    if ($targetType === '') {
+        $targetType = $inventarisId !== '' ? 'inventaris' : 'ruangan';
+    }
+
+    $targetValue = trim($source['targetValue'] ?? '');
     if ($targetValue === '') {
-        $targetValue = $targetType === 'ruangan'
-            ? trim($source['ruangan_id'] ?? '')
-            : trim($source['inventaris_id'] ?? '');
+        $targetValue = $targetType === 'ruangan' ? $ruanganId : $inventarisId;
     }
 
     return [

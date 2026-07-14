@@ -7,12 +7,14 @@ require '../../csrf.php';
 require '../../db.php';
 require '../../utils/old_input.php';
 require_once '../../database/maintenance.php';
+require_once '../../database/penghuni.php';
 require 'validation.php';
 
 $role = $_SESSION['userRole'];
 $userId = (int)$_SESSION['userId'];
 
 $rooms = fetchMaintenanceRooms($db, false);
+$kamars = fetchActiveKamarWithOccupancy($db);
 $inventory = fetchMaintenanceInventory($db, false);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -62,6 +64,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $old = pullOldFormInput();
+
+$initialLocationType = !empty($old['kamar_id']) ? 'kamar' : 'ruangan';
 ?>
 
 <!DOCTYPE html>
@@ -91,7 +95,7 @@ $old = pullOldFormInput();
                 
                
                 <div class="tw:lg:col-span-2">
-                    <form action="create.php" method="POST" enctype="multipart/form-data" class="tw:grid tw:grid-cols-1 tw:lg:grid-cols-2 tw:gap-4 tw:p-[1.45rem] tw:rounded-[24px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.88)] tw:shadow-sm" x-data="{ targetType: '<?= htmlspecialchars($old['target_tipe'] ?? 'ruangan') ?>' }">
+                    <form action="create.php" method="POST" enctype="multipart/form-data" class="tw:grid tw:grid-cols-1 tw:lg:grid-cols-2 tw:gap-4 tw:p-[1.45rem] tw:rounded-[24px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.88)] tw:shadow-sm">
 
                         <?php echo csrf_field(); ?>
 
@@ -109,22 +113,41 @@ $old = pullOldFormInput();
                         </div>
 
 
-                        <div class="mb-3 tw:col-span-full">
-                            <label class="form-label">Target Lokasi Laporan</label>
-                            <div class="tw:flex tw:gap-4 tw:mt-1 tw:mb-3">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="target_tipe" id="target_ruangan" value="ruangan" x-model="targetType">
-                                    <label class="form-check-label" for="target_ruangan">Ruangan</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="target_tipe" id="target_inventaris" value="inventaris" x-model="targetType">
-                                    <label class="form-check-label" for="target_inventaris">Inventaris / Barang</label>
+                        <div class="tw:contents" x-data="{
+                                locationType: '<?= htmlspecialchars($initialLocationType, ENT_QUOTES) ?>',
+                                selectedRuangan: '<?= htmlspecialchars((string) ($old['ruangan_id'] ?? ''), ENT_QUOTES) ?>',
+                                selectedKamar: '<?= htmlspecialchars((string) ($old['kamar_id'] ?? ''), ENT_QUOTES) ?>',
+                                selectedInventaris: '<?= htmlspecialchars((string) ($old['inventaris_id'] ?? ''), ENT_QUOTES) ?>',
+                                inventoryList: <?= htmlspecialchars(json_encode($inventory), ENT_QUOTES, 'UTF-8') ?>,
+                                get filteredInventory() {
+                                    return this.locationType === 'ruangan'
+                                        ? this.inventoryList.filter(item => String(item.RuanganID) === String(this.selectedRuangan))
+                                        : this.inventoryList.filter(item => String(item.KamarID) === String(this.selectedKamar));
+                                },
+                                setLocationType(type) {
+                                    this.locationType = type;
+                                    this.selectedRuangan = '';
+                                    this.selectedKamar = '';
+                                    this.selectedInventaris = '';
+                                }
+                            }">
+                            <div class="mb-3">
+                                <label class="form-label">Lokasi Kerusakan</label>
+                                <div class="tw:flex tw:gap-4 tw:mt-1">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="location_type" id="location_ruangan" value="ruangan" :checked="locationType === 'ruangan'" @change="setLocationType('ruangan')">
+                                        <label class="form-check-label" for="location_ruangan">Ruangan (Area Umum)</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="location_type" id="location_kamar" value="kamar" :checked="locationType === 'kamar'" @change="setLocationType('kamar')">
+                                        <label class="form-check-label" for="location_kamar">Kamar (Kamar Tidur)</label>
+                                    </div>
                                 </div>
                             </div>
 
-
-                            <div x-show="targetType === 'ruangan'">
-                                <select name="ruangan_id" id="ruangan_id" class="form-select" :required="targetType === 'ruangan'">
+                            <div class="mb-3" x-show="locationType === 'ruangan'" x-cloak>
+                                <label for="ruangan_id" class="form-label">Pilih Ruangan</label>
+                                <select name="ruangan_id" id="ruangan_id" class="form-select" x-model="selectedRuangan" @change="selectedInventaris = ''" :required="locationType === 'ruangan'">
                                     <option value="" disabled <?= empty($old['ruangan_id']) ? 'selected' : '' ?>>Pilih Ruangan</option>
                                     <?php foreach ($rooms as $r): ?>
                                         <option value="<?= $r['RuanganID'] ?>" <?= (string) ($old['ruangan_id'] ?? '') === (string) $r['RuanganID'] ? 'selected' : '' ?>>
@@ -134,15 +157,28 @@ $old = pullOldFormInput();
                                 </select>
                             </div>
 
-                            <div x-show="targetType === 'inventaris'">
-                                <select name="inventaris_id" id="inventaris_id" class="form-select" :required="targetType === 'inventaris'">
-                                    <option value="" disabled <?= empty($old['inventaris_id']) ? 'selected' : '' ?>>Pilih Inventaris / Barang</option>
-                                    <?php foreach ($inventory as $i): ?>
-                                        <option value="<?= $i['InventarisID'] ?>" <?= (string) ($old['inventaris_id'] ?? '') === (string) $i['InventarisID'] ? 'selected' : '' ?>>
-                                            <?= htmlspecialchars($i['NamaBarang']) ?>
+                            <div class="mb-3" x-show="locationType === 'kamar'" x-cloak>
+                                <label for="kamar_id" class="form-label">Kamar</label>
+                                <select class="form-select" name="kamar_id" id="kamar_id" x-model="selectedKamar" @change="selectedInventaris = ''" :required="locationType === 'kamar'">
+                                    <option value="" <?= empty($old['kamar_id']) ? 'selected' : '' ?> disabled>Pilih Kamar</option>
+                                    <?php foreach ($kamars as $k): ?>
+                                        <option value="<?= $k['KamarID'] ?>" <?= (string) ($old['kamar_id'] ?? '') === (string) $k['KamarID'] ? 'selected' : '' ?>>
+                                            <?= htmlspecialchars($k['NomorKamar']) ?> - Lantai <?= htmlspecialchars($k['Lantai']) ?>
+                                            (<?= (int) $k['JumlahPenghuniAktual'] ?>/<?= (int) $k['KapasitasPenghuni'] ?> terisi)
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
+                            </div>
+
+                            <div class="mb-3" x-show="(locationType === 'ruangan' && selectedRuangan !== '') || (locationType === 'kamar' && selectedKamar !== '')" x-cloak>
+                                <label for="inventaris_id" class="form-label" x-text="locationType === 'ruangan' ? 'Inventaris di Ruangan Ini (Opsional)' : 'Pilih Barang yang Rusak'"></label>
+                                <select name="inventaris_id" id="inventaris_id" class="form-select" x-model="selectedInventaris" :required="locationType === 'kamar'">
+                                    <option value="" :disabled="locationType === 'kamar'" x-text="locationType === 'ruangan' ? '-- Laporkan Ruangan Secara Umum --' : '-- Pilih Barang --'"></option>
+                                    <template x-for="item in filteredInventory" :key="item.InventarisID">
+                                        <option :value="item.InventarisID" x-text="item.NamaBarang"></option>
+                                    </template>
+                                </select>
+                                <div class="form-text" x-show="filteredInventory.length === 0" x-text="locationType === 'ruangan' ? 'Tidak ada data inventaris tercatat untuk ruangan ini.' : 'Tidak ada data inventaris tercatat untuk kamar ini.'"></div>
                             </div>
                         </div>
 
