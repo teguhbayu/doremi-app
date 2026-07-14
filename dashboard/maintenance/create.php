@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require 'helpers.php';
 // Memastikan semua peran yang diizinkan bisa membuat laporan baru

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 $currentPath = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH) ?? '';
 $dashboardBasePath = '/doremi-app/dashboard';
 $relativePath = trim((string) str_replace($dashboardBasePath, '', $currentPath), '/');
