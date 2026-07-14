@@ -67,7 +67,21 @@ $totalReports = count($reports);
                                             <div class="tw:text-xs tw:text-slate-500">-</div>
                                         <?php endif; ?>
                                     </td>
-                                    <td>
+                                    <td class="tw:max-w-48 tw:truncate" title="<?php
+                                         if (!empty($r['NamaRuangan'])) {
+                                             echo 'Ruangan: ' . htmlspecialchars($r['NamaRuangan']) . ' (Lantai ' . htmlspecialchars($r['LantaiRuangan']) . ')';
+                                         } elseif (!empty($r['NamaBarang'])) {
+                                             $loc = 'Inventaris: ' . htmlspecialchars($r['NamaBarang']);
+                                             if (!empty($r['InvRuanganNama'])) {
+                                                 $loc .= ' (Ruangan ' . htmlspecialchars($r['InvRuanganNama']) . ')';
+                                             } elseif (!empty($r['InvKamarNomor'])) {
+                                                 $loc .= ' (Kamar ' . htmlspecialchars($r['InvKamarNomor']) . ')';
+                                             }
+                                             echo $loc;
+                                         } else {
+                                             echo '-';
+                                         }
+                                     ?>">
                                         <?php if (!empty($r['NamaRuangan'])): ?>
                                             <div>Ruangan: <strong><?= htmlspecialchars($r['NamaRuangan']) ?></strong></div>
                                             <div class="tw:text-xs tw:text-slate-500">Lantai <?= htmlspecialchars($r['LantaiRuangan']) ?></div>
@@ -161,22 +175,39 @@ $totalReports = count($reports);
                                             </div>
                                             <div class="modal-body">
                                                 <div class="tw:flex tw:flex-col tw:gap-3">
-                                                    <div>
-                                                        <label class="tw:text-xs tw:text-slate-500">Tingkat Kerusakan</label>
-                                                        <p class="tw:font-semibold">
-                                                            <?php if ($r['JenisLaporan'] === 'Kerusakan Darurat / Berat'): ?>
-                                                                <span class="badge bg-danger text-white">Darurat</span>
-                                                            <?php elseif ($r['JenisLaporan'] === 'Kerusakan Sedang'): ?>
-                                                                <span class="badge bg-warning text-dark">Sedang</span>
-                                                            <?php else: ?>
-                                                                <span class="badge bg-success text-white">Ringan</span>
-                                                            <?php endif; ?>
-                                                        </p>
-                                                    </div>
-                                                    <div>
-                                                        <label class="tw:text-xs tw:text-slate-500">Deskripsi Masalah</label>
-                                                        <p class="tw:text-slate-700 tw:whitespace-pre-line tw:break-words"><?= htmlspecialchars($r['Deskripsi']) ?></p>
-                                                    </div>
+                                                     <div>
+                                                         <label class="tw:text-xs tw:text-slate-500">Tingkat Kerusakan</label>
+                                                         <p class="tw:font-semibold">
+                                                             <?php if ($r['JenisLaporan'] === 'Kerusakan Darurat / Berat'): ?>
+                                                                 <span class="badge bg-danger text-white">Darurat</span>
+                                                             <?php elseif ($r['JenisLaporan'] === 'Kerusakan Sedang'): ?>
+                                                                 <span class="badge bg-warning text-dark">Sedang</span>
+                                                             <?php else: ?>
+                                                                 <span class="badge bg-success text-white">Ringan</span>
+                                                             <?php endif; ?>
+                                                         </p>
+                                                     </div>
+                                                     <div>
+                                                         <label class="tw:text-xs tw:text-slate-500">Target Lokasi</label>
+                                                         <p class="tw:font-semibold tw:mb-0">
+                                                             <?php if (!empty($r['NamaRuangan'])): ?>
+                                                                 Ruangan: <?= htmlspecialchars($r['NamaRuangan']) ?> (Lantai <?= htmlspecialchars($r['LantaiRuangan']) ?>)
+                                                             <?php elseif (!empty($r['NamaBarang'])): ?>
+                                                                 Inventaris: <?= htmlspecialchars($r['NamaBarang']) ?>
+                                                                 <?php if (!empty($r['InvRuanganNama'])): ?>
+                                                                     (Lokasi: Ruangan <?= htmlspecialchars($r['InvRuanganNama']) ?>)
+                                                                 <?php elseif (!empty($r['InvKamarNomor'])): ?>
+                                                                     (Lokasi: Kamar <?= htmlspecialchars($r['InvKamarNomor']) ?>)
+                                                                 <?php endif; ?>
+                                                             <?php else: ?>
+                                                                 -
+                                                             <?php endif; ?>
+                                                         </p>
+                                                     </div>
+                                                     <div>
+                                                         <label class="tw:text-xs tw:text-slate-500">Deskripsi Masalah</label>
+                                                         <p class="tw:text-slate-700 tw:whitespace-pre-line tw:break-words"><?= htmlspecialchars($r['Deskripsi']) ?></p>
+                                                     </div>
                                                      <?php if (!empty($r['HasFotoLaporan'])): ?>
                                                         <div>
                                                             <label class="tw:text-xs tw:text-slate-500 tw:mb-1 tw:block">Foto Masalah</label>

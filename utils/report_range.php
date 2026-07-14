@@ -30,12 +30,31 @@ function resolveReportRangeFilter(array $query, string $defaultRange = '7d'): ar
         }
     }
 
+    // Calculate actual start/end dates for preset ranges so PDF headers are informative
+    $today = date('Y-m-d');
+    $presetDates = match ($range) {
+        '7d'  => ['start' => date('Y-m-d', strtotime('-6 days')), 'end' => $today],
+        '30d' => ['start' => date('Y-m-d', strtotime('-29 days')), 'end' => $today],
+        '6m'  => ['start' => date('Y-m-d', strtotime('-6 months')), 'end' => $today],
+        default => null,
+    };
+
+    // Short label for UI display
     $rangeLabel = match ($range) {
-        '7d' => '7 Hari Terakhir',
+        '7d'  => '7 Hari Terakhir',
         '30d' => '30 Hari Terakhir',
-        '6m' => '6 Bulan Terakhir',
+        '6m'  => '6 Bulan Terakhir',
         'all' => 'Semua Waktu',
-        'custom' => date('d/m/Y', strtotime($startDate)) . ' - ' . date('d/m/Y', strtotime($endDate)),
+        'custom' => date('d M Y', strtotime($startDate)) . ' - ' . date('d M Y', strtotime($endDate)),
+    };
+
+    // Full label with actual dates for PDF export headers
+    $rangeLabelFull = match ($range) {
+        '7d'  => '7 Hari Terakhir (' . date('d M Y', strtotime($presetDates['start'])) . ' - ' . date('d M Y', strtotime($presetDates['end'])) . ')',
+        '30d' => '30 Hari Terakhir (' . date('d M Y', strtotime($presetDates['start'])) . ' - ' . date('d M Y', strtotime($presetDates['end'])) . ')',
+        '6m'  => '6 Bulan Terakhir (' . date('d M Y', strtotime($presetDates['start'])) . ' - ' . date('d M Y', strtotime($presetDates['end'])) . ')',
+        'all' => 'Semua Waktu',
+        'custom' => date('d M Y', strtotime($startDate)) . ' - ' . date('d M Y', strtotime($endDate)),
     };
 
     return [
@@ -43,6 +62,7 @@ function resolveReportRangeFilter(array $query, string $defaultRange = '7d'): ar
         'startDate' => $startDate,
         'endDate' => $endDate,
         'rangeLabel' => $rangeLabel,
+        'rangeLabelFull' => $rangeLabelFull,
     ];
 }
 

@@ -132,7 +132,7 @@ if ($role === 'SIGAP') {
                                                         <span class="badge bg-success">Selesai</span>
                                                     <?php endif; ?>
                                                 </td>
-                                                <td><?= htmlspecialchars($row['Keperluan']) ?></td>
+                                                <td class="tw:max-w-48 tw:truncate" title="<?= htmlspecialchars($row['Keperluan']) ?>"><?= htmlspecialchars($row['Keperluan']) ?></td>
                                                 <td><?= $row['WaktuKeluar'] ? date('H:i, d M', strtotime($row['WaktuKeluar'])) : '-' ?>
                                                 </td>
                                                 <td><?= $row['WaktuMasuk'] ? date('H:i, d M', strtotime($row['WaktuMasuk'])) : '-' ?>
@@ -168,12 +168,12 @@ if ($role === 'SIGAP') {
                                 <tbody>
                                     <?php while ($row = mysqli_fetch_assoc($pendingQuery)): ?>
                                         <tr>
-                                            <td>
+                                            <td class="tw:max-w-40 tw:truncate" title="<?= htmlspecialchars($row['NamaPenghuni']) ?> (<?= $row['Nim'] ?>)">
                                                 <div class="tw:font-bold"><?= htmlspecialchars($row['NamaPenghuni']) ?></div>
                                                 <div class="tw:text-xs tw:text-gray-500"><?= $row['Nim'] ?></div>
                                             </td>
                                             <td><?= $row['NomorKamar'] ?></td>
-                                            <td><?= htmlspecialchars($row['Keperluan']) ?></td>
+                                            <td class="tw:max-w-48 tw:truncate" title="<?= htmlspecialchars($row['Keperluan']) ?>"><?= htmlspecialchars($row['Keperluan']) ?></td>
                                             <td>
                                                 <form action="process.php" method="POST" class="tw:inline">
                                                     <input type="hidden" name="action" value="confirm_exit">
@@ -210,7 +210,7 @@ if ($role === 'SIGAP') {
                                 <tbody>
                                     <?php while ($row = mysqli_fetch_assoc($outsideQuery)): ?>
                                         <tr>
-                                            <td>
+                                            <td class="tw:max-w-40 tw:truncate" title="<?= htmlspecialchars($row['NamaPenghuni']) ?> (<?= $row['Nim'] ?>)">
                                                 <div class="tw:font-bold"><?= htmlspecialchars($row['NamaPenghuni']) ?></div>
                                                 <div class="tw:text-xs tw:text-gray-500"><?= $row['Nim'] ?></div>
                                             </td>

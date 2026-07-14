@@ -68,7 +68,7 @@ $totalLogs = mysqli_num_rows($logQuery);
                                             <span class="badge bg-success">Masuk</span>
                                         <?php endif; ?>
                                     </td>
-                                    <td><?= htmlspecialchars($row['Keperluan']) ?></td>
+                                    <td class="tw:max-w-48 tw:truncate" title="<?= htmlspecialchars($row['Keperluan']) ?>"><?= htmlspecialchars($row['Keperluan']) ?></td>
                                     <td><?= $row['WaktuKeluar'] ? date('H:i, d M Y', strtotime($row['WaktuKeluar'])) : '-' ?></td>
                                     <td><?= $row['WaktuMasuk'] ? date('H:i, d M Y', strtotime($row['WaktuMasuk'])) : '-' ?></td>
                                     <td><?= htmlspecialchars($row['NamaPetugas'] ?? '-') ?></td>

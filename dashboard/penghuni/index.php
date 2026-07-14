@@ -50,7 +50,7 @@ $totalPenghuni = mysqli_num_rows($query);
                     <?php while ($penghuni = mysqli_fetch_assoc($query)) { ?>
                         <tr>
                             <td><?php echo $penghuni["Nim"]; ?></td>
-                            <td class="tw:text-left"><?php echo $penghuni["NamaPenghuni"]; ?></td>
+                            <td class="tw:text-left tw:max-w-48 tw:truncate" title="<?php echo htmlspecialchars($penghuni["NamaPenghuni"]); ?>"><?php echo $penghuni["NamaPenghuni"]; ?></td>
                             <td><?php echo $penghuni["NomorKamar"] ?? 'N/A'; ?></td>
                             <td>
                                 <div class="tw:inline-flex tw:justify-center tw:items-center tw:gap-1 tw:text-black">

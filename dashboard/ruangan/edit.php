@@ -18,7 +18,7 @@ require '../../database/ruangan.php';
 require '../../utils/old_input.php';
 require_once '../../utils/validation_helpers.php';
 
-$ruanganTypes = ['Ruang Ibadah', 'Ruang Publik', 'Ruang Jemur', 'Lapangan Olahraga', 'Balkon', 'Kamar Mandi'];
+$ruanganTypes = ['Tempat Ibadah', 'Ruang Publik', 'Ruang Jemur', 'Lapangan Olahraga', 'Balkon', 'Kamar Mandi'];
 
 $id = $_GET['id'] ?? null;
 if (!$id) {

@@ -142,8 +142,9 @@ $kamarState = [
                 </div>
                 <div class="mb-3">
                     <label for="bagianKamar" class="form-label">Bagian Kamar</label>
-                    <input type="text" name="bagianKamar" class="form-control" id="bagianKamar" maxlength="19"
-                        x-model="bagian" @input="bagian = bagian.replace(/\s+/g, '').toUpperCase()" required>
+                    <input type="text" name="bagianKamar" class="form-control" id="bagianKamar" maxlength="1"
+                        pattern="[A-Za-z]" title="Kolom kamar hanya boleh diisi 1 huruf."
+                        x-model="bagian" @input="bagian = bagian.replace(/[^A-Za-z]/g, '').slice(0, 1).toUpperCase()" required>
                 </div>
                 <div class="mb-3">
                     <label for="nomorKamarPreview" class="form-label">Nomor Kamar</label>

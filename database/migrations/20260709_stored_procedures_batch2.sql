@@ -588,13 +588,16 @@ BEGIN
            pt.NamaPetugas AS NamaReporterPetugas,
            tech.NamaPetugas AS NamaTeknisi,
            r.NamaRuangan, r.Lantai AS LantaiRuangan,
-           i.NamaBarang
+           i.NamaBarang,
+           inv_r.NamaRuangan AS InvRuanganNama, inv_k.NomorKamar AS InvKamarNomor
     FROM maintenance m
     LEFT JOIN penghuni p ON m.PenghuniID = p.PenghuniID
     LEFT JOIN petugas pt ON m.PetugasID = pt.PetugasID
     LEFT JOIN petugas tech ON m.TeknisiID = tech.PetugasID
     LEFT JOIN ruangan r ON m.RuanganID = r.RuanganID
     LEFT JOIN inventaris i ON m.InventarisID = i.InventarisID
+    LEFT JOIN ruangan inv_r ON i.RuanganID = inv_r.RuanganID
+    LEFT JOIN kamar inv_k ON i.KamarID = inv_k.KamarID
     WHERE m.IsDeleted = 0
       AND (
           role_param = 'MAINTENANCE'

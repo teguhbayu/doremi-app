@@ -52,8 +52,8 @@ $totalRuangan = mysqli_num_rows($query);
                 <tbody>
                     <?php while ($ruangan = mysqli_fetch_assoc($query)) { ?>
                         <tr>
-                            <td><?php echo htmlspecialchars($ruangan["NamaRuangan"]); ?></td>
-                            <td><?php echo htmlspecialchars($ruangan["JenisRuangan"]); ?></td>
+                            <td class="tw:max-w-48 tw:truncate" title="<?php echo htmlspecialchars($ruangan["NamaRuangan"]); ?>"><?php echo htmlspecialchars($ruangan["NamaRuangan"]); ?></td>
+                            <td class="tw:max-w-32 tw:truncate" title="<?php echo htmlspecialchars($ruangan["JenisRuangan"]); ?>"><?php echo htmlspecialchars($ruangan["JenisRuangan"]); ?></td>
                             <td>Lantai <?php echo htmlspecialchars($ruangan["Lantai"]); ?></td>
                             <td>
                                 <div class="tw:inline-flex tw:justify-center tw:items-center tw:gap-2 tw:text-black">

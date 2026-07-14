@@ -54,18 +54,18 @@ $totalInventaris = count($inventarisList);
                 <tbody>
                     <?php foreach ($inventarisList as $inventaris) { ?>
                         <tr>
-                            <td><?php echo htmlspecialchars($inventaris["NamaBarang"]); ?></td>
+                            <td class="tw:max-w-48 tw:truncate" title="<?php echo htmlspecialchars($inventaris["NamaBarang"]); ?>"><?php echo htmlspecialchars($inventaris["NamaBarang"]); ?></td>
                             <td><?php echo htmlspecialchars($inventaris["Jumlah"]); ?></td>
-                            <td>
-                                <?php 
-                                    $lokasiStr = "N/A";
-                                    if ($inventaris["NomorKamar"]) {
-                                        $lokasiStr = "Kamar: " . $inventaris["NomorKamar"];
-                                    } elseif ($inventaris["NamaRuangan"]) {
-                                        $lokasiStr = "Ruangan: " . $inventaris["NamaRuangan"];
-                                    }
-                                    echo htmlspecialchars($lokasiStr);
-                                ?>
+                            <?php 
+                                $lokasiStr = "N/A";
+                                if ($inventaris["NomorKamar"]) {
+                                    $lokasiStr = "Kamar: " . $inventaris["NomorKamar"];
+                                } elseif ($inventaris["NamaRuangan"]) {
+                                    $lokasiStr = "Ruangan: " . $inventaris["NamaRuangan"];
+                                }
+                            ?>
+                            <td class="tw:max-w-48 tw:truncate" title="<?php echo htmlspecialchars($lokasiStr); ?>">
+                                <?php echo htmlspecialchars($lokasiStr); ?>
                             </td>
                             <td>
                                 <div class="tw:inline-flex tw:justify-center tw:items-center tw:gap-2 tw:text-black">

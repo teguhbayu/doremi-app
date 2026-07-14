@@ -14,6 +14,7 @@ $range = $rangeFilter['range'];
 $startDate = $rangeFilter['startDate'];
 $endDate = $rangeFilter['endDate'];
 $rangeLabel = $rangeFilter['rangeLabel'];
+$rangeLabelFull = $rangeFilter['rangeLabelFull'];
 
 /** Format a duration given in minutes into a human-friendly string. */
 function paket_format_duration(?int $minutes): string
@@ -51,6 +52,13 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel') {
     echo "\xEF\xBB\xBF";
 
     $out = fopen('php://output', 'w');
+
+    // Metadata header rows
+    fputcsv($out, ['Laporan Paket & Logistik'], ';', '"', "\\");
+    fputcsv($out, ['Periode', $rangeLabelFull], ';', '"', "\\");
+    fputcsv($out, ['Diekspor pada', date('d M Y, H:i') . ' WIB'], ';', '"', "\\");
+    fputcsv($out, [], ';', '"', "\\"); // blank separator row
+
     fputcsv($out, ['No', 'Penghuni', 'NIM', 'Kamar', 'Tipe', 'Pengirim', 'Kurir', 'Status', 'Waktu Sampai', 'Waktu Ambil', 'Durasi Ambil (Menit)', 'Dicatat Oleh'], ';', '"', "\\");
 
     $no = 1;
@@ -101,7 +109,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'pdf') {
         ];
     }
     
-    \Utils\generateReportPdf($filename, 'Laporan Paket & Logistik', $rangeLabel, $headers, $widths, $rows);
+    \Utils\generateReportPdf($filename, 'Laporan Paket & Logistik', $rangeLabelFull, $headers, $widths, $rows);
     exit;
 }
 
