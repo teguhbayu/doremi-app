@@ -4,19 +4,16 @@ require 'helpers.php';
 paket_require_roles(['SIGAP', 'PENGURUS']);
 require '../../db.php';
 require '../../database/paketReport.php';
+require '../../utils/report_range.php';
 
 $role = $_SESSION['userRole'];
 session_write_close();
 
-$allowedRanges = ['7d', '30d', '6m', 'all'];
-$range = in_array($_GET['range'] ?? '', $allowedRanges) ? $_GET['range'] : '7d';
-
-$rangeLabel = match ($range) {
-    '7d' => '7 Hari Terakhir',
-    '30d' => '30 Hari Terakhir',
-    '6m' => '6 Bulan Terakhir',
-    'all' => 'Semua Waktu',
-};
+$rangeFilter = resolveReportRangeFilter($_GET);
+$range = $rangeFilter['range'];
+$startDate = $rangeFilter['startDate'];
+$endDate = $rangeFilter['endDate'];
+$rangeLabel = $rangeFilter['rangeLabel'];
 
 /** Format a duration given in minutes into a human-friendly string. */
 function paket_format_duration(?int $minutes): string
@@ -47,7 +44,8 @@ $statusMeta = [
 ];
 
 if (isset($_GET['export']) && $_GET['export'] === 'excel') {
-    $filename = 'laporan-paket-' . $range . '-' . date('Ymd') . '.csv';
+    $filenameSuffix = $range === 'custom' ? $startDate . '_' . $endDate : $range;
+    $filename = 'laporan-paket-' . $filenameSuffix . '-' . date('Ymd') . '.csv';
     header('Content-Type: text/csv; charset=UTF-8');
     header('Content-Disposition: attachment; filename="' . $filename . '"');
     echo "\xEF\xBB\xBF";
@@ -56,7 +54,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel') {
     fputcsv($out, ['No', 'Penghuni', 'NIM', 'Kamar', 'Tipe', 'Pengirim', 'Kurir', 'Status', 'Waktu Sampai', 'Waktu Ambil', 'Durasi Ambil (Menit)', 'Dicatat Oleh'], ';');
 
     $no = 1;
-    foreach (fetchPaketReportExport($db, $range) as $row) {
+    foreach (fetchPaketReportExport($db, $range, $startDate, $endDate) as $row) {
         fputcsv($out, [
             $no++,
             $row['NamaPenghuni'],
@@ -76,14 +74,14 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel') {
     exit;
 }
 
-$stats = fetchPaketReportStats($db, $range);
+$stats = fetchPaketReportStats($db, $range, $startDate, $endDate);
 $avgMinutes = ($stats['avg_menit'] ?? null) !== null ? (int) $stats['avg_menit'] : null;
 
 // ── Status distribution (doughnut) ──────────────────────────────────────────
 $statusOrder = ['Sudah Diambil', 'Belum Diambil', 'TERTUKAR'];
 $statusColors = ['Sudah Diambil' => '#10b981', 'Belum Diambil' => '#f59e0b', 'TERTUKAR' => '#ef4444'];
 $statusData = ['Sudah Diambil' => 0, 'Belum Diambil' => 0, 'TERTUKAR' => 0];
-foreach (fetchPaketReportStatusDist($db, $range) as $row) {
+foreach (fetchPaketReportStatusDist($db, $range, $startDate, $endDate) as $row) {
     if (array_key_exists($row['s'], $statusData)) {
         $statusData[$row['s']] = (int) $row['n'];
     }
@@ -93,10 +91,26 @@ $statusValues = array_map(fn($k) => $statusData[$k], $statusOrder);
 $statusBgColors = array_map(fn($k) => $statusColors[$k], $statusOrder);
 
 // ── Trend (line) ─────────────────────────────────────────────────────────────
-if (in_array($range, ['7d', '30d'])) {
+if ($range === 'custom') {
+    if (reportCustomRangeIsDaily($startDate, $endDate)) {
+        $labelMap = reportCustomDailyLabels($startDate, $endDate);
+        $trendRaw = [];
+        foreach (fetchPaketReportTrendDaily($db, $range, $startDate, $endDate) as $row) {
+            $trendRaw[$row['d']] = (int) $row['n'];
+        }
+    } else {
+        $labelMap = reportCustomMonthlyLabels($startDate, $endDate);
+        $trendRaw = [];
+        foreach (fetchPaketReportTrendMonthly($db, $range, $startDate, $endDate) as $row) {
+            $trendRaw[$row['m']] = (int) $row['n'];
+        }
+    }
+    $trendLabels = array_values($labelMap);
+    $trendValues = array_map(fn($k) => $trendRaw[$k] ?? 0, array_keys($labelMap));
+} elseif (in_array($range, ['7d', '30d'])) {
     $days = $range === '7d' ? 7 : 30;
     $trendRaw = [];
-    foreach (fetchPaketReportTrendDaily($db, $range) as $row) {
+    foreach (fetchPaketReportTrendDaily($db, $range, $startDate, $endDate) as $row) {
         $trendRaw[$row['d']] = (int) $row['n'];
     }
     $trendLabels = [];
@@ -108,7 +122,7 @@ if (in_array($range, ['7d', '30d'])) {
     }
 } else {
     $trendRaw = [];
-    foreach (fetchPaketReportTrendMonthly($db, $range) as $row) {
+    foreach (fetchPaketReportTrendMonthly($db, $range, $startDate, $endDate) as $row) {
         $trendRaw[$row['m']] = (int) $row['n'];
     }
     if ($range === '6m') {
@@ -131,7 +145,7 @@ if (in_array($range, ['7d', '30d'])) {
 
 // ── Tipe kiriman distribution (doughnut) ─────────────────────────────────────
 $tipeData = ['Paket' => 0, 'Dokumen' => 0];
-foreach (fetchPaketReportTipeDist($db, $range) as $row) {
+foreach (fetchPaketReportTipeDist($db, $range, $startDate, $endDate) as $row) {
     $label = paket_type_label($row['j']);
     if (array_key_exists($label, $tipeData)) {
         $tipeData[$label] += (int) $row['n'];
@@ -141,14 +155,14 @@ foreach (fetchPaketReportTipeDist($db, $range) as $row) {
 // ── Top 5 kurir (horizontal bar) ─────────────────────────────────────────────
 $topKurirLabels = [];
 $topKurirValues = [];
-foreach (fetchPaketReportTopKurir($db, $range) as $row) {
+foreach (fetchPaketReportTopKurir($db, $range, $startDate, $endDate) as $row) {
     $topKurirLabels[] = $row['Kurir'];
     $topKurirValues[] = (int) $row['n'];
 }
 
 // ── Jam sibuk paket datang (bar) ─────────────────────────────────────────────
 $hourRaw = array_fill(0, 24, 0);
-foreach (fetchPaketReportJamSibuk($db, $range) as $row) {
+foreach (fetchPaketReportJamSibuk($db, $range, $startDate, $endDate) as $row) {
     $hourRaw[(int) $row['h']] = (int) $row['n'];
 }
 $hourLabels = [];
@@ -161,7 +175,7 @@ for ($h = 0; $h < 24; $h++) {
 // ── Top 5 penghuni penerima terbanyak (horizontal bar) ───────────────────────
 $topPenghuniLabels = [];
 $topPenghuniValues = [];
-foreach (fetchPaketReportTopPenghuni($db, $range) as $row) {
+foreach (fetchPaketReportTopPenghuni($db, $range, $startDate, $endDate) as $row) {
     $topPenghuniLabels[] = $row['NamaPenghuni'];
     $topPenghuniValues[] = (int) $row['n'];
 }
@@ -169,11 +183,15 @@ foreach (fetchPaketReportTopPenghuni($db, $range) as $row) {
 // ── Petugas SIGAP ranking (PENGURUS only) ────────────────────────────────────
 $petugasPerforma = [];
 if ($role === 'PENGURUS') {
-    $petugasPerforma = fetchPaketReportPetugasRanking($db, $range);
+    $petugasPerforma = fetchPaketReportPetugasRanking($db, $range, $startDate, $endDate);
 }
 
 // ── Detail rows ──────────────────────────────────────────────────────────────
-$detailRows = fetchPaketReportDetail($db, $range);
+$detailRows = fetchPaketReportDetail($db, $range, $startDate, $endDate);
+
+$rangeQueryParams = $range === 'custom'
+    ? 'range=custom&start_date=' . urlencode($startDate) . '&end_date=' . urlencode($endDate)
+    : 'range=' . urlencode($range);
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -191,8 +209,8 @@ $detailRows = fetchPaketReportDetail($db, $range);
                 <i class="fa-solid fa-chart-bar tw:mr-[10px] tw:text-[#146c94]!"></i>Laporan Paket
             </h1>
 
-            <div class="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-3 tw:mb-8 no-print">
-                <div class="tw:flex tw:gap-2 tw:flex-wrap tw:mt-4">
+            <div class="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-3 no-print" x-data="{ showCustom: <?= $range === 'custom' ? 'true' : 'false' ?> }">
+                <div class="tw:flex tw:gap-2 tw:flex-wrap tw:mt-4 tw:items-center">
                     <?php foreach (['7d' => '7 Hari', '30d' => '30 Hari', '6m' => '6 Bulan', 'all' => 'Semua'] as $val => $label): ?>
                         <a href="?range=<?= $val ?>" style="
                     font-size:12px; font-weight:600; padding:6px 16px; border-radius:20px; text-decoration:none;
@@ -202,9 +220,16 @@ $detailRows = fetchPaketReportDetail($db, $range);
                     transition: all .15s;
                 "><?= $label ?></a>
                     <?php endforeach; ?>
+                    <button type="button" @click="showCustom = !showCustom" style="
+                    font-size:12px; font-weight:600; padding:6px 16px; border-radius:20px;
+                    border: 1.5px solid <?= $range === 'custom' ? '#146c94' : '#e2e8f0' ?>;
+                    background: <?= $range === 'custom' ? '#146c94' : '#fff' ?>;
+                    color: <?= $range === 'custom' ? '#fff' : '#64748b' ?>;
+                    transition: all .15s; cursor: pointer;
+                "><i class="fa-regular fa-calendar"></i> Custom</button>
                 </div>
                 <div class="tw:flex tw:gap-2 tw:mt-4">
-                    <a href="?range=<?= $range ?>&export=excel"
+                    <a href="?<?= $rangeQueryParams ?>&export=excel"
                         class="tw:inline-flex tw:items-center tw:gap-[6px] tw:text-xs tw:font-semibold tw:px-4 tw:py-[7px] tw:rounded-[10px] tw:bg-emerald-500 tw:text-white tw:no-underline tw:border-none">
                         <i class="fa-solid fa-file-excel"></i> Export Excel
                     </a>
@@ -213,9 +238,30 @@ $detailRows = fetchPaketReportDetail($db, $range);
                         <i class="fa-solid fa-file-pdf"></i> Export PDF
                     </button>
                 </div>
+
+                <div x-show="showCustom" x-cloak style="width:100%;">
+                    <form method="GET" class="no-print" style="
+                        display:flex; flex-wrap:wrap; align-items:flex-end; gap:12px; margin-top:12px;
+                        padding:12px; border-radius:16px; border:1px solid rgba(20,108,148,0.15); background:rgba(20,108,148,0.04);
+                    ">
+                        <input type="hidden" name="range" value="custom">
+                        <div style="width:170px;">
+                            <label class="tw:block tw:text-xs tw:font-semibold tw:text-slate-500 tw:mb-1">Dari Tanggal</label>
+                            <input type="date" name="start_date" value="<?= htmlspecialchars($startDate ?? '') ?>" class="form-control" style="font-size:13px; padding:6px 10px;" required>
+                        </div>
+                        <div style="width:170px;">
+                            <label class="tw:block tw:text-xs tw:font-semibold tw:text-slate-500 tw:mb-1">Sampai Tanggal</label>
+                            <input type="date" name="end_date" value="<?= htmlspecialchars($endDate ?? '') ?>" class="form-control" style="font-size:13px; padding:6px 10px;" required>
+                        </div>
+                        <button type="submit" style="
+                        font-size:12px; font-weight:700; padding:9px 20px; border-radius:10px; border:none;
+                        background:#146c94; color:#fff; cursor:pointer;
+                    ">Terapkan</button>
+                    </form>
+                </div>
             </div>
 
-            <div class="report-stat-grid tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:lg:grid-cols-4 tw:gap-5 tw:mb-8">
+            <div class="report-stat-grid tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:lg:grid-cols-4 tw:gap-5 tw:mt-4 tw:mb-8">
                 <div data-gsap="stat-card"
                     class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.85)] tw:shadow-sm">
                     <div class="tw:flex tw:items-center tw:gap-4">

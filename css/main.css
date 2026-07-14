@@ -388,6 +388,9 @@
   .tw\:block {
     display: block !important;
   }
+  .tw\:contents {
+    display: contents !important;
+  }
   .tw\:flex {
     display: flex !important;
   }
