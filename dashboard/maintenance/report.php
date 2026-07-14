@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require 'helpers.php';
 maintenance_require_roles(['MAINTENANCE', 'PENGURUS']);

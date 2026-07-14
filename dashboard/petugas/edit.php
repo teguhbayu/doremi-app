@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 require '../../vendor/autoload.php';
 
 use Respect\Validation\Validator as v;
@@ -9,9 +9,6 @@ if (!isset($_SESSION['userId'])) {
     exit;
 }
 require '../../db.php';
-require '../../database/petugas.php';
-require '../../utils/old_input.php';
-require_once '../../utils/validation_helpers.php';
 
 $id = $_GET['id'] ?? null;
 if (!$id) {
@@ -19,7 +16,12 @@ if (!$id) {
     exit;
 }
 
-$petugas = fetchPetugasById($db, (int) $id);
+$stmt = mysqli_prepare($db, "SELECT PetugasID, NamaPetugas, Email, Jabatan, NoHP FROM petugas WHERE PetugasID = ? AND IsDeleted = 0 LIMIT 1");
+mysqli_stmt_bind_param($stmt, 'i', $id);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+$petugas = mysqli_fetch_assoc($result);
+mysqli_stmt_close($stmt);
 
 if (!$petugas) {
     header("Location: /doremi-app/dashboard/petugas/");
@@ -38,6 +40,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $isChangingPassword = $password !== '' || $confirmPassword !== '';
 
+    $baseSchema = v::keySet(
+        v::key('nama', v::stringType()->length(3, 100)),
+        v::key('email', v::email()->length(3, 100)),
+        v::key('no', v::digit()->length(10, 16)),
+        v::key('jabatan', v::alpha()->in(["PENGURUS", "SIGAP", "SERVANDA", "MAINTENANCE"])),
+        v::key('password', v::optional(v::length(8, 100))),
+        v::key('confirmPassword', v::optional(v::length(8, 100)))
+    );
+
     $postData = [
         'nama' => $nama,
         'email' => $email,
@@ -47,36 +58,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'confirmPassword' => $confirmPassword,
     ];
 
-    // Password fields are excluded from the flashed old-input so a plaintext
-    // password never gets echoed back into the page after a failed submit.
-    $oldInput = ['nama' => $nama, 'email' => $email, 'no' => $no, 'jabatan' => $jabatan];
-
-    $fieldError = firstFieldError($postData, [
-        'nama' => ['label' => 'Nama Petugas', 'rule' => v::stringType()->length(3, 100)],
-        'email' => ['label' => 'Email Petugas', 'rule' => v::email()->length(3, 100)],
-        'no' => ['label' => 'No. HP', 'rule' => v::digit()->length(10, 16)],
-        'jabatan' => ['label' => 'Jabatan', 'rule' => v::alpha()->in(["PENGURUS", "SIGAP", "SERVANDA", "MAINTENANCE"])],
-        'password' => ['label' => 'Password', 'rule' => v::optional(v::length(8, 100))],
-        'confirmPassword' => ['label' => 'Konfirmasi Password', 'rule' => v::optional(v::length(8, 100))],
-    ]);
-
-    if ($fieldError !== null) {
-        setOldFormInput($oldInput);
-        header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&status=error&message=' . urlencode($fieldError));
+    if (!$baseSchema->validate($postData)) {
+        header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&status=error&message=Data Petugas Tidak Valid!');
         exit;
     }
 
     if ($isChangingPassword && $password !== $confirmPassword) {
-        setOldFormInput($oldInput);
         header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&status=error&message=Password Tidak Cocok!');
         exit;
     }
 
-    $duplicatePetugas = findPetugasDuplicateExcluding($db, (int) $id, $email, $no);
+    $duplicateCheckStmt = mysqli_prepare(
+        $db,
+        "SELECT PetugasID, Email, NoHP
+         FROM petugas
+         WHERE IsDeleted = 0 AND PetugasID != ? AND (Email = ? OR NoHP = ?)
+         LIMIT 1"
+    );
+    mysqli_stmt_bind_param($duplicateCheckStmt, 'iss', $id, $email, $no);
+    mysqli_stmt_execute($duplicateCheckStmt);
+    $duplicateCheckResult = mysqli_stmt_get_result($duplicateCheckStmt);
+    $duplicatePetugas = mysqli_fetch_assoc($duplicateCheckResult);
+    mysqli_stmt_close($duplicateCheckStmt);
 
     if ($duplicatePetugas) {
-        setOldFormInput($oldInput);
-
         if (($duplicatePetugas['Email'] ?? '') === $email) {
             header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&status=error&message=Email petugas sudah terdaftar!');
             exit;
@@ -88,22 +93,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($isChangingPassword) {
         $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-        updatePetugasWithPassword($db, (int) $id, $nama, $email, $jabatan, $no, $hashedPassword);
+        $stmt = mysqli_prepare($db, "UPDATE petugas SET NamaPetugas = ?, Email = ?, Jabatan = ?, NoHP = ?, Password = ? WHERE PetugasID = ?");
+        mysqli_stmt_bind_param($stmt, 'sssssi', $nama, $email, $jabatan, $no, $hashedPassword, $id);
     } else {
-        updatePetugasWithoutPassword($db, (int) $id, $nama, $email, $jabatan, $no);
+        $stmt = mysqli_prepare($db, "UPDATE petugas SET NamaPetugas = ?, Email = ?, Jabatan = ?, NoHP = ? WHERE PetugasID = ?");
+        mysqli_stmt_bind_param($stmt, 'ssssi', $nama, $email, $jabatan, $no, $id);
     }
+
+    if (!mysqli_stmt_execute($stmt)) {
+        mysqli_stmt_close($stmt);
+        exit;
+    }
+
+    mysqli_stmt_close($stmt);
 
     header("Location: /doremi-app/dashboard/petugas/?status=success&message=Petugas Berhasil Diupdate!");
     exit;
 }
-
-$old = pullOldFormInput();
-$formData = [
-    'nama' => $old['nama'] ?? $petugas['NamaPetugas'],
-    'email' => $old['email'] ?? $petugas['Email'],
-    'no' => $old['no'] ?? $petugas['NoHP'],
-    'jabatan' => $old['jabatan'] ?? $petugas['Jabatan'],
-];
 ?>
 
 <!DOCTYPE html>
@@ -120,7 +126,7 @@ $formData = [
             </h1>
             <div class="page-toolbar" data-note="Kosongkan password jika tidak ingin mengubah akses login">
                 <a href="index.php" class="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:min-h-12 tw:px-4 tw:py-[0.85rem] tw:rounded-2xl tw:border tw:border-[rgba(22,60,122,0.12)] tw:font-extrabold tw:no-underline tw:text-slate-900 tw:bg-[rgba(255,255,255,0.82)] tw:hover:bg-gray-50 tw:transition-all tw:text-sm">
-                    <i class="iconsax" icon-name="arrow-left"></i>
+                    <i class="iconsax" icon-name="arrow-left-2"></i>
                     <span>Kembali ke daftar</span>
                 </a>
             </div>
@@ -129,25 +135,25 @@ $formData = [
                 <div class="mb-3">
                     <label for="namaPetugas" class="form-label">Nama Petugas</label>
                     <input type="text" name="namaPetugas" class="form-control" id="namaPetugas"
-                        value="<?= htmlspecialchars($formData['nama']) ?>" required>
+                        value="<?= htmlspecialchars($petugas['NamaPetugas']) ?>" required>
                 </div>
                 <div class="mb-3">
                     <label for="emailPetugas" class="form-label">Email Petugas</label>
                     <input type="email" name="emailPetugas" class="form-control" id="emailPetugas"
-                        value="<?= htmlspecialchars($formData['email']) ?>" required>
+                        value="<?= htmlspecialchars($petugas['Email']) ?>" required>
                 </div>
                 <div class="mb-3">
                     <label for="noPetugas" class="form-label">No. HP</label>
                     <input type="text" name="noPetugas" class="form-control" id="noPetugas" inputmode="numeric"
                         pattern="[0-9]{10,16}" maxlength="16"
-                        value="<?= htmlspecialchars($formData['no']) ?>" required>
+                        value="<?= htmlspecialchars($petugas['NoHP']) ?>" required>
                 </div>
                 <div class="mb-3">
                     <label for="jabatanPetugas" class="form-label">Jabatan</label>
                     <select class="form-select" name="jabatanPetugas" id="jabatanPetugas" <?= $isSelfEdit ? 'disabled' : 'required' ?>>
                         <option disabled>Pilih Salah Satu</option>
                         <?php foreach (["PENGURUS", "SIGAP", "SERVANDA", "MAINTENANCE"] as $role): ?>
-                            <option value="<?= $role ?>" <?= $formData['jabatan'] === $role ? 'selected' : '' ?>>
+                            <option value="<?= $role ?>" <?= $petugas['Jabatan'] === $role ? 'selected' : '' ?>>
                                 <?= $role ?>
                             </option>
                         <?php endforeach; ?>

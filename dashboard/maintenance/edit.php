@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require 'helpers.php';
 // Allowed the MAINTENANCE role to edit their submitted tickets

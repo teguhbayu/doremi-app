@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 require '../../vendor/autoload.php';
 
 use Respect\Validation\Validator as v;
@@ -14,12 +14,9 @@ if ($_SESSION['userRole'] !== 'PENGURUS') {
 }
 require '../../csrf.php';
 require '../../db.php';
-require '../../database/inventaris.php';
-require '../../utils/old_input.php';
-require_once '../../utils/validation_helpers.php';
 
-$kamars = fetchActiveKamarOptions($db);
-$ruangans = fetchActiveRuanganOptions($db);
+$kamars = mysqli_fetch_all(mysqli_query($db, "SELECT KamarID, NomorKamar FROM kamar WHERE IsDeleted = 0"), MYSQLI_ASSOC);
+$ruangans = mysqli_fetch_all(mysqli_query($db, "SELECT RuanganID, NamaRuangan FROM ruangan WHERE IsDeleted = 0"), MYSQLI_ASSOC);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_validate($_SERVER['PHP_SELF']);
@@ -28,18 +25,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $lokasi = $_POST['lokasiBarang'] ?? '';
     $keterangan = trim($_POST['keteranganBarang'] ?? '');
 
-    $postData = ['nama' => $nama, 'jumlah' => $jumlah, 'lokasi' => $lokasi, 'keterangan' => $keterangan];
+    $inventarisSchema = v::keySet(
+        v::key('nama', v::stringType()->length(1, 100)),
+        v::key('jumlah', v::numericVal()->min(0)->max(999999)),
+        v::key('lokasi', v::stringType()->length(1, 50)),
+        v::key('keterangan', v::stringType()->length(0, 500))
+    );
 
-    $fieldError = firstFieldError($postData, [
-        'nama' => ['label' => 'Nama Barang', 'rule' => v::stringType()->length(1, 100)],
-        'jumlah' => ['label' => 'Jumlah', 'rule' => v::numericVal()->min(0)->max(999999)],
-        'lokasi' => ['label' => 'Lokasi', 'rule' => v::stringType()->length(1, 50)],
-        'keterangan' => ['label' => 'Keterangan', 'rule' => v::stringType()->length(0, 500)],
-    ]);
-
-    if ($fieldError !== null) {
-        setOldFormInput($postData);
-        header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=' . urlencode($fieldError));
+    if (!$inventarisSchema->validate(['nama' => $nama, 'jumlah' => $jumlah, 'lokasi' => $lokasi, 'keterangan' => $keterangan])) {
+        header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Data Inventaris tidak Valid!');
         exit;
     }
 
@@ -48,33 +42,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (str_starts_with($lokasi, 'kamar:')) {
         $kamarId = (int) explode(':', $lokasi)[1];
-        if (!checkKamarActive($db, $kamarId)) {
-            setOldFormInput($postData);
+        $chk = mysqli_prepare($db, "SELECT KamarID FROM kamar WHERE KamarID = ? AND IsDeleted = 0 LIMIT 1");
+        mysqli_stmt_bind_param($chk, 'i', $kamarId);
+        mysqli_stmt_execute($chk);
+        if (!mysqli_fetch_assoc(mysqli_stmt_get_result($chk))) {
+            mysqli_stmt_close($chk);
             header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Kamar tidak ditemukan!');
             exit;
         }
+        mysqli_stmt_close($chk);
     } elseif (str_starts_with($lokasi, 'ruangan:')) {
         $ruanganId = (int) explode(':', $lokasi)[1];
-        if (!checkRuanganActive($db, $ruanganId)) {
-            setOldFormInput($postData);
+        $chk = mysqli_prepare($db, "SELECT RuanganID FROM ruangan WHERE RuanganID = ? AND IsDeleted = 0 LIMIT 1");
+        mysqli_stmt_bind_param($chk, 'i', $ruanganId);
+        mysqli_stmt_execute($chk);
+        if (!mysqli_fetch_assoc(mysqli_stmt_get_result($chk))) {
+            mysqli_stmt_close($chk);
             header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Ruangan tidak ditemukan!');
             exit;
         }
+        mysqli_stmt_close($chk);
     }
 
-    try {
-        createInventaris($db, $ruanganId, $kamarId, $nama, (int) $jumlah, $keterangan);
-    } catch (RuntimeException $e) {
-        setOldFormInput($postData);
+    $now = date('Y-m-d H:i:s');
+
+    $stmt = mysqli_prepare($db, "INSERT INTO inventaris (RuanganID, KamarID, NamaBarang, Jumlah, Keterangan, UpdatedAt, IsDeleted) VALUES (?, ?, ?, ?, ?, ?, 0)");
+    mysqli_stmt_bind_param($stmt, 'iisiss', $ruanganId, $kamarId, $nama, $jumlah, $keterangan, $now);
+
+    if (!mysqli_stmt_execute($stmt)) {
         header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Terjadi Kesalahan saat menyimpan data!');
+        mysqli_stmt_close($stmt);
         exit;
     }
+
+    mysqli_stmt_close($stmt);
 
     header("Location: " . '/doremi-app/dashboard/inventaris/' . '?status=success&message=Inventaris Berhasil Ditambahkan!');
     exit;
 }
 
-$old = pullOldFormInput();
 ?>
 
 
@@ -92,15 +98,14 @@ $old = pullOldFormInput();
             </h1>
             <div class="page-toolbar" data-note="Form inventaris baru">
                 <a href="index.php" class="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:min-h-12 tw:px-4 tw:py-[0.85rem] tw:rounded-2xl tw:border tw:border-[rgba(22,60,122,0.12)] tw:font-extrabold tw:no-underline tw:text-slate-900 tw:bg-[rgba(255,255,255,0.82)] tw:hover:bg-gray-50 tw:transition-all tw:text-sm">
-                    <i class="iconsax" icon-name="arrow-left"></i>
+                    <i class="iconsax" icon-name="arrow-left-2"></i>
                     <span>Kembali ke daftar</span>
                 </a>
             </div>
 
-            <form method="POST" class="tw:grid tw:grid-cols-1 tw:lg:grid-cols-2 tw:gap-4 tw:p-[1.45rem] tw:rounded-[24px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.88)] tw:shadow-sm"
-                x-data='<?= json_encode(['nama' => $old['nama'] ?? '', 'keterangan' => $old['keterangan'] ?? ''], JSON_HEX_APOS | JSON_HEX_QUOT) ?>'>
+            <form method="POST" class="tw:grid tw:grid-cols-1 tw:lg:grid-cols-2 tw:gap-4 tw:p-[1.45rem] tw:rounded-[24px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.88)] tw:shadow-sm" x-data="{ nama: '', keterangan: '' }">
                 <?php echo csrf_field(); ?>
-
+               
               <div class="mb-3">
                     <label for="namaBarang" class="form-label">Nama Barang</label>
                     <input type="text" name="namaBarang" class="form-control" id="namaBarang" x-model="nama" maxlength="100" required>
@@ -110,20 +115,20 @@ $old = pullOldFormInput();
                 </div>
                 <div class="mb-3">
                     <label for="jumlahBarang" class="form-label">Jumlah</label>
-                    <input type="number" name="jumlahBarang" class="form-control" id="jumlahBarang" min="0" max="999999" value="<?= htmlspecialchars($old['jumlah'] ?? '') ?>" required>
+                    <input type="number" name="jumlahBarang" class="form-control" id="jumlahBarang" min="0" max="999999" required>
                 </div>
                 <div class="mb-3">
                     <label for="lokasiBarang" class="form-label">Lokasi</label>
                     <select class="form-select" name="lokasiBarang" id="lokasiBarang" required>
-                        <option disabled <?= empty($old['lokasi']) ? 'selected' : '' ?>>Pilih Lokasi</option>
+                        <option selected disabled>Pilih Lokasi</option>
                         <optgroup label="Kamar">
                             <?php foreach ($kamars as $k): ?>
-                                <option value="kamar:<?= $k['KamarID'] ?>" <?= ($old['lokasi'] ?? '') === 'kamar:' . $k['KamarID'] ? 'selected' : '' ?>>Kamar <?= $k['NomorKamar'] ?></option>
+                                <option value="kamar:<?= $k['KamarID'] ?>">Kamar <?= $k['NomorKamar'] ?></option>
                             <?php endforeach; ?>
                         </optgroup>
                         <optgroup label="Ruangan">
                             <?php foreach ($ruangans as $r): ?>
-                                <option value="ruangan:<?= $r['RuanganID'] ?>" <?= ($old['lokasi'] ?? '') === 'ruangan:' . $r['RuanganID'] ? 'selected' : '' ?>><?= $r['NamaRuangan'] ?></option>
+                                <option value="ruangan:<?= $r['RuanganID'] ?>"><?= $r['NamaRuangan'] ?></option>
                             <?php endforeach; ?>
                         </optgroup>
                     </select>

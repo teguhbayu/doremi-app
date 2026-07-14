@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 if (!isset($_SESSION['userId']) || $_SESSION['userRole'] !== 'SIGAP') {
     header("Location: /doremi-app/dashboard/");
@@ -6,11 +6,14 @@ if (!isset($_SESSION['userId']) || $_SESSION['userRole'] !== 'SIGAP') {
 }
 
 require '../../db.php';
-require_once '../../database/inout.php';
-require_once '../../utils/format.php';
 
-$logRows = fetchAllInOutLogs($db);
-$totalLogs = count($logRows);
+$logQuery = mysqli_query($db, "SELECT io.*, pe.NamaPenghuni, pe.Nim, k.NomorKamar, pt.NamaPetugas 
+                               FROM inoutpenghuni io 
+                               JOIN penghuni pe ON io.PenghuniID = pe.PenghuniID 
+                               JOIN kamar k ON pe.KamarID = k.KamarID 
+                               LEFT JOIN petugas pt ON io.PetugasID = pt.PetugasID 
+                               ORDER BY io.InOutID DESC");
+$totalLogs = mysqli_num_rows($logQuery);
 ?>
 
 <!DOCTYPE html>
@@ -27,7 +30,7 @@ $totalLogs = count($logRows);
             </h1>
             <div class="page-toolbar" data-note="<?= $totalLogs ?> transaksi tercatat">
                 <a href="index.php" class="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:min-h-12 tw:px-4 tw:py-[0.85rem] tw:rounded-2xl tw:border tw:border-[rgba(22,60,122,0.12)] tw:font-extrabold tw:no-underline tw:text-slate-900 tw:bg-[rgba(255,255,255,0.82)] tw:hover:bg-gray-50 tw:transition-all tw:text-sm">
-                    <i class="iconsax" icon-name="arrow-left"></i>
+                    <i class="iconsax" icon-name="arrow-left-2"></i>
                     <span>Kembali ke konfirmasi</span>
                 </a>
             </div>
@@ -48,7 +51,7 @@ $totalLogs = count($logRows);
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($logRows as $row): ?>
+                            <?php while ($row = mysqli_fetch_assoc($logQuery)): ?>
                                 <tr>
                                     <td></td>
                                     <td>
@@ -66,11 +69,11 @@ $totalLogs = count($logRows);
                                         <?php endif; ?>
                                     </td>
                                     <td><?= htmlspecialchars($row['Keperluan']) ?></td>
-                                    <td><?= formatDateTime($row['WaktuKeluar'] ?? null, 'H:i, d M Y') ?></td>
-                                    <td><?= formatDateTime($row['WaktuMasuk'] ?? null, 'H:i, d M Y') ?></td>
+                                    <td><?= $row['WaktuKeluar'] ? date('H:i, d M Y', strtotime($row['WaktuKeluar'])) : '-' ?></td>
+                                    <td><?= $row['WaktuMasuk'] ? date('H:i, d M Y', strtotime($row['WaktuMasuk'])) : '-' ?></td>
                                     <td><?= htmlspecialchars($row['NamaPetugas'] ?? '-') ?></td>
                                 </tr>
-                            <?php endforeach; ?>
+                            <?php endwhile; ?>
                         </tbody>
                     </table>
                 </div>

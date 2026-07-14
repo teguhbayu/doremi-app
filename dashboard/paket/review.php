@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require 'helpers.php';
 paket_require_roles(['SIGAP']);
