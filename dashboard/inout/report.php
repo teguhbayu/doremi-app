@@ -52,7 +52,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel') {
     echo "\xEF\xBB\xBF";
 
     $out = fopen('php://output', 'w');
-    fputcsv($out, ['No', 'Penghuni', 'NIM', 'Kamar', 'Keperluan', 'Status', 'Waktu Keluar', 'Waktu Masuk', 'Durasi (Menit)', 'Dikonfirmasi Oleh'], ';');
+    fputcsv($out, ['No', 'Penghuni', 'NIM', 'Kamar', 'Keperluan', 'Status', 'Waktu Keluar', 'Waktu Masuk', 'Durasi (Menit)', 'Dikonfirmasi Oleh'], ';', '"', "\\");
 
     $no = 1;
     foreach (fetchInOutReportExport($db, $range, $startDate, $endDate) as $row) {
@@ -67,9 +67,38 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel') {
             $row['WaktuMasuk'] ? date('d/m/Y H:i', strtotime($row['WaktuMasuk'])) : '-',
             $row['Durasi'] ?? '-',
             $row['NamaPetugas'] ?? '-',
-        ], ';');
+        ], ';', '"', "\\");
     }
     fclose($out);
+    exit;
+}
+
+if (isset($_GET['export']) && $_GET['export'] === 'pdf') {
+    require_once '../../utils/reportPdf.php';
+    $filenameSuffix = $range === 'custom' ? $startDate . '_' . $endDate : $range;
+    $filename = 'laporan-izin-keluar-' . $filenameSuffix . '-' . date('Ymd') . '.pdf';
+    
+    $headers = ['No', 'Penghuni', 'NIM', 'Kamar', 'Keperluan', 'Status', 'Waktu Keluar', 'Waktu Masuk', 'Durasi', 'Petugas'];
+    $widths = [10, 42, 22, 14, 50, 18, 32, 32, 22, 35];
+    
+    $rows = [];
+    $no = 1;
+    foreach (fetchInOutReportExport($db, $range, $startDate, $endDate) as $row) {
+        $rows[] = [
+            $no++,
+            $row['NamaPenghuni'],
+            $row['Nim'],
+            $row['NomorKamar'],
+            $row['Keperluan'],
+            $statusMeta[$row['Status']]['label'] ?? $row['Status'],
+            $row['WaktuKeluar'] ? date('d/m/Y H:i', strtotime($row['WaktuKeluar'])) : '-',
+            $row['WaktuMasuk'] ? date('d/m/Y H:i', strtotime($row['WaktuMasuk'])) : '-',
+            inout_format_duration($row['Durasi']),
+            $row['NamaPetugas'] ?? '-',
+        ];
+    }
+    
+    \Utils\generateReportPdf($filename, 'Laporan Izin Keluar Masuk', $rangeLabel, $headers, $widths, $rows);
     exit;
 }
 
@@ -231,10 +260,10 @@ $rangeQueryParams = $range === 'custom'
                         class="tw:inline-flex tw:items-center tw:gap-[6px] tw:text-xs tw:font-semibold tw:px-4 tw:py-[7px] tw:rounded-[10px] tw:bg-emerald-500 tw:text-white tw:no-underline tw:border-none">
                         <i class="fa-solid fa-file-excel"></i> Export Excel
                     </a>
-                    <button onclick="window.print()"
-                        class="tw:inline-flex tw:items-center tw:gap-[6px] tw:text-xs tw:font-semibold tw:px-4 tw:py-[7px] tw:rounded-[10px] tw:bg-red-500 tw:text-white tw:border-none tw:cursor-pointer">
+                    <a href="?<?= $rangeQueryParams ?>&export=pdf"
+                        class="tw:inline-flex tw:items-center tw:gap-[6px] tw:text-xs tw:font-semibold tw:px-4 tw:py-[7px] tw:rounded-[10px] tw:bg-red-500 tw:text-white tw:no-underline tw:border-none">
                         <i class="fa-solid fa-file-pdf"></i> Export PDF
-                    </button>
+                    </a>
                 </div>
 
                 <div x-show="showCustom" x-cloak style="width:100%;">

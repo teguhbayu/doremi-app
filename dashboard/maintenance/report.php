@@ -25,7 +25,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel') {
     echo "\xEF\xBB\xBF";
 
     $out = fopen('php://output', 'w');
-    fputcsv($out, ['No', 'Pelapor', 'Lokasi / Target', 'Jenis', 'Status', 'Tanggal Lapor', 'Tanggal Selesai', 'Durasi (Hari)', 'Petugas'], ';');
+    fputcsv($out, ['No', 'Pelapor', 'Lokasi / Target', 'Jenis', 'Status', 'Tanggal Lapor', 'Tanggal Selesai', 'Durasi (Hari)', 'Petugas'], ';', '"', "\\");
 
     $no = 1;
     foreach (fetchMaintenanceReportExport($db, $range, $startDate, $endDate) as $row) {
@@ -39,9 +39,37 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel') {
             $row['TanggalSelesai'] ? date('d/m/Y', strtotime($row['TanggalSelesai'])) : '-',
             $row['Durasi'] ?? '-',
             $row['Petugas'] ?? '-',
-        ], ';');
+        ], ';', '"', "\\");
     }
     fclose($out);
+    exit;
+}
+
+if (isset($_GET['export']) && $_GET['export'] === 'pdf') {
+    require_once '../../utils/reportPdf.php';
+    $filenameSuffix = $range === 'custom' ? $startDate . '_' . $endDate : $range;
+    $filename = 'laporan-maintenance-' . $filenameSuffix . '-' . date('Ymd') . '.pdf';
+    
+    $headers = ['No', 'Pelapor', 'Lokasi / Target', 'Jenis', 'Status', 'Tgl Lapor', 'Tgl Selesai', 'Durasi', 'Petugas'];
+    $widths = [10, 42, 38, 48, 20, 30, 30, 24, 35];
+    
+    $rows = [];
+    $no = 1;
+    foreach (fetchMaintenanceReportExport($db, $range, $startDate, $endDate) as $row) {
+        $rows[] = [
+            $no++,
+            $row['Pelapor'],
+            $row['Lokasi'],
+            $row['JenisLaporan'],
+            $row['StatusMaintenance'],
+            $row['TanggalLapor'] ? date('d/m/Y', strtotime($row['TanggalLapor'])) : '-',
+            $row['TanggalSelesai'] ? date('d/m/Y', strtotime($row['TanggalSelesai'])) : '-',
+            ($row['Durasi'] !== null ? $row['Durasi'] . ' hari' : '-'),
+            $row['Petugas'] ?? '-',
+        ];
+    }
+    
+    \Utils\generateReportPdf($filename, 'Laporan Maintenance', $rangeLabel, $headers, $widths, $rows);
     exit;
 }
 
@@ -190,10 +218,10 @@ $rangeQueryParams = $range === 'custom'
                         class="tw:inline-flex tw:items-center tw:gap-[6px] tw:text-xs tw:font-semibold tw:px-4 tw:py-[7px] tw:rounded-[10px] tw:bg-emerald-500 tw:text-white tw:no-underline tw:border-none">
                         <i class="fa-solid fa-file-excel"></i> Export Excel
                     </a>
-                    <button onclick="window.print()"
-                        class="tw:inline-flex tw:items-center tw:gap-[6px] tw:text-xs tw:font-semibold tw:px-4 tw:py-[7px] tw:rounded-[10px] tw:bg-red-500 tw:text-white tw:border-none tw:cursor-pointer">
+                    <a href="?<?= $rangeQueryParams ?>&export=pdf"
+                        class="tw:inline-flex tw:items-center tw:gap-[6px] tw:text-xs tw:font-semibold tw:px-4 tw:py-[7px] tw:rounded-[10px] tw:bg-red-500 tw:text-white tw:no-underline tw:border-none">
                         <i class="fa-solid fa-file-pdf"></i> Export PDF
-                    </button>
+                    </a>
                 </div>
 
                 <div x-show="showCustom" x-cloak style="width:100%;">

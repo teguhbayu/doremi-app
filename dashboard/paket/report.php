@@ -51,7 +51,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel') {
     echo "\xEF\xBB\xBF";
 
     $out = fopen('php://output', 'w');
-    fputcsv($out, ['No', 'Penghuni', 'NIM', 'Kamar', 'Tipe', 'Pengirim', 'Kurir', 'Status', 'Waktu Sampai', 'Waktu Ambil', 'Durasi Ambil (Menit)', 'Dicatat Oleh'], ';');
+    fputcsv($out, ['No', 'Penghuni', 'NIM', 'Kamar', 'Tipe', 'Pengirim', 'Kurir', 'Status', 'Waktu Sampai', 'Waktu Ambil', 'Durasi Ambil (Menit)', 'Dicatat Oleh'], ';', '"', "\\");
 
     $no = 1;
     foreach (fetchPaketReportExport($db, $range, $startDate, $endDate) as $row) {
@@ -68,9 +68,40 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel') {
             $row['WaktuPengambilan'] ? date('d/m/Y H:i', strtotime($row['WaktuPengambilan'])) : '-',
             $row['Durasi'] ?? '-',
             $row['NamaPetugas'] ?? '-',
-        ], ';');
+        ], ';', '"', "\\");
     }
     fclose($out);
+    exit;
+}
+
+if (isset($_GET['export']) && $_GET['export'] === 'pdf') {
+    require_once '../../utils/reportPdf.php';
+    $filenameSuffix = $range === 'custom' ? $startDate . '_' . $endDate : $range;
+    $filename = 'laporan-paket-' . $filenameSuffix . '-' . date('Ymd') . '.pdf';
+    
+    $headers = ['No', 'Penghuni', 'NIM', 'Kamar', 'Tipe', 'Pengirim', 'Kurir', 'Status', 'Waktu Sampai', 'Waktu Ambil', 'Durasi', 'Petugas'];
+    $widths = [8, 32, 18, 12, 18, 30, 20, 22, 30, 30, 22, 35];
+    
+    $rows = [];
+    $no = 1;
+    foreach (fetchPaketReportExport($db, $range, $startDate, $endDate) as $row) {
+        $rows[] = [
+            $no++,
+            $row['NamaPenghuni'],
+            $row['Nim'],
+            $row['NomorKamar'] ?? '-',
+            paket_type_label($row['JenisPaket'] ?? null),
+            $row['NamaPengirim'],
+            $row['Kurir'],
+            $statusMeta[$row['Status']]['label'] ?? $row['Status'],
+            $row['WaktuSampai'] ? date('d/m/Y H:i', strtotime($row['WaktuSampai'])) : '-',
+            $row['WaktuPengambilan'] ? date('d/m/Y H:i', strtotime($row['WaktuPengambilan'])) : '-',
+            paket_format_duration($row['Durasi']),
+            $row['NamaPetugas'] ?? '-',
+        ];
+    }
+    
+    \Utils\generateReportPdf($filename, 'Laporan Paket & Logistik', $rangeLabel, $headers, $widths, $rows);
     exit;
 }
 
@@ -233,10 +264,10 @@ $rangeQueryParams = $range === 'custom'
                         class="tw:inline-flex tw:items-center tw:gap-[6px] tw:text-xs tw:font-semibold tw:px-4 tw:py-[7px] tw:rounded-[10px] tw:bg-emerald-500 tw:text-white tw:no-underline tw:border-none">
                         <i class="fa-solid fa-file-excel"></i> Export Excel
                     </a>
-                    <button onclick="window.print()"
-                        class="tw:inline-flex tw:items-center tw:gap-[6px] tw:text-xs tw:font-semibold tw:px-4 tw:py-[7px] tw:rounded-[10px] tw:bg-red-500 tw:text-white tw:border-none tw:cursor-pointer">
+                    <a href="?<?= $rangeQueryParams ?>&export=pdf"
+                        class="tw:inline-flex tw:items-center tw:gap-[6px] tw:text-xs tw:font-semibold tw:px-4 tw:py-[7px] tw:rounded-[10px] tw:bg-red-500 tw:text-white tw:no-underline tw:border-none">
                         <i class="fa-solid fa-file-pdf"></i> Export PDF
-                    </button>
+                    </a>
                 </div>
 
                 <div x-show="showCustom" x-cloak style="width:100%;">

@@ -33,8 +33,16 @@ if (!$isOwner) {
     maintenance_redirect('index.php', 'error', 'Anda tidak memiliki hak akses untuk mengedit laporan ini.');
 }
 
-$ruangans = fetchMaintenanceRooms($db);
-$inventarisList = fetchMaintenanceInventory($db);
+require_once '../../database/penghuni.php';
+
+$rooms = fetchMaintenanceRooms($db, false);
+$kamars = fetchActiveKamarWithOccupancy($db);
+$inventory = fetchMaintenanceInventory($db, false);
+
+$inventarisItem = null;
+if (!empty($report['InventarisID'])) {
+    $inventarisItem = dbFetchOne($db, "SELECT InventarisID, RuanganID, KamarID FROM inventaris WHERE InventarisID = ?", 'i', [$report['InventarisID']]);
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_validate($_SERVER['PHP_SELF'] . '?id=' . $id);
@@ -47,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $targetIds = resolveMaintenanceTargetIds($reportInput);
 
     try {
-        $fotoLaporan = maintenance_store_photo($_FILES['fotoLaporan'] ?? [], $report['FotoLaporan']);
+        $fotoLaporan = maintenance_store_photo($_FILES['foto_laporan'] ?? [], $report['FotoLaporan']);
     } catch (RuntimeException $e) {
         setOldFormInput($_POST);
         maintenance_redirect($_SERVER['PHP_SELF'] . '?id=' . $id, 'error', $e->getMessage());
@@ -71,9 +79,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $old = pullOldFormInput();
-$currentTargetType = $old['targetType'] ?? (!empty($report['RuanganID']) ? 'ruangan' : 'inventaris');
-$currentTargetValue = $old['targetValue'] ?? (!empty($report['RuanganID']) ? $report['RuanganID'] : $report['InventarisID']);
-$currentJenisLaporan = $old['jenisLaporan'] ?? $report['JenisLaporan'];
+
+if (!empty($old)) {
+    $initialLocationType = !empty($old['kamar_id']) ? 'kamar' : 'ruangan';
+    $selectedRuangan = $old['ruangan_id'] ?? '';
+    $selectedKamar = $old['kamar_id'] ?? '';
+    $selectedInventaris = $old['inventaris_id'] ?? '';
+} else {
+    if (!empty($report['InventarisID'])) {
+        $initialLocationType = !empty($inventarisItem['KamarID']) ? 'kamar' : 'ruangan';
+        $selectedRuangan = $inventarisItem['RuanganID'] ?? '';
+        $selectedKamar = $inventarisItem['KamarID'] ?? '';
+        $selectedInventaris = $report['InventarisID'];
+    } else if (!empty($report['RuanganID'])) {
+        $initialLocationType = 'ruangan';
+        $selectedRuangan = $report['RuanganID'];
+        $selectedKamar = '';
+        $selectedInventaris = '';
+    } else {
+        $initialLocationType = 'ruangan';
+        $selectedRuangan = '';
+        $selectedKamar = '';
+        $selectedInventaris = '';
+    }
+}
+$currentJenisLaporan = $old['jenisLaporan'] ?? $old['skala_prioritas'] ?? $report['JenisLaporan'];
 $currentDeskripsi = $old['deskripsi'] ?? $report['Deskripsi'];
 ?>
 
@@ -98,108 +128,193 @@ $currentDeskripsi = $old['deskripsi'] ?? $report['Deskripsi'];
             </div>
 
             <div class="tw:grid tw:grid-cols-1 tw:lg:grid-cols-3 tw:gap-8">
+                <div class="tw:lg:col-span-2">
+                    <form action="edit.php?id=<?= $id ?>" method="POST" enctype="multipart/form-data" class="tw:grid tw:grid-cols-1 tw:lg:grid-cols-2 tw:gap-4 tw:p-[1.45rem] tw:rounded-[24px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.88)] tw:shadow-sm">
+
+                        <?php echo csrf_field(); ?>
+
+                        <div class="mb-3 tw:col-span-full">
+                            <label for="skala_prioritas" class="form-label">Skala Prioritas (Berbasis Kriteria OSHA)</label>
+                            <select name="skala_prioritas" id="skala_prioritas" class="form-select" required onchange="verifyPriority()">
+                                <option value="Kerusakan Ringan" data-osha="convenience" <?= $currentJenisLaporan === 'Kerusakan Ringan' ? 'selected' : '' ?>>Kerusakan Ringan (Non-Urgent / Kenyamanan)</option>
+                                <option value="Kerusakan Sedang" data-osha="serious" <?= $currentJenisLaporan === 'Kerusakan Sedang' ? 'selected' : '' ?>>Kerusakan Sedang (Urgent / Keamanan & Sanitasi Dasar)</option>
+                                <option value="Kerusakan Darurat / Berat" data-osha="imminent" <?= $currentJenisLaporan === 'Kerusakan Darurat / Berat' ? 'selected' : '' ?>>Darurat (Emergency / Ancaman Keselamatan Jiwa & Fisik)</option>
+                            </select>
+
+                            <div id="osha-helper" class="tw:mt-2 tw:p-3 tw:rounded-xl tw:text-xs tw:hidden tw:border"></div>
+                        </div>
+
+                        <div class="tw:contents" x-data="{
+                                locationType: '<?= htmlspecialchars($initialLocationType, ENT_QUOTES) ?>',
+                                selectedRuangan: '<?= htmlspecialchars((string) $selectedRuangan, ENT_QUOTES) ?>',
+                                selectedKamar: '<?= htmlspecialchars((string) $selectedKamar, ENT_QUOTES) ?>',
+                                selectedInventaris: '<?= htmlspecialchars((string) $selectedInventaris, ENT_QUOTES) ?>',
+                                inventoryList: <?= htmlspecialchars(json_encode($inventory), ENT_QUOTES, 'UTF-8') ?>,
+                                get filteredInventory() {
+                                    return this.locationType === 'ruangan'
+                                        ? this.inventoryList.filter(item => String(item.RuanganID) === String(this.selectedRuangan))
+                                        : this.inventoryList.filter(item => String(item.KamarID) === String(this.selectedKamar));
+                                },
+                                setLocationType(type) {
+                                    this.locationType = type;
+                                    this.selectedRuangan = '';
+                                    this.selectedKamar = '';
+                                    this.selectedInventaris = '';
+                                }
+                            }">
+                            <div class="mb-3">
+                                <label class="form-label">Lokasi Kerusakan</label>
+                                <div class="tw:flex tw:gap-4 tw:mt-1">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="location_type" id="location_ruangan" value="ruangan" :checked="locationType === 'ruangan'" @change="setLocationType('ruangan')">
+                                        <label class="form-check-label" for="location_ruangan">Ruangan (Area Umum)</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="location_type" id="location_kamar" value="kamar" :checked="locationType === 'kamar'" @change="setLocationType('kamar')">
+                                        <label class="form-check-label" for="location_kamar">Kamar (Kamar Tidur)</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3" x-show="locationType === 'ruangan'" x-cloak>
+                                <label for="ruangan_id" class="form-label">Pilih Ruangan</label>
+                                <select name="ruangan_id" id="ruangan_id" class="form-select" x-model="selectedRuangan" @change="selectedInventaris = ''" :required="locationType === 'ruangan'">
+                                    <option value="" disabled>Pilih Ruangan</option>
+                                    <?php foreach ($rooms as $r): ?>
+                                        <option value="<?= $r['RuanganID'] ?>">
+                                            <?= htmlspecialchars($r['NamaRuangan']) ?> (Lantai <?= htmlspecialchars($r['Lantai']) ?>)
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+
+                            <div class="mb-3" x-show="locationType === 'kamar'" x-cloak>
+                                <label for="kamar_id" class="form-label">Kamar</label>
+                                <select class="form-select" name="kamar_id" id="kamar_id" x-model="selectedKamar" @change="selectedInventaris = ''" :required="locationType === 'kamar'">
+                                    <option value="" disabled>Pilih Kamar</option>
+                                    <?php foreach ($kamars as $k): ?>
+                                        <option value="<?= $k['KamarID'] ?>">
+                                            <?= htmlspecialchars($k['NomorKamar']) ?> - Lantai <?= htmlspecialchars($k['Lantai']) ?>
+                                            (<?= (int) $k['JumlahPenghuniAktual'] ?>/<?= (int) $k['KapasitasPenghuni'] ?> terisi)
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+
+                            <div class="mb-3" x-show="(locationType === 'ruangan' && selectedRuangan !== '') || (locationType === 'kamar' && selectedKamar !== '')" x-cloak>
+                                <label for="inventaris_id" class="form-label" x-text="locationType === 'ruangan' ? 'Inventaris di Ruangan Ini (Opsional)' : 'Pilih Barang yang Rusak'"></label>
+                                <select name="inventaris_id" id="inventaris_id" class="form-select" x-model="selectedInventaris" :required="locationType === 'kamar'">
+                                    <option value="" :disabled="locationType === 'kamar'" x-text="locationType === 'ruangan' ? '-- Laporkan Ruangan Secara Umum --' : '-- Pilih Barang --'"></option>
+                                    <template x-for="item in filteredInventory" :key="item.InventarisID">
+                                        <option :value="item.InventarisID" x-text="item.NamaBarang"></option>
+                                    </template>
+                                </select>
+                                <div class="form-text" x-show="filteredInventory.length === 0" x-text="locationType === 'ruangan' ? 'Tidak ada data inventaris tercatat untuk ruangan ini.' : 'Tidak ada data inventaris tercatat untuk kamar ini.'"></div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 tw:col-span-full">
+                            <label for="deskripsi" class="form-label">Deskripsi Masalah</label>
+                            <textarea name="deskripsi" id="deskripsi" maxlength="1000" class="form-control" rows="4" required
+                                      placeholder="Jelaskan kronologi dan letak kerusakan..." oninput="updateCharCount(this)"><?= htmlspecialchars($currentDeskripsi) ?></textarea>
+                            <div class="tw:text-xs tw:text-gray-500 tw:text-right tw:mt-1">
+                                <span id="charCount"><?= mb_strlen($currentDeskripsi) ?></span> / 1000 karakter
+                            </div>
+                        </div>
+
+                        <div class="mb-4 tw:col-span-full">
+                            <label for="foto_laporan" class="form-label">Foto Bukti Kerusakan</label>
+                            <?php if (!empty($report['FotoLaporan'])): ?>
+                                <div class="tw:mb-3">
+                                    <p class="tw:text-xs tw:text-slate-500 tw:mb-1">Foto Terunggah:</p>
+                                    <img src="<?= $report['FotoLaporan'] ?>" alt="Foto Laporan" class="tw:max-h-40 tw:rounded-lg tw:border">
+                                </div>
+                            <?php endif; ?>
+                            <input type="file" name="foto_laporan" id="foto_laporan" class="form-control" accept="image/png,image/jpeg,image/webp">
+                            <div class="form-text">Biarkan kosong jika tidak ingin merubah foto. Maksimal ukuran file 2MB (JPG/PNG/WEBP).</div>
+                        </div>
+
+                        <div class="tw:w-full tw:flex tw:justify-end tw:gap-3 tw:col-span-full">
+                            <a href="index.php" class="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:min-h-12 tw:px-4 tw:py-[0.85rem] tw:rounded-2xl tw:border tw:border-[rgba(22,60,122,0.12)] tw:font-extrabold tw:no-underline tw:text-slate-900 tw:bg-[rgba(255,255,255,0.82)] tw:hover:bg-gray-50 tw:transition-all tw:text-sm">Batal</a>
+                            <button type="submit" class="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:min-h-12 tw:px-4 tw:py-[0.85rem] tw:rounded-2xl tw:border tw:border-transparent tw:font-extrabold tw:no-underline tw:text-white tw:bg-secondary tw:shadow-md tw:hover:bg-primary tw:transition-all tw:text-sm">Simpan Perubahan</button>
+                        </div>
+                    </form>
+                </div>
+
                 <div class="tw:lg:col-span-1">
-                    <div class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.88)] tw:shadow-sm tw:h-full">
-                        <h5 class="tw:m-0 tw:text-[1.2rem] tw:text-slate-900">Panduan Tingkat Urgensi</h5>
-                        <p class="tw:m-0 tw:text-slate-500 tw:leading-[1.75] tw:text-sm">Sesuaikan kategori tingkat kerusakan agar prioritas pengerjaan tetap akurat saat laporan diperbarui.</p>
-
+                    <div class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.88)] tw:shadow-sm">
+                        <h5 class="tw:m-0 tw:text-[1.2rem] tw:text-slate-900 tw:flex tw:items-center tw:gap-2 tw:mb-3">
+                            <i class="iconsax tw:text-lg" icon-name="info-circle"></i>
+                            <span>Panduan OSHA</span>
+                        </h5>
+                        <p class="tw:m-0 tw:text-slate-500 tw:leading-[1.75] tw:text-sm tw:mb-4">
+                            Gunakan panduan standar OSHA berikut untuk menentukan skala prioritas secara objektif, demi kelancaran prioritas pengerjaan oleh tim teknisi.
+                        </p>
                         <div class="tw:grid tw:gap-[0.85rem]">
-                            <div class="tw:p-4 tw:rounded-[18px] tw:bg-[rgba(255,255,255,0.80)] tw:border tw:border-[rgba(22,60,122,0.10)] tw:border-l-4 tw:border-l-[rgba(20,108,148,0.30)]">
-                                <strong>Kerusakan Ringan</strong>
-                                <p>Masalah kecil yang tidak mengganggu fungsi vital asrama.</p>
-                            </div>
-
-                            <div class="tw:p-4 tw:rounded-[18px] tw:bg-[rgba(250,236,207,0.55)] tw:border tw:border-l-4 tw:border-[rgba(212,141,47,0.20)] tw:border-l-amber-500">
-                                <strong>Kerusakan Sedang</strong>
-                                <p>Masalah yang mengurangi kenyamanan asrama tetapi tidak darurat.</p>
-                            </div>
-
                             <div class="tw:p-4 tw:rounded-[18px] tw:bg-[rgba(245,221,218,0.55)] tw:border tw:border-l-4 tw:border-[rgba(188,79,69,0.20)] tw:border-l-red-500">
-                                <strong>Kerusakan Darurat / Berat</strong>
-                                <p>Masalah darurat yang membahayakan struktural atau keselamatan penghuni.</p>
+                                <strong class="tw:text-red-700">Darurat <i>(Imminent Danger)</i></strong>
+                                <p class="tw:text-xs">Kondisi bahaya nyata yang mengancam keselamatan fisik segera (misal: korsleting aktif, kebocoran gas, kebakaran, banjir besar).</p>
+                            </div>
+                            <div class="tw:p-4 tw:rounded-[18px] tw:bg-[rgba(250,236,207,0.55)] tw:border tw:border-l-4 tw:border-[rgba(212,141,47,0.20)] tw:border-l-amber-500">
+                                <strong class="tw:text-amber-700">Sedang <i>(Serious Hazard)</i></strong>
+                                <p class="tw:text-xs">Mengganggu fungsi hidup harian atau keamanan mendesak (air mati total, kunci pintu luar rusak, toilet mampet).</p>
+                            </div>
+                            
+                            <div class="tw:p-4 tw:rounded-[18px] tw:bg-green-50 tw:border tw:border-l-4 tw:border-[rgba(22,101,52,0.20)] tw:border-l-green-700">
+                                <strong class="tw:text-green-700">Ringan <i>(Other-than-Serious)</i></strong>
+                                <p class="tw:text-xs tw:text-green-600">Kerusakan minor/kosmetik yang tidak mengancam keselamatan fisik (keran menetes, engsel longgar, lampu redup).</p>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <div class="tw:lg:col-span-2">
-                    <form method="POST" enctype="multipart/form-data" class="tw:grid tw:grid-cols-1 tw:lg:grid-cols-2 tw:gap-4 tw:p-[1.45rem] tw:rounded-[24px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.88)] tw:shadow-sm" x-data="{ targetType: '<?= $currentTargetType ?>' }">
-                            <?php echo csrf_field(); ?>
-                            
-                      <div class="mb-4">
-                                <label class="form-label tw:font-semibold">Skala Prioritas / Tingkat Kerusakan</label>
-                                <select name="jenisLaporan" class="form-select" required>
-                                    <option value="Kerusakan Ringan" <?= $currentJenisLaporan === 'Kerusakan Ringan' ? 'selected' : '' ?>>Kerusakan Ringan (Low Priority)</option>
-                                    <option value="Kerusakan Sedang" <?= $currentJenisLaporan === 'Kerusakan Sedang' ? 'selected' : '' ?>>Kerusakan Sedang (Medium Priority)</option>
-                                    <option value="Kerusakan Darurat / Berat" <?= $currentJenisLaporan === 'Kerusakan Darurat / Berat' ? 'selected' : '' ?>>Kerusakan Darurat / Berat (EMERGENCY)</option>
-                                </select>
-                            </div>
-
-                            <div class="mb-4 tw:col-span-full">
-                                <label class="form-label tw:font-semibold">Target / Objek Lokasi</label>
-                                <div class="tw:flex tw:gap-4 tw:mb-2">
-                                    <label class="tw:inline-flex tw:items-center">
-                                        <input type="radio" name="targetType" value="ruangan" x-model="targetType" class="form-check-input tw:mr-2">
-                                        <span>Ruangan</span>
-                                    </label>
-                                    <label class="tw:inline-flex tw:items-center">
-                                        <input type="radio" name="targetType" value="inventaris" x-model="targetType" class="form-check-input tw:mr-2">
-                                        <span>Inventaris / Barang</span>
-                                    </label>
-                                </div>
-
-                                <div x-show="targetType === 'ruangan'">
-                                    <select name="targetValue" class="form-select" :required="targetType === 'ruangan'">
-                                        <option value="" disabled>Pilih Ruangan</option>
-                                        <?php foreach ($ruangans as $r): ?>
-                                            <option value="<?= $r['RuanganID'] ?>" <?= ($currentTargetType === 'ruangan' && $currentTargetValue == $r['RuanganID']) ? 'selected' : '' ?>>
-                                                <?= htmlspecialchars($r['NamaRuangan']) ?> - Lantai <?= $r['Lantai'] ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-
-                                <div x-show="targetType === 'inventaris'">
-                                    <select name="targetValue" class="form-select" :required="targetType === 'inventaris'">
-                                        <option value="" disabled>Pilih Inventaris</option>
-                                        <?php foreach ($inventarisList as $i): ?>
-                                            <option value="<?= $i['InventarisID'] ?>" <?= ($currentTargetType === 'inventaris' && $currentTargetValue == $i['InventarisID']) ? 'selected' : '' ?>>
-                                                <?= htmlspecialchars($i['NamaBarang']) ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="mb-4 tw:col-span-full">
-                                <label class="form-label tw:font-semibold">Deskripsi Kerusakan</label>
-                                <textarea name="deskripsi" class="form-control" rows="4" required><?= htmlspecialchars($currentDeskripsi) ?></textarea>
-                            </div>
-
-                            <div class="mb-4 tw:col-span-full">
-                                <label class="form-label tw:font-semibold">Foto Bukti Kerusakan</label>
-                                <?php if (!empty($report['FotoLaporan'])): ?>
-                                    <div class="tw:mb-3">
-                                        <p class="tw:text-xs tw:text-slate-500 tw:mb-1">Foto Terunggah:</p>
-                                        <img src="<?= $report['FotoLaporan'] ?>" alt="Foto Laporan" class="tw:max-h-40 tw:rounded-lg tw:border">
-                                    </div>
-                                <?php endif; ?>
-                                <input type="file" name="fotoLaporan" class="form-control" accept="image/png,image/jpeg,image/webp">
-                                <div class="form-text">Biarkan kosong jika tidak ingin merubah foto. Maksimal ukuran file 2MB (JPG/PNG).</div>
-                            </div>
-
-                            <div class="tw:col-span-full tw:flex tw:justify-end tw:mt-4">
-                                <button type="submit"
-                                    class="tw:bg-secondary tw:w-full tw:text-white tw:px-3 tw:py-3 tw:rounded-xl tw:justify-center tw:hover:bg-accent tw:duration-300 tw:transition-all tw:inline-flex tw:items-center tw:gap-2">
-                                    <span>Simpan Perubahan</span>
-                                </button>
-                            </div>
-                    </form>
-                </div>
             </div>
         </div>
     </main>
+
     <?php require '../../bootstrap.php'; ?>
     <?php require '../../validation_alert.php'; ?>
+
+    <script>
+        // Fungsi Penanganan Box Notifikasi OSHA Dinamis dengan Warna Merah Legam (#7f1d1d)
+        function verifyPriority() {
+            const select = document.getElementById('skala_prioritas');
+            const helper = document.getElementById('osha-helper');
+            const selectedOption = select.options[select.selectedIndex];
+            const category = selectedOption ? selectedOption.getAttribute('data-osha') : '';
+
+            // Reset Kelas bawaan
+            helper.className = "tw:mt-2 tw:p-3 tw:rounded-xl tw:text-xs tw:hidden tw:border";
+            helper.removeAttribute('style');
+
+            if (category === 'imminent') {
+                helper.classList.remove('tw:hidden');
+                helper.setAttribute('style', 'background-color: #fef2f2; color: #7f1d1d; border-color: #fee2e2; font-weight: 600;');
+                helper.innerHTML = "<strong>Peringatan Darurat:</strong> Kondisi ini harus merupakan ancaman keselamatan fisik segera. Laporan palsu atau penyalahgunaan kategori ini dapat dikenakan sanksi administratif.";
+                
+                // Konfirmasi Pengguna untuk Mencegah Abuse
+                const confirmCheck = confirm("Peringatan: Kategori 'Darurat' hanya untuk kondisi berbahaya yang mengancam keselamatan fisik penghuni segera (seperti korsleting aktif, kebocoran gas, atau banjir bandang). Apakah kerusakan ini benar-benar darurat?");
+                if (!confirmCheck) {
+                    select.value = "Kerusakan Ringan";
+                    verifyPriority();
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const select = document.getElementById('skala_prioritas');
+            if (select) {
+                // Run on initial load to show helper if it's already emergency
+                verifyPriority();
+            }
+        });
+
+        // Fungsi Penghitung Panjang Karakter Deskripsi Masalah Real-Time
+        function updateCharCount(textarea) {
+            const charCountSpan = document.getElementById('charCount');
+            if (charCountSpan) {
+                charCountSpan.textContent = textarea.value.length;
+            }
+        }
+    </script>
 </body>
 </html>

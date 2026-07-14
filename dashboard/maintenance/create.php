@@ -249,7 +249,7 @@ $initialLocationType = !empty($old['kamar_id']) ? 'kamar' : 'ruangan';
             const select = document.getElementById('skala_prioritas');
             const helper = document.getElementById('osha-helper');
             const selectedOption = select.options[select.selectedIndex];
-            const category = selectedOption.getAttribute('data-osha');
+            const category = selectedOption ? selectedOption.getAttribute('data-osha') : '';
 
             // Reset Kelas bawaan
             helper.className = "tw:mt-2 tw:p-3 tw:rounded-xl tw:text-xs tw:hidden tw:border";

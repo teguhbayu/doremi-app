@@ -78,9 +78,9 @@ function updateMaintenanceUrgency(mysqli $db, int $maintenanceId, string $jenisL
 {
     dbExecute(
         $db,
-        "UPDATE maintenance SET JenisLaporan = ? WHERE MaintenanceID = ? AND IsDeleted = 0",
-        'si',
-        [$jenisLaporan, $maintenanceId]
+        "CALL sp_updateMaintenanceUrgency(?, ?)",
+        'is',
+        [$maintenanceId, $jenisLaporan]
     );
 
     return true;
