@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['userId'])) {
     header("Location: /doremi-app/login.php");
@@ -206,7 +206,7 @@ if ($role === 'MAINTENANCE') {
                         <div class="tw:flex tw:items-center tw:gap-4">
                             <div
                                 class="tw:w-[3.4rem] tw:h-[3.4rem] tw:inline-flex tw:items-center tw:justify-center tw:rounded-[20px] tw:flex-shrink-0 tw:text-primary tw:bg-accent/80">
-                                <i class="iconsax tw:text-3xl" icon-name="box-1"></i>
+                                <i class="iconsax tw:text-3xl" icon-name="box"></i>
                             </div>
                             <div>
                                 <span
@@ -240,7 +240,7 @@ if ($role === 'MAINTENANCE') {
                         <div class="tw:flex tw:items-center tw:gap-4">
                             <div
                                 class="tw:w-[3.4rem] tw:h-[3.4rem] tw:inline-flex tw:items-center tw:justify-center tw:rounded-[20px] tw:flex-shrink-0 tw:text-red-700 tw:bg-[rgba(245,221,218,0.82)]">
-                                <i class="iconsax tw:text-3xl" icon-name="danger"></i>
+                                <i class="iconsax tw:text-3xl" icon-name="warning-triangle"></i>
                             </div>
                             <div>
                                 <span
@@ -404,7 +404,7 @@ if ($role === 'MAINTENANCE') {
                             <!-- Berwarna merah jika ada tugas skala darurat aktif yang harus diselesaikan segera -->
                             <div
                                 class="tw:w-[3.4rem] tw:h-[3.4rem] tw:inline-flex tw:items-center tw:justify-center tw:rounded-[20px] tw:flex-shrink-0 <?= $activeEmergencyTasks > 0 ? 'tw:text-red-700 tw:bg-[rgba(245,221,218,0.82)]' : 'tw:bg-slate-100 tw:text-slate-500' ?>">
-                                <i class="iconsax tw:text-3xl" icon-name="danger"></i>
+                                <i class="iconsax tw:text-3xl" icon-name="warning-triangle"></i>
                             </div>
                             <div>
                                 <span
