@@ -1,54 +1,55 @@
 <?php
+require_once __DIR__ . '/../../utils/url.php';
 $menus = [];
 
 switch ($_SESSION["userRole"]) {
     case "PENGURUS":
         $menus = [
-            ["title" => "Home", "target" => "/doremi-app/dashboard/", "icon" => "home-2"],
-            ["title" => "Petugas", "target" => "/doremi-app/dashboard/petugas/", "icon" => "user-1"],
-            ["title" => "Penghuni", "target" => "/doremi-app/dashboard/penghuni/", "icon" => "group"],
-            ["title" => "Kamar", "target" => "/doremi-app/dashboard/kamar/", "icon" => "house-1"],
-            ["title" => "Ruangan", "target" => "/doremi-app/dashboard/ruangan/", "icon" => "buildings-1"],
-            ["title" => "Inventaris", "target" => "/doremi-app/dashboard/inventaris/", "icon" => "archive-book"],
-            ["title" => "Lapor Perbaikan", "target" => "/doremi-app/dashboard/maintenance/", "icon" => "setting-2"],
+            ["title" => "Home", "target" => app_url("dashboard/"), "icon" => "home-2"],
+            ["title" => "Petugas", "target" => app_url("dashboard/petugas/"), "icon" => "user-1"],
+            ["title" => "Penghuni", "target" => app_url("dashboard/penghuni/"), "icon" => "group"],
+            ["title" => "Kamar", "target" => app_url("dashboard/kamar/"), "icon" => "house-1"],
+            ["title" => "Ruangan", "target" => app_url("dashboard/ruangan/"), "icon" => "buildings-1"],
+            ["title" => "Inventaris", "target" => app_url("dashboard/inventaris/"), "icon" => "archive-book"],
+            ["title" => "Lapor Perbaikan", "target" => app_url("dashboard/maintenance/"), "icon" => "setting-2"],
             ["title" => "Laporan", "target" => "#", "icon" => "fa-solid fa-file-lines", "children" => [
-                ["title" => "Laporan Perbaikan", "target" => "/doremi-app/dashboard/maintenance/report.php", "icon" => "fa-solid fa-chart-bar"],
-                ["title" => "Laporan Izin Keluar", "target" => "/doremi-app/dashboard/inout/report.php", "icon" => "fa-solid fa-chart-line"],
-                ["title" => "Laporan Paket", "target" => "/doremi-app/dashboard/paket/report.php", "icon" => "fa-solid fa-chart-column"]
+                ["title" => "Laporan Perbaikan", "target" => app_url("dashboard/maintenance/report.php"), "icon" => "fa-solid fa-chart-bar"],
+                ["title" => "Laporan Izin Keluar", "target" => app_url("dashboard/inout/report.php"), "icon" => "fa-solid fa-chart-line"],
+                ["title" => "Laporan Paket", "target" => app_url("dashboard/paket/report.php"), "icon" => "fa-solid fa-chart-column"]
             ]],
         ];
         break;
     case "PENGHUNI":
         $menus = [
-            ["title" => "Home", "target" => "/doremi-app/dashboard/", "icon" => "home-2"],
-            ["title" => "Izin Keluar", "target" => "/doremi-app/dashboard/inout/", "icon" => "send-diagonal-up"],
-            ["title" => "Paket", "target" => "/doremi-app/dashboard/paket/", "icon" => "box"],
-            ["title" => "Lapor Perbaikan", "target" => "/doremi-app/dashboard/maintenance/", "icon" => "setting-2"],
+            ["title" => "Home", "target" => app_url("dashboard/"), "icon" => "home-2"],
+            ["title" => "Izin Keluar", "target" => app_url("dashboard/inout/"), "icon" => "send-diagonal-up"],
+            ["title" => "Paket", "target" => app_url("dashboard/paket/"), "icon" => "box"],
+            ["title" => "Lapor Perbaikan", "target" => app_url("dashboard/maintenance/"), "icon" => "setting-2"],
         ];
         break;
     case "SIGAP":
         $menus = [
-            ["title" => "Home", "target" => "/doremi-app/dashboard/", "icon" => "home-2"],
-            ["title" => "Konfirmasi In/Out", "target" => "/doremi-app/dashboard/inout/", "icon" => "shield-tick"],
-            ["title" => "Paket", "target" => "/doremi-app/dashboard/paket/", "icon" => "box"],
-            ["title" => "Lapor Perbaikan", "target" => "/doremi-app/dashboard/maintenance/", "icon" => "setting-2"],
+            ["title" => "Home", "target" => app_url("dashboard/"), "icon" => "home-2"],
+            ["title" => "Konfirmasi In/Out", "target" => app_url("dashboard/inout/"), "icon" => "shield-tick"],
+            ["title" => "Paket", "target" => app_url("dashboard/paket/"), "icon" => "box"],
+            ["title" => "Lapor Perbaikan", "target" => app_url("dashboard/maintenance/"), "icon" => "setting-2"],
             ["title" => "Laporan", "target" => "#", "icon" => "fa-solid fa-file-lines", "children" => [
-                ["title" => "Laporan Izin Keluar", "target" => "/doremi-app/dashboard/inout/report.php", "icon" => "fa-solid fa-chart-line"],
-                ["title" => "Laporan Paket", "target" => "/doremi-app/dashboard/paket/report.php", "icon" => "fa-solid fa-chart-column"]
+                ["title" => "Laporan Izin Keluar", "target" => app_url("dashboard/inout/report.php"), "icon" => "fa-solid fa-chart-line"],
+                ["title" => "Laporan Paket", "target" => app_url("dashboard/paket/report.php"), "icon" => "fa-solid fa-chart-column"]
             ]],
         ];
         break;
     case "SERVANDA":
         $menus = [
-            ["title" => "Home", "target" => "/doremi-app/dashboard/", "icon" => "home-2"],
-            ["title" => "Lapor Perbaikan", "target" => "/doremi-app/dashboard/maintenance/", "icon" => "setting-2"],
+            ["title" => "Home", "target" => app_url("dashboard/"), "icon" => "home-2"],
+            ["title" => "Lapor Perbaikan", "target" => app_url("dashboard/maintenance/"), "icon" => "setting-2"],
         ];
         break;
     case "MAINTENANCE":
         $menus = [
-            ["title" => "Home", "target" => "/doremi-app/dashboard/", "icon" => "home-2"],
-            ["title" => "Perbaikan", "target" => "/doremi-app/dashboard/maintenance/", "icon" => "setting-2"],
-            ["title" => "Laporan Perbaikan", "target" => "/doremi-app/dashboard/maintenance/report.php", "icon" => "fa-solid fa-chart-bar"],
+            ["title" => "Home", "target" => app_url("dashboard/"), "icon" => "home-2"],
+            ["title" => "Perbaikan", "target" => app_url("dashboard/maintenance/"), "icon" => "setting-2"],
+            ["title" => "Laporan Perbaikan", "target" => app_url("dashboard/maintenance/report.php"), "icon" => "fa-solid fa-chart-bar"],
         ];
         break;
 }
@@ -69,10 +70,10 @@ switch ($_SESSION["userRole"]) {
 
     <aside class="dashboard-sidebar" :class="{ 'is-open': sidebarOpen }">
         <div class="dashboard-sidebar__panel">
-            <a class="tw:flex tw:items-center  tw:gap-3 tw:p-[0.4rem] tw:no-underline" href="/doremi-app/dashboard/">
+            <a class="tw:flex tw:items-center  tw:gap-3 tw:p-[0.4rem] tw:no-underline" href="<?= app_url('dashboard/') ?>">
                 <span
                     class="tw:flex tw:justify-center tw:items-center tw:bg-white/10! tw:rounded-[18px] tw:p-2 tw:size-fit">
-                    <img src="/doremi-app/images/logo.png" alt="Logo DOREMI"
+                    <img src="<?= app_url('images/logo.png') ?>" alt="Logo DOREMI"
                         class="tw:size-8 tw:rounded-full tw:object-cover tw:aspect-square">
                 </span>
                 <span>
@@ -114,8 +115,8 @@ switch ($_SESSION["userRole"]) {
 
                         $target = $menu["target"];
                         $isMatch = false;
-                        if ($target == "/doremi-app/dashboard/") {
-                            $isMatch = ($currentPath == "/doremi-app/dashboard/" || $currentPath == "/doremi-app/dashboard/index.php");
+                    if ($target == app_url("dashboard/")) {
+                        $isMatch = ($currentPath == app_url("dashboard/") || $currentPath == app_url("dashboard/index.php"));
                         } else {
                             $isMatch = str_starts_with($currentPath, $target);
                         }
@@ -184,7 +185,7 @@ switch ($_SESSION["userRole"]) {
                     <small
                         class="tw:text-[rgba(255,255,255,0.60)] tw:text-[0.875em]"><?= htmlspecialchars($_SESSION["userRole"]) ?></small>
                 </div>
-                <form method="post" action="/doremi-app/logout.php">
+                <form method="post" action="<?= app_url('logout.php') ?>">
                     <button
                         class="tw:w-full tw:min-h-[2.9rem] tw:rounded-2xl tw:text-white tw:font-extrabold tw:bg-[rgba(188,79,69,0.90)] tw:hover:bg-[rgba(188,79,69,1)] tw:transition-colors tw:font-extrabold"
                         type="submit">Logout</button>

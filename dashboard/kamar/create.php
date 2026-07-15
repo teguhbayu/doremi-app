@@ -1,12 +1,12 @@
 <?php
+require_once '../../utils/url.php';
 require '../../vendor/autoload.php';
 
 use Respect\Validation\Validator as v;
 session_start();
 
 if (!isset($_SESSION['userId'])) {
-    header("Location: /doremi-app/login.php");
-    exit;
+    app_redirect('login.php');
 }
 require '../../db.php';
 require '../../database/kamar.php';
@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    header("Location: " . '/doremi-app/dashboard/kamar/' . '?status=success&message=Kamar Berhasil Ditambahkan!');
+    header('Location: ' . app_url('dashboard/kamar/?status=success&message=Kamar Berhasil Ditambahkan!'));
     exit;
 }
 

@@ -1,16 +1,15 @@
 <?php
+require_once '../../utils/url.php';
 require '../../vendor/autoload.php';
 
 use Respect\Validation\Validator as v;
 session_start();
 
 if (!isset($_SESSION['userId'])) {
-    header("Location: /doremi-app/login.php");
-    exit;
+    app_redirect('login.php');
 }
 if ($_SESSION['userRole'] !== 'PENGURUS') {
-    header("Location: /doremi-app/dashboard/");
-    exit;
+    app_redirect('dashboard/');
 }
 require '../../csrf.php';
 require '../../db.php';
@@ -59,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     mysqli_stmt_close($stmt);
 
-    header("Location: " . '/doremi-app/dashboard/ruangan/' . '?status=success&message=Ruangan Berhasil Ditambahkan!');
+        header('Location: ' . app_url('dashboard/ruangan/?status=success&message=Ruangan Berhasil Ditambahkan!'));
     exit;
 }
 

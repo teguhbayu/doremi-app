@@ -2,6 +2,7 @@
 if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
     die('Access denied');
 }
+require_once __DIR__ . '/../../utils/url.php';
 
 function paket_redirect(string $path, ?string $status = null, ?string $message = null): void
 {
@@ -12,20 +13,18 @@ function paket_redirect(string $path, ?string $status = null, ?string $message =
         ]);
     }
 
-    header("Location: $path");
+    header('Location: ' . app_url($path));
     exit;
 }
 
 function paket_require_roles(array $allowedRoles): void
 {
     if (!isset($_SESSION['userId'])) {
-        header('Location: /doremi-app/login.php');
-        exit;
+        app_redirect('login.php');
     }
 
     if (!in_array($_SESSION['userRole'] ?? '', $allowedRoles, true)) {
-        header('Location: /doremi-app/dashboard/');
-        exit;
+        app_redirect('dashboard/');
     }
 }
 
@@ -107,7 +106,7 @@ function paket_photo_url(?string $path): string
         return $path;
     }
 
-    return '/doremi-app/' . ltrim($path, '/');
+    return app_url($path);
 }
 
 function paket_status_meta(?string $status): array

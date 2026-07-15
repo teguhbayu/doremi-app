@@ -9,13 +9,13 @@ require 'validation.php';
 
 $paketId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 if (!$paketId) {
-    paket_redirect('/doremi-app/dashboard/paket/', 'error', 'Data paket tidak valid.');
+        paket_redirect('dashboard/paket/', 'error', 'Data paket tidak valid.');
 }
 
 $paket = fetchPaketDetail($db, $paketId);
 
 if (!$paket) {
-    paket_redirect('/doremi-app/dashboard/paket/', 'error', 'Data paket tidak ditemukan.');
+        paket_redirect('dashboard/paket/', 'error', 'Data paket tidak ditemukan.');
 }
 
 $penghuniList = fetchActivePenghuniOptions($db);
@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         paket_redirect($_SERVER['PHP_SELF'] . '?id=' . $paketId, 'error', 'Gagal memperbarui data paket.');
     }
 
-    paket_redirect('/doremi-app/dashboard/paket/', 'success', 'Data paket berhasil diperbarui.');
+        paket_redirect('dashboard/paket/', 'success', 'Data paket berhasil diperbarui.');
 }
 
 $old = pullOldFormInput();

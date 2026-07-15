@@ -1,9 +1,9 @@
 <?php
+require_once '../../utils/url.php';
 session_start();
 
 if (!isset($_SESSION['userId'])) {
-    header("Location: /doremi-app/login.php");
-    exit;
+    app_redirect('login.php');
 }
 
 require '../../db.php';
@@ -15,12 +15,12 @@ if ($id) {
     mysqli_stmt_bind_param($stmt, "i", $id);
 
     if (mysqli_stmt_execute($stmt)) {
-        header("Location: /doremi-app/dashboard/penghuni/?status=success&message=Penghuni Berhasil Dihapus!");
+        header('Location: ' . app_url('dashboard/penghuni/?status=success&message=Penghuni Berhasil Dihapus!'));
     } else {
-        header("Location: /doremi-app/dashboard/penghuni/?status=error&message=Gagal Menghapus Penghuni!");
+        header('Location: ' . app_url('dashboard/penghuni/?status=error&message=Gagal Menghapus Penghuni!'));
     }
     mysqli_stmt_close($stmt);
 } else {
-    header("Location: /doremi-app/dashboard/penghuni/");
+    header('Location: ' . app_url('dashboard/penghuni/'));
 }
 exit;

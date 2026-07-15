@@ -1,16 +1,15 @@
 <?php
+require_once '../../utils/url.php';
 require '../../vendor/autoload.php';
 
 use Respect\Validation\Validator as v;
 session_start();
 
 if (!isset($_SESSION['userId'])) {
-    header("Location: /doremi-app/login.php");
-    exit;
+    app_redirect('login.php');
 }
 if ($_SESSION['userRole'] !== 'PENGURUS') {
-    header("Location: /doremi-app/dashboard/");
-    exit;
+    app_redirect('dashboard/');
 }
 require '../../csrf.php';
 require '../../db.php';
@@ -18,7 +17,7 @@ require_once '../../database/inventaris.php';
 
 $id = $_GET['id'] ?? null;
 if (!$id) {
-    header("Location: /doremi-app/dashboard/inventaris/");
+    header('Location: ' . app_url('dashboard/inventaris/'));
     exit;
 }
 
@@ -30,7 +29,7 @@ $inventaris = mysqli_fetch_assoc($result);
 mysqli_stmt_close($stmt);
 
 if (!$inventaris) {
-    header("Location: /doremi-app/dashboard/inventaris/");
+    header('Location: ' . app_url('dashboard/inventaris/'));
     exit;
 }
 
@@ -107,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     mysqli_stmt_close($stmt);
 
-    header("Location: /doremi-app/dashboard/inventaris/?status=success&message=Inventaris Berhasil Diupdate!");
+        header('Location: ' . app_url('dashboard/inventaris/?status=success&message=Inventaris Berhasil Diupdate!'));
     exit;
 }
 ?>

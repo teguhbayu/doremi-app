@@ -694,7 +694,7 @@ $rangeQueryParams = $range === 'custom'
             { id: 'chartPenghuni', title: 'Top 5 Penerima Terbanyak' },
         ];
     </script>
-    <script src="/doremi-app/js/report-pdf-export.js?v=<?= filemtime(dirname(__DIR__, 2) . '/js/report-pdf-export.js') ?>"></script>
+<script src="<?= app_url('js/report-pdf-export.js') ?>?v=<?= filemtime(dirname(__DIR__, 2) . '/js/report-pdf-export.js') ?>"></script>
 
 
     <style>

@@ -1,16 +1,15 @@
 <?php
+require_once '../../utils/url.php';
 require '../../vendor/autoload.php';
 
 use Respect\Validation\Validator as v;
 session_start();
 
 if (!isset($_SESSION['userId'])) {
-    header("Location: /doremi-app/login.php");
-    exit;
+    app_redirect('login.php');
 }
 if ($_SESSION['userRole'] !== 'PENGURUS') {
-    header("Location: /doremi-app/dashboard/");
-    exit;
+    app_redirect('dashboard/');
 }
 require '../../csrf.php';
 require '../../db.php';
@@ -22,7 +21,7 @@ $ruanganTypes = ['Tempat Ibadah', 'Ruang Publik', 'Ruang Jemur', 'Lapangan Olahr
 
 $id = $_GET['id'] ?? null;
 if (!$id) {
-    header("Location: /doremi-app/dashboard/ruangan/");
+    header('Location: ' . app_url('dashboard/ruangan/'));
     exit;
 }
 
@@ -34,7 +33,7 @@ $ruangan = mysqli_fetch_assoc($result);
 mysqli_stmt_close($stmt);
 
 if (!$ruangan) {
-    header("Location: /doremi-app/dashboard/ruangan/");
+    header('Location: ' . app_url('dashboard/ruangan/'));
     exit;
 }
 
@@ -80,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    header("Location: /doremi-app/dashboard/ruangan/?status=success&message=Ruangan Berhasil Diupdate!");
+        header('Location: ' . app_url('dashboard/ruangan/?status=success&message=Ruangan Berhasil Diupdate!'));
     exit;
 }
 

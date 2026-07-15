@@ -1,22 +1,21 @@
 <?php
+require_once '../../utils/url.php';
 session_start();
 
 if (!isset($_SESSION['userId'])) {
-    header("Location: /doremi-app/login.php");
-    exit;
+    app_redirect('login.php');
 }
 if ($_SESSION['userRole'] !== 'PENGURUS') {
-    header("Location: /doremi-app/dashboard/");
-    exit;
+    app_redirect('dashboard/');
 }
 require '../../csrf.php';
 
 // Only accept POST to prevent CSRF via URL
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header("Location: /doremi-app/dashboard/ruangan/");
+    header('Location: ' . app_url('dashboard/ruangan/'));
     exit;
 }
-csrf_validate('/doremi-app/dashboard/ruangan/');
+    csrf_validate(app_url('dashboard/ruangan/'));
 
 require '../../db.php';
 
@@ -27,12 +26,12 @@ if ($id) {
     mysqli_stmt_bind_param($stmt, "i", $id);
 
     if (mysqli_stmt_execute($stmt)) {
-        header("Location: /doremi-app/dashboard/ruangan/?status=success&message=Ruangan Berhasil Dihapus!");
+    header('Location: ' . app_url('dashboard/ruangan/?status=success&message=Ruangan Berhasil Dihapus!'));
     } else {
-        header("Location: /doremi-app/dashboard/ruangan/?status=error&message=Gagal Menghapus Ruangan!");
+    header('Location: ' . app_url('dashboard/ruangan/?status=error&message=Gagal Menghapus Ruangan!'));
     }
     mysqli_stmt_close($stmt);
 } else {
-    header("Location: /doremi-app/dashboard/ruangan/");
+    header('Location: ' . app_url('dashboard/ruangan/'));
 }
 exit;

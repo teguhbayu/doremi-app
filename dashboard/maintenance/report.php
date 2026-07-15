@@ -608,7 +608,7 @@ $rangeQueryParams = $range === 'custom'
             { id: 'chartStacked', title: 'Status per Jenis Laporan' },
         ];
     </script>
-    <script src="/doremi-app/js/report-pdf-export.js?v=<?= filemtime(dirname(__DIR__, 2) . '/js/report-pdf-export.js') ?>"></script>
+<script src="<?= app_url('js/report-pdf-export.js') ?>?v=<?= filemtime(dirname(__DIR__, 2) . '/js/report-pdf-export.js') ?>"></script>
 
     <style>
         @media print {

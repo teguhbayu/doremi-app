@@ -2,16 +2,16 @@
 if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
     die('Access denied');
 }
+require_once __DIR__ . '/../utils/url.php';
 
 function authRedirectToDashboard(): void
 {
-    header("Location: /doremi-app/dashboard");
-    exit;
+    app_redirect('dashboard');
 }
 
-function authRedirectToLoginError(string $message, string $path = '/doremi-app/login.php'): void
+function authRedirectToLoginError(string $message, string $path = 'login.php'): void
 {
-    header("Location: " . $path . '?status=error&message=' . urlencode($message));
+    header('Location: ' . app_url($path) . '?status=error&message=' . urlencode($message));
     exit;
 }
 

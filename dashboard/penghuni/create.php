@@ -1,10 +1,10 @@
 <?php
+require_once '../../utils/url.php';
 require '../../vendor/autoload.php';
 session_start();
 
 if (!isset($_SESSION['userId'])) {
-    header("Location: /doremi-app/login.php");
-    exit;
+    app_redirect('login.php');
 }
 require '../../db.php';
 require '../../utils/old_input.php';
@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
-        header("Location: " . '/doremi-app/dashboard/penghuni/' . '?status=success&message=Penghuni berhasil ditambahkan kembali dari data yang pernah dihapus!');
+        header('Location: ' . app_url('dashboard/penghuni/?status=success&message=Penghuni berhasil ditambahkan kembali dari data yang pernah dihapus!'));
         exit;
     }
 
@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    header("Location: " . '/doremi-app/dashboard/penghuni/' . '?status=success&message=Penghuni Berhasil Ditambahkan!');
+        header('Location: ' . app_url('dashboard/penghuni/?status=success&message=Penghuni Berhasil Ditambahkan!'));
     exit;
 }
 

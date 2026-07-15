@@ -1,22 +1,21 @@
 <?php
+require_once '../../utils/url.php';
 session_start();
 
 if (!isset($_SESSION['userId'])) {
-    header("Location: /doremi-app/login.php");
-    exit;
+    app_redirect('login.php');
 }
 if ($_SESSION['userRole'] !== 'PENGURUS') {
-    header("Location: /doremi-app/dashboard/");
-    exit;
+    app_redirect('dashboard/');
 }
 require '../../csrf.php';
 
 // Only accept POST to prevent CSRF via URL
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header("Location: /doremi-app/dashboard/inventaris/");
+    header('Location: ' . app_url('dashboard/inventaris/'));
     exit;
 }
-csrf_validate('/doremi-app/dashboard/inventaris/');
+    csrf_validate(app_url('dashboard/inventaris/'));
 
 require '../../db.php';
 require '../../database/inventaris.php';
@@ -26,11 +25,11 @@ $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
 if ($id) {
     try {
         deleteInventaris($db, (int) $id);
-        header("Location: /doremi-app/dashboard/inventaris/?status=success&message=Inventaris Berhasil Dihapus!");
+    header('Location: ' . app_url('dashboard/inventaris/?status=success&message=Inventaris Berhasil Dihapus!'));
     } catch (RuntimeException $e) {
-        header("Location: /doremi-app/dashboard/inventaris/?status=error&message=Gagal Menghapus Inventaris!");
+    header('Location: ' . app_url('dashboard/inventaris/?status=error&message=Gagal Menghapus Inventaris!'));
     }
 } else {
-    header("Location: /doremi-app/dashboard/inventaris/");
+    header('Location: ' . app_url('dashboard/inventaris/'));
 }
 exit;
