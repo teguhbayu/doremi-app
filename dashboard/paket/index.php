@@ -107,6 +107,7 @@ $belumDiambil = $paketSummary['belumDiambil'];
                             <?php foreach ($pakets as $paket): ?>
                                 <?php $status = $paket['Status'] ?? 'Belum Diambil'; ?>
                                 <?php $statusMeta = paket_status_meta($status); ?>
+                                <?php $statusSortOrder = ['Belum Diambil' => 1, 'Sudah Diambil' => 2, 'TERTUKAR' => 3]; ?>
                                 <?php $isPickupLocked = !empty($paket['PengambilanPaketID']) && paket_is_final_status($status); ?>
                                 <tr>
                                     <td class="tw:text-start" title="<?php if ($role === 'SIGAP'): ?><?= htmlspecialchars($paket['NamaPenghuni']) ?> (<?= htmlspecialchars($paket['Nim']) ?>)<?php else: ?><?= htmlspecialchars($paket['NamaPetugasPaket'] ?? '') ?><?php endif; ?>">
@@ -139,7 +140,7 @@ $belumDiambil = $paketSummary['belumDiambil'];
                                     <td>
                                         <?= formatDateTime($paket['WaktuSampai'] ?? null) ?>
                                     </td>
-                                    <td>
+                                    <td data-order="<?= $statusSortOrder[$status] ?? 99 ?>">
                                         <?php
                                             $canMarkTertukar = $role === 'SIGAP' && ($paket['Status'] ?? '') === 'Sudah Diambil';
                                         ?>
@@ -295,8 +296,12 @@ $belumDiambil = $paketSummary['belumDiambil'];
                     order: [],
                     columnDefs: [
                         {
-                            targets: 6,
+                            targets: 7,
                             orderable: false
+                        },
+                        {
+                            targets: 6,
+                            orderable: true
                         },
                         {
                             targets: '_all',
