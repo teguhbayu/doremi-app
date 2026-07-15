@@ -35,13 +35,41 @@ if (!$isOwner) {
 
 require_once '../../database/penghuni.php';
 
-$rooms = fetchMaintenanceRooms($db, false);
+$rooms = fetchMaintenanceRooms($db, true);
 $kamars = fetchActiveKamarWithOccupancy($db);
-$inventory = fetchMaintenanceInventory($db, false);
+$inventory = fetchMaintenanceInventory($db, true);
 
 $inventarisItem = null;
 if (!empty($report['InventarisID'])) {
-    $inventarisItem = dbFetchOne($db, "SELECT InventarisID, RuanganID, KamarID FROM inventaris WHERE InventarisID = ?", 'i', [$report['InventarisID']]);
+    $inventarisItem = dbFetchOne($db, "SELECT InventarisID, RuanganID, KamarID, NamaBarang FROM inventaris WHERE InventarisID = ?", 'i', [$report['InventarisID']]);
+    if ($inventarisItem) {
+        $found = false;
+        foreach ($inventory as $inv) {
+            if ((int)$inv['InventarisID'] === (int)$report['InventarisID']) {
+                $found = true;
+                break;
+            }
+        }
+        if (!$found) {
+            $inventory[] = $inventarisItem;
+        }
+    }
+}
+
+if (!empty($report['RuanganID'])) {
+    $found = false;
+    foreach ($rooms as $r) {
+        if ((int)$r['RuanganID'] === (int)$report['RuanganID']) {
+            $found = true;
+            break;
+        }
+    }
+    if (!$found) {
+        $deletedRuangan = dbFetchOne($db, "SELECT RuanganID, NamaRuangan FROM ruangan WHERE RuanganID = ?", 'i', [$report['RuanganID']]);
+        if ($deletedRuangan) {
+            $rooms[] = $deletedRuangan;
+        }
+    }
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
