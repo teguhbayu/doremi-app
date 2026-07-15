@@ -1,93 +1,93 @@
 # Graph Report - doremi-app  (2026-07-15)
 
 ## Corpus Check
-- 112 files · ~1,254,417 words
+- 115 files · ~1,254,750 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 585 nodes · 857 edges · 134 communities (88 shown, 46 thin omitted)
+- 584 nodes · 857 edges · 134 communities (88 shown, 46 thin omitted)
 - Extraction: 80% EXTRACTED · 20% INFERRED · 0% AMBIGUOUS · INFERRED: 174 edges (avg confidence: 0.75)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `0d99017c`
+- Built from commit: `e9e91553`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
-- DataTables JS Library
-- In/Out Request Management
-- Database & Auth Helpers
-- Resident (Penghuni) Helpers
-- Maintenance Report Validation
-- Package (Paket) Helpers
-- Authentication Flow
-- In/Out Input & Validation
-- Composer Project Config
-- Coding Guidelines
-- Room (Kamar) Helpers
-- Maintenance Helpers
-- Room Facility Images
-- Dining Facility Images
-- Recreation Facility Images
-- Dormitory Staff & Org
-- Outdoor Facilities Images
-- Node.js / Tailwind Config
-- Error UI Feedback
-- Doremi Brand Identity
-- Market & Inventory
-- Bathroom Facility Images
-- Dev Start Scripts
-- Auditorium Event Photo
-- Basketball Court Photo
-- Success UI Feedback
-- dbFetchAll
-- Database Schema
-- Database Schema
-- Database Dump — `astrador_doremiapp`
-- Doremi App — Agent Instructions
-- Graphify — Codebase Knowledge Graph
-- Karpathy behavioral guidelines
-- Karpathy behavioral guidelines
-- CLAUDE.md
-- Goal-Driven Execution Principle
-- Simplicity First Principle
-- Surgical Changes Principle
-- Think Before Coding Principle
-- User Roles (PENGURUS/SIGAP/VIRTUS/MAINTENANCE/PENGHUNI)
-- database/auth.php
-- database/inout.php
-- database/maintenance.php
-- database/paket.php
-- database/penghuni.php
-- database/photos.php
-- database/query.php Shared Helpers
-- Doremi App Context Skill (agents)
-- Stored Procedures Layer
-- DB Table: inoutpenghuni
-- DB Table: inventaris
-- DB Table: kamar
-- DB Table: maintenance
-- DB Table: paket
-- DB Table: pengambilanpaket
-- DB Table: penghuni
-- DB Table: petugas
-- DB Table: ruangan
-- Doremi Tech Stack
-- Database Triggers
-- User-Defined Functions (UDFs)
-- Coding Guideline Skill (claude)
-- Doremi App Context Skill (claude)
-- Doremi App Database Dump
-- DB Data: inoutpenghuni rows
-- DB Data: inventaris rows
-- DB Data: kamar rows
-- DB Data: maintenance rows
-- DB Data: paket rows
-- DB Data: pengambilanpaket rows
-- DB Data: penghuni rows
-- DB Data: petugas rows
-- DB Data: ruangan rows
+- [[_COMMUNITY_DataTables JS Library|DataTables JS Library]]
+- [[_COMMUNITY_InOut Request Management|In/Out Request Management]]
+- [[_COMMUNITY_Database & Auth Helpers|Database & Auth Helpers]]
+- [[_COMMUNITY_Resident (Penghuni) Helpers|Resident (Penghuni) Helpers]]
+- [[_COMMUNITY_Maintenance Report Validation|Maintenance Report Validation]]
+- [[_COMMUNITY_Package (Paket) Helpers|Package (Paket) Helpers]]
+- [[_COMMUNITY_Authentication Flow|Authentication Flow]]
+- [[_COMMUNITY_InOut Input & Validation|In/Out Input & Validation]]
+- [[_COMMUNITY_Composer Project Config|Composer Project Config]]
+- [[_COMMUNITY_Coding Guidelines|Coding Guidelines]]
+- [[_COMMUNITY_Room (Kamar) Helpers|Room (Kamar) Helpers]]
+- [[_COMMUNITY_Maintenance Helpers|Maintenance Helpers]]
+- [[_COMMUNITY_Room Facility Images|Room Facility Images]]
+- [[_COMMUNITY_Dining Facility Images|Dining Facility Images]]
+- [[_COMMUNITY_Recreation Facility Images|Recreation Facility Images]]
+- [[_COMMUNITY_Dormitory Staff & Org|Dormitory Staff & Org]]
+- [[_COMMUNITY_Outdoor Facilities Images|Outdoor Facilities Images]]
+- [[_COMMUNITY_Node.js  Tailwind Config|Node.js / Tailwind Config]]
+- [[_COMMUNITY_Error UI Feedback|Error UI Feedback]]
+- [[_COMMUNITY_Doremi Brand Identity|Doremi Brand Identity]]
+- [[_COMMUNITY_Market & Inventory|Market & Inventory]]
+- [[_COMMUNITY_Bathroom Facility Images|Bathroom Facility Images]]
+- [[_COMMUNITY_Dev Start Scripts|Dev Start Scripts]]
+- [[_COMMUNITY_Auditorium Event Photo|Auditorium Event Photo]]
+- [[_COMMUNITY_Basketball Court Photo|Basketball Court Photo]]
+- [[_COMMUNITY_Success UI Feedback|Success UI Feedback]]
+- [[_COMMUNITY_dbFetchAll|dbFetchAll]]
+- [[_COMMUNITY_Database Schema|Database Schema]]
+- [[_COMMUNITY_Database Schema|Database Schema]]
+- [[_COMMUNITY_Database Dump — `astrador_doremiapp`|Database Dump — `astrador_doremiapp`]]
+- [[_COMMUNITY_Doremi App — Agent Instructions|Doremi App — Agent Instructions]]
+- [[_COMMUNITY_Graphify — Codebase Knowledge Graph|Graphify — Codebase Knowledge Graph]]
+- [[_COMMUNITY_Karpathy behavioral guidelines|Karpathy behavioral guidelines]]
+- [[_COMMUNITY_Karpathy behavioral guidelines|Karpathy behavioral guidelines]]
+- [[_COMMUNITY_CLAUDE|CLAUDE.md]]
+- [[_COMMUNITY_Goal-Driven Execution Principle|Goal-Driven Execution Principle]]
+- [[_COMMUNITY_Simplicity First Principle|Simplicity First Principle]]
+- [[_COMMUNITY_Surgical Changes Principle|Surgical Changes Principle]]
+- [[_COMMUNITY_Think Before Coding Principle|Think Before Coding Principle]]
+- [[_COMMUNITY_User Roles (PENGURUSSIGAPVIRTUSMAINTENANCEPENGHUNI)|User Roles (PENGURUS/SIGAP/VIRTUS/MAINTENANCE/PENGHUNI)]]
+- [[_COMMUNITY_databaseauth.php|database/auth.php]]
+- [[_COMMUNITY_databaseinout.php|database/inout.php]]
+- [[_COMMUNITY_databasemaintenance.php|database/maintenance.php]]
+- [[_COMMUNITY_databasepaket.php|database/paket.php]]
+- [[_COMMUNITY_databasepenghuni.php|database/penghuni.php]]
+- [[_COMMUNITY_databasephotos.php|database/photos.php]]
+- [[_COMMUNITY_databasequery.php Shared Helpers|database/query.php Shared Helpers]]
+- [[_COMMUNITY_Doremi App Context Skill (agents)|Doremi App Context Skill (agents)]]
+- [[_COMMUNITY_Stored Procedures Layer|Stored Procedures Layer]]
+- [[_COMMUNITY_DB Table inoutpenghuni|DB Table: inoutpenghuni]]
+- [[_COMMUNITY_DB Table inventaris|DB Table: inventaris]]
+- [[_COMMUNITY_DB Table kamar|DB Table: kamar]]
+- [[_COMMUNITY_DB Table maintenance|DB Table: maintenance]]
+- [[_COMMUNITY_DB Table paket|DB Table: paket]]
+- [[_COMMUNITY_DB Table pengambilanpaket|DB Table: pengambilanpaket]]
+- [[_COMMUNITY_DB Table penghuni|DB Table: penghuni]]
+- [[_COMMUNITY_DB Table petugas|DB Table: petugas]]
+- [[_COMMUNITY_DB Table ruangan|DB Table: ruangan]]
+- [[_COMMUNITY_Doremi Tech Stack|Doremi Tech Stack]]
+- [[_COMMUNITY_Database Triggers|Database Triggers]]
+- [[_COMMUNITY_User-Defined Functions (UDFs)|User-Defined Functions (UDFs)]]
+- [[_COMMUNITY_Coding Guideline Skill (claude)|Coding Guideline Skill (claude)]]
+- [[_COMMUNITY_Doremi App Context Skill (claude)|Doremi App Context Skill (claude)]]
+- [[_COMMUNITY_Doremi App Database Dump|Doremi App Database Dump]]
+- [[_COMMUNITY_DB Data inoutpenghuni rows|DB Data: inoutpenghuni rows]]
+- [[_COMMUNITY_DB Data inventaris rows|DB Data: inventaris rows]]
+- [[_COMMUNITY_DB Data kamar rows|DB Data: kamar rows]]
+- [[_COMMUNITY_DB Data maintenance rows|DB Data: maintenance rows]]
+- [[_COMMUNITY_DB Data paket rows|DB Data: paket rows]]
+- [[_COMMUNITY_DB Data pengambilanpaket rows|DB Data: pengambilanpaket rows]]
+- [[_COMMUNITY_DB Data penghuni rows|DB Data: penghuni rows]]
+- [[_COMMUNITY_DB Data petugas rows|DB Data: petugas rows]]
+- [[_COMMUNITY_DB Data ruangan rows|DB Data: ruangan rows]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `dbFetchAll()` - 58 edges
@@ -102,8 +102,6 @@
 10. `ne()` - 10 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `validatePaketInput()` --calls--> `checkPenghuniExists()`  [INFERRED]
-  dashboard/paket/validation.php → database/paket.php
 - `validatePenghuniInputSchema()` --calls--> `firstFieldError()`  [INFERRED]
   dashboard/penghuni/validation.php → utils/validation_helpers.php
 - `authAttemptPasswordLogin()` --calls--> `findAuthUserByEmail()`  [INFERRED]
@@ -112,6 +110,8 @@
   auth/helpers.php → database/auth.php
 - `validateInOutRequestInput()` --calls--> `textLength()`  [INFERRED]
   dashboard/inout/validation.php → utils/format.php
+- `validateMaintenanceReportInput()` --calls--> `checkMaintenanceTargetExists()`  [INFERRED]
+  dashboard/maintenance/validation.php → database/maintenance.php
 
 ## Import Cycles
 - None detected.
@@ -120,27 +120,27 @@
 
 ### Community 0 - "DataTables JS Library"
 Cohesion: 0.08
-Nodes (59): A(), ae(), at(), B(), be(), c(), ce(), ct() (+51 more)
+Nodes (60): A(), ae(), at(), B(), be(), c(), ce(), ct() (+52 more)
 
 ### Community 1 - "In/Out Request Management"
 Cohesion: 0.08
-Nodes (48): confirmInOutEntry(), confirmInOutExit(), countActiveInOutRequests(), createInOutRequest(), fetchAllInOutLogs(), fetchInOutHistoryForPenghuni(), fetchOutsideInOutRequests(), fetchPendingInOutRequests() (+40 more)
+Nodes (37): paket_is_valid_length(), mysqli, validatePaketInput(), checkKamarActive(), checkRuanganActive(), createInventaris(), deleteInventaris(), fetchActiveKamarOptions() (+29 more)
 
 ### Community 3 - "Resident (Penghuni) Helpers"
 Cohesion: 0.12
 Nodes (30): penghuni_allowed_floors(), penghuni_duplicate_identity_message(), penghuni_find_identity_matches(), penghuni_gender_label(), penghuni_is_valid_nim(), penghuni_is_valid_phone(), penghuni_nim_max_length(), penghuni_nim_min_length() (+22 more)
 
 ### Community 4 - "Maintenance Report Validation"
-Cohesion: 0.11
-Nodes (19): mysqli, validateMaintenanceReportInput(), checkMaintenanceTargetExists(), checkMaintenanceTechnicianOwnership(), claimMaintenanceReport(), completeMaintenanceReport(), createMaintenanceReport(), deleteMaintenanceReport() (+11 more)
+Cohesion: 0.08
+Nodes (40): confirmInOutEntry(), confirmInOutExit(), countActiveInOutRequests(), createInOutRequest(), fetchAllInOutLogs(), fetchInOutHistoryForPenghuni(), fetchOutsideInOutRequests(), fetchPendingInOutRequests() (+32 more)
 
 ### Community 5 - "Package (Paket) Helpers"
-Cohesion: 0.13
-Nodes (11): paket_allowed_types(), paket_cleanup_legacy_photo(), paket_is_valid_length(), paket_normalize_datetime(), paket_normalize_type(), paket_store_photo(), paket_type_badge_class(), paket_type_label() (+3 more)
+Cohesion: 0.14
+Nodes (9): paket_allowed_types(), paket_cleanup_legacy_photo(), paket_normalize_datetime(), paket_normalize_type(), paket_redirect(), paket_store_photo(), paket_type_badge_class(), paket_type_label() (+1 more)
 
 ### Community 6 - "Authentication Flow"
 Cohesion: 0.09
-Nodes (18): authAttemptEmailLogin(), authAttemptPasswordLogin(), authRedirectToDashboard(), authRedirectToLoginError(), mysqli, csrf_field(), csrf_token(), csrf_validate() (+10 more)
+Nodes (17): authAttemptEmailLogin(), authAttemptPasswordLogin(), authRedirectToDashboard(), authRedirectToLoginError(), mysqli, csrf_field(), csrf_token(), csrf_validate() (+9 more)
 
 ### Community 7 - "In/Out Input & Validation"
 Cohesion: 0.22
@@ -155,8 +155,8 @@ Cohesion: 0.60
 Nodes (4): kamar_build_nomor(), kamar_extract_bagian(), kamar_has_lantai_prefix(), kamar_normalize_segment()
 
 ### Community 11 - "Maintenance Helpers"
-Cohesion: 0.30
-Nodes (11): createPetugas(), deletePetugas(), fetchAllPetugas(), fetchPetugasById(), findPetugasDuplicateActive(), findPetugasDuplicateDeleted(), findPetugasDuplicateExcluding(), mysqli (+3 more)
+Cohesion: 0.22
+Nodes (4): mysqli, validateMaintenanceReportInput(), checkMaintenanceTargetExists(), firstFieldError()
 
 ### Community 12 - "Room Facility Images"
 Cohesion: 0.50
@@ -179,8 +179,8 @@ Cohesion: 0.67
 Nodes (4): Dormitory Balcony/Outdoor Area, Badminton Court Photo, Balkon (Balcony) Photo, Images Directory
 
 ### Community 18 - "Node.js / Tailwind Config"
-Cohesion: 0.33
-Nodes (5): dependencies, tailwindcss, @tailwindcss/cli, tailwindcss, @tailwindcss/cli
+Cohesion: 0.50
+Nodes (3): dependencies, tailwindcss, @tailwindcss/cli
 
 ### Community 20 - "Error UI Feedback"
 Cohesion: 0.67
@@ -236,10 +236,8 @@ _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `dbFetchOne()` connect `In/Out Request Management` to `Resident (Penghuni) Helpers`, `Maintenance Report Validation`, `Authentication Flow`, `Maintenance Helpers`, `dbFetchAll`?**
   _High betweenness centrality (0.081) - this node is a cross-community bridge._
-- **Why does `dbFetchAll()` connect `dbFetchAll` to `Maintenance Helpers`, `In/Out Request Management`, `Resident (Penghuni) Helpers`, `Maintenance Report Validation`?**
+- **Why does `dbFetchAll()` connect `dbFetchAll` to `In/Out Request Management`, `Resident (Penghuni) Helpers`, `Maintenance Report Validation`?**
   _High betweenness centrality (0.067) - this node is a cross-community bridge._
-- **Why does `checkPenghuniExists()` connect `In/Out Request Management` to `Package (Paket) Helpers`?**
-  _High betweenness centrality (0.030) - this node is a cross-community bridge._
 - **Are the 53 inferred relationships involving `dbFetchAll()` (e.g. with `fetchDashboardEmergencyList()` and `fetchDashboardGenderStats()`) actually correct?**
   _`dbFetchAll()` has 53 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 29 inferred relationships involving `dbExecute()` (e.g. with `confirmInOutEntry()` and `confirmInOutExit()`) actually correct?**
@@ -248,3 +246,5 @@ _Questions this graph is uniquely positioned to answer:_
   _`dbFetchOne()` has 27 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 10 inferred relationships involving `n()` (e.g. with `A()` and `_e()`) actually correct?**
   _`n()` has 10 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 5 inferred relationships involving `se()` (e.g. with `c()` and `D()`) actually correct?**
+  _`se()` has 5 INFERRED edges - model-reasoned connections that need verification._

@@ -14,6 +14,7 @@ if ($_SESSION['userRole'] !== 'PENGURUS') {
 }
 require '../../csrf.php';
 require '../../db.php';
+require_once '../../database/inventaris.php';
 
 $id = $_GET['id'] ?? null;
 if (!$id) {
