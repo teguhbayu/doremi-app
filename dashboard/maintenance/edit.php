@@ -46,6 +46,9 @@ if (!empty($report['InventarisID'])) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_validate($_SERVER['PHP_SELF'] . '?id=' . $id);
+    if (isset($_POST['deskripsi'])) {
+        $_POST['deskripsi'] = str_replace("\r\n", "\n", $_POST['deskripsi']);
+    }
     $reportInput = collectMaintenanceReportInput($_POST);
     $validationMessage = validateMaintenanceReportInput($db, $reportInput);
     if ($validationMessage !== null) {
@@ -104,7 +107,7 @@ if (!empty($old)) {
     }
 }
 $currentJenisLaporan = $old['jenisLaporan'] ?? $old['skala_prioritas'] ?? $report['JenisLaporan'];
-$currentDeskripsi = $old['deskripsi'] ?? $report['Deskripsi'];
+$currentDeskripsi = str_replace("\r\n", "\n", $old['deskripsi'] ?? $report['Deskripsi'] ?? '');
 ?>
 
 <!DOCTYPE html>

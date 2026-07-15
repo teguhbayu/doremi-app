@@ -1510,7 +1510,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "dashboard_paket_helpers_paket_is_valid_length",
-      "community": 5,
+      "community": 1,
       "norm_label": "paket_is_valid_length()"
     },
     {
@@ -1710,7 +1710,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "dashboard_paket_validation_validatepaketinput",
-      "community": 5,
+      "community": 1,
       "norm_label": "validatepaketinput()"
     },
     {
@@ -1720,7 +1720,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "dashboard_paket_validation_php_mysqli",
-      "community": 5,
+      "community": 1,
       "norm_label": "mysqli"
     },
     {
@@ -2310,7 +2310,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "database_inout",
-      "community": 133,
+      "community": 4,
       "norm_label": "inout.php"
     },
     {
@@ -2320,7 +2320,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "database_inout_fetchinouthistoryforpenghuni",
-      "community": 133,
+      "community": 4,
       "norm_label": "fetchinouthistoryforpenghuni()"
     },
     {
@@ -2330,7 +2330,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "database_inout_php_mysqli",
-      "community": 133,
+      "community": 4,
       "norm_label": "mysqli"
     },
     {
@@ -2340,7 +2340,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "database_inout_countactiveinoutrequests",
-      "community": 133,
+      "community": 4,
       "norm_label": "countactiveinoutrequests()"
     },
     {
@@ -2350,7 +2350,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "database_inout_fetchpendinginoutrequests",
-      "community": 133,
+      "community": 4,
       "norm_label": "fetchpendinginoutrequests()"
     },
     {
@@ -2360,7 +2360,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "database_inout_fetchoutsideinoutrequests",
-      "community": 133,
+      "community": 4,
       "norm_label": "fetchoutsideinoutrequests()"
     },
     {
@@ -2370,7 +2370,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "database_inout_fetchallinoutlogs",
-      "community": 133,
+      "community": 4,
       "norm_label": "fetchallinoutlogs()"
     },
     {
@@ -2380,7 +2380,7 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "database_inout_createinoutrequest",
-      "community": 133,
+      "community": 4,
       "norm_label": "createinoutrequest()"
     },
     {
@@ -2390,7 +2390,7 @@
       "source_location": "L45",
       "_origin": "ast",
       "id": "database_inout_confirminoutexit",
-      "community": 133,
+      "community": 4,
       "norm_label": "confirminoutexit()"
     },
     {
@@ -2400,7 +2400,7 @@
       "source_location": "L51",
       "_origin": "ast",
       "id": "database_inout_confirminoutentry",
-      "community": 133,
+      "community": 4,
       "norm_label": "confirminoutentry()"
     },
     {
@@ -2720,7 +2720,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "database_maintenance",
-      "community": 1,
+      "community": 4,
       "norm_label": "maintenance.php"
     },
     {
@@ -2730,7 +2730,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "database_maintenance_fetchmaintenancereportsforrole",
-      "community": 1,
+      "community": 4,
       "norm_label": "fetchmaintenancereportsforrole()"
     },
     {
@@ -2740,7 +2740,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "database_maintenance_php_mysqli",
-      "community": 1,
+      "community": 4,
       "norm_label": "mysqli"
     },
     {
@@ -2750,7 +2750,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "database_maintenance_fetchmaintenancereportbyid",
-      "community": 1,
+      "community": 4,
       "norm_label": "fetchmaintenancereportbyid()"
     },
     {
@@ -2760,7 +2760,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "database_maintenance_fetchmaintenancerooms",
-      "community": 1,
+      "community": 4,
       "norm_label": "fetchmaintenancerooms()"
     },
     {
@@ -2770,7 +2770,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "database_maintenance_fetchmaintenanceinventory",
-      "community": 1,
+      "community": 4,
       "norm_label": "fetchmaintenanceinventory()"
     },
     {
@@ -2790,7 +2790,7 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "database_maintenance_createmaintenancereport",
-      "community": 1,
+      "community": 4,
       "norm_label": "createmaintenancereport()"
     },
     {
@@ -2800,7 +2800,7 @@
       "source_location": "L58",
       "_origin": "ast",
       "id": "database_maintenance_updatemaintenancereport",
-      "community": 1,
+      "community": 4,
       "norm_label": "updatemaintenancereport()"
     },
     {
@@ -2810,7 +2810,7 @@
       "source_location": "L77",
       "_origin": "ast",
       "id": "database_maintenance_updatemaintenanceurgency",
-      "community": 1,
+      "community": 4,
       "norm_label": "updatemaintenanceurgency()"
     },
     {
@@ -2820,7 +2820,7 @@
       "source_location": "L89",
       "_origin": "ast",
       "id": "database_maintenance_claimmaintenancereport",
-      "community": 1,
+      "community": 4,
       "norm_label": "claimmaintenancereport()"
     },
     {
@@ -2830,7 +2830,7 @@
       "source_location": "L94",
       "_origin": "ast",
       "id": "database_maintenance_checkmaintenancetechnicianownership",
-      "community": 1,
+      "community": 4,
       "norm_label": "checkmaintenancetechnicianownership()"
     },
     {
@@ -2840,7 +2840,7 @@
       "source_location": "L99",
       "_origin": "ast",
       "id": "database_maintenance_completemaintenancereport",
-      "community": 1,
+      "community": 4,
       "norm_label": "completemaintenancereport()"
     },
     {
@@ -2850,7 +2850,7 @@
       "source_location": "L111",
       "_origin": "ast",
       "id": "database_maintenance_deletemaintenancereport",
-      "community": 1,
+      "community": 4,
       "norm_label": "deletemaintenancereport()"
     },
     {
@@ -2860,7 +2860,7 @@
       "source_location": "L117",
       "_origin": "ast",
       "id": "database_maintenance_ismaintenancereportowner",
-      "community": 1,
+      "community": 4,
       "norm_label": "ismaintenancereportowner()"
     },
     {
@@ -3060,7 +3060,7 @@
       "source_location": "L52",
       "_origin": "ast",
       "id": "database_paket_checkpenghuniexists",
-      "community": 5,
+      "community": 1,
       "norm_label": "checkpenghuniexists()"
     },
     {
@@ -3530,7 +3530,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "database_query",
-      "community": 1,
+      "community": 4,
       "norm_label": "query.php"
     },
     {
@@ -3540,7 +3540,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "database_query_dbbindparams",
-      "community": 1,
+      "community": 4,
       "norm_label": "dbbindparams()"
     },
     {
@@ -3550,7 +3550,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "mysqli_stmt",
-      "community": 1,
+      "community": 4,
       "norm_label": "mysqli_stmt"
     },
     {
@@ -3570,7 +3570,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "database_query_php_mysqli",
-      "community": 1,
+      "community": 4,
       "norm_label": "mysqli"
     },
     {
@@ -3600,7 +3600,7 @@
       "source_location": "L62",
       "_origin": "ast",
       "id": "database_query_dbexecute",
-      "community": 1,
+      "community": 4,
       "norm_label": "dbexecute()"
     },
     {
@@ -3610,7 +3610,7 @@
       "source_location": "L78",
       "_origin": "ast",
       "id": "database_query_dbclearstoredresults",
-      "community": 1,
+      "community": 4,
       "norm_label": "dbclearstoredresults()"
     },
     {
@@ -3620,7 +3620,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "database_ruangan",
-      "community": 1,
+      "community": 4,
       "norm_label": "ruangan.php"
     },
     {
@@ -3630,7 +3630,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "database_ruangan_createruangan",
-      "community": 1,
+      "community": 4,
       "norm_label": "createruangan()"
     },
     {
@@ -3640,7 +3640,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "database_ruangan_php_mysqli",
-      "community": 1,
+      "community": 4,
       "norm_label": "mysqli"
     },
     {
@@ -3650,7 +3650,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "database_ruangan_updateruangan",
-      "community": 1,
+      "community": 4,
       "norm_label": "updateruangan()"
     },
     {
@@ -3722,6 +3722,16 @@
       "id": "js_file_upload_validation",
       "community": 88,
       "norm_label": "file-upload-validation.js"
+    },
+    {
+      "label": "showInvalidFileAlert()",
+      "file_type": "code",
+      "source_file": "js/file-upload-validation.js",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "js_file_upload_validation_showinvalidfilealert",
+      "community": 88,
+      "norm_label": "showinvalidfilealert()"
     },
     {
       "label": "login.php",
@@ -13517,6 +13527,16 @@
       "context": "parameter_type",
       "source": "database_ruangan_updateruangan",
       "target": "database_ruangan_php_mysqli",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/file-upload-validation.js",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "js_file_upload_validation",
+      "target": "js_file_upload_validation_showinvalidfilealert",
       "confidence_score": 1.0
     },
     {

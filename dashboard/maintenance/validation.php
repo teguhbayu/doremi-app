@@ -26,7 +26,7 @@ function collectMaintenanceReportInput(array $source): array
         'jenisLaporan' => trim($source['jenisLaporan'] ?? $source['skala_prioritas'] ?? ''),
         'targetType' => $targetType,
         'targetValue' => $targetValue,
-        'deskripsi' => trim($source['deskripsi'] ?? ''),
+        'deskripsi' => str_replace("\r\n", "\n", trim($source['deskripsi'] ?? '')),
     ];
 }
 

@@ -19,6 +19,9 @@ $ruanganTypes = ['Tempat Ibadah', 'Ruang Publik', 'Ruang Jemur', 'Lapangan Olahr
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_validate($_SERVER['PHP_SELF']);
+    if (isset($_POST['keteranganRuangan'])) {
+        $_POST['keteranganRuangan'] = str_replace("\r\n", "\n", $_POST['keteranganRuangan']);
+    }
     $nama = trim($_POST['namaRuangan'] ?? '');
     $jenis = trim($_POST['jenisRuangan'] ?? '');
     $lantai = trim($_POST['lantaiRuangan'] ?? '');
