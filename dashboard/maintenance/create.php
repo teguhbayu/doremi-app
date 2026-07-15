@@ -19,6 +19,9 @@ $inventory = fetchMaintenanceInventory($db, false);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_validate('create.php');
+    if (isset($_POST['deskripsi'])) {
+        $_POST['deskripsi'] = str_replace("\r\n", "\n", $_POST['deskripsi']);
+    }
     $reportInput = collectMaintenanceReportInput($_POST);
     $validationMessage = validateMaintenanceReportInput($db, $reportInput);
     if ($validationMessage !== null) {

@@ -16,7 +16,7 @@ function collectPenghuniInput(array $source): array
         'no' => penghuni_normalize_phone($source['noPenghuni'] ?? ''),
         'jk' => trim($source['jkPenghuni'] ?? ''),
         'kamarId' => trim($source['kamarPenghuni'] ?? ''),
-        'alamat' => trim($source['alamatPenghuni'] ?? ''),
+        'alamat' => str_replace("\r\n", "\n", trim($source['alamatPenghuni'] ?? '')),
         'password' => trim($source['passwordPenghuni'] ?? ''),
         'confirmPassword' => trim($source['confirmPasswordPenghuni'] ?? ''),
     ];

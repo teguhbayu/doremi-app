@@ -38,6 +38,9 @@ $ruangans = fetchActiveRuanganOptions($db);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_validate($_SERVER['PHP_SELF'] . '?id=' . $id);
+    if (isset($_POST['keteranganBarang'])) {
+        $_POST['keteranganBarang'] = str_replace("\r\n", "\n", $_POST['keteranganBarang']);
+    }
     $nama = trim($_POST['namaBarang'] ?? '');
     $jumlah = trim($_POST['jumlahBarang'] ?? '');
     $lokasi = $_POST['lokasiBarang'] ?? '';

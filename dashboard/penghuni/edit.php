@@ -59,7 +59,7 @@ $formData = [
     'no' => $old['no'] ?? $penghuni['NoHP'],
     'jk' => $old['jk'] ?? $penghuni['JenisKelamin'],
     'kamarId' => $old['kamarId'] ?? $penghuni['KamarID'],
-    'alamat' => $old['alamat'] ?? $penghuni['Alamat'],
+    'alamat' => str_replace("\r\n", "\n", $old['alamat'] ?? $penghuni['Alamat'] ?? ''),
 ];
 ?>
 
