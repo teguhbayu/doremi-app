@@ -7,10 +7,16 @@ if (!isset($_SESSION['userId'])) {
 }
 
 require '../../db.php';
+require_once '../../database/kamar.php';
 
 $id = $_GET['id'] ?? null;
 
 if ($id) {
+    if (countActivePenghuniByKamar($db, (int) $id) > 0) {
+        header("Location: /doremi-app/dashboard/kamar/?status=error&message=Kamar tidak dapat dihapus karena masih memiliki penghuni!");
+        exit;
+    }
+
     $stmt = mysqli_prepare($db, "CALL sp_deleteKamar(?)");
     mysqli_stmt_bind_param($stmt, "i", $id);
 

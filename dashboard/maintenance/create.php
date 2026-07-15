@@ -54,6 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $petugasId,
             $targetIds['ruanganId'],
             $targetIds['inventarisId'],
+            $targetIds['kamarId'],
             $reportInput['jenisLaporan'],
             $reportInput['deskripsi'],
             $fotoBase64,

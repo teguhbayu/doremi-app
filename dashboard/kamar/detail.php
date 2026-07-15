@@ -7,6 +7,8 @@ if (!isset($_SESSION['userId'])) {
 }
 
 require '../../db.php';
+require_once '../../database/inventaris.php';
+require_once '../../utils/format.php';
 
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 if (!$id) {
@@ -32,6 +34,8 @@ mysqli_stmt_execute($penghuniStmt);
 $penghuniResult = mysqli_stmt_get_result($penghuniStmt);
 $penghunis = mysqli_fetch_all($penghuniResult, MYSQLI_ASSOC);
 mysqli_stmt_close($penghuniStmt);
+
+$inventaris = fetchInventarisByKamar($db, $id);
 
 $sisaKapasitas = max(0, (int) $kamar['KapasitasPenghuni'] - (int) $kamar['JumlahPenghuniAktual']);
 ?>
@@ -149,15 +153,78 @@ $sisaKapasitas = max(0, (int) $kamar['KapasitasPenghuni'] - (int) $kamar['Jumlah
                     </div>
                 <?php endif; ?>
             </div>
+
+            <div class="tw:bg-white tw:p-6 tw:rounded-[24px] tw:shadow-sm tw:border tw:border-gray-100 tw:mt-6">
+                <div class="tw:flex tw:flex-col tw:gap-2 tw:md:flex-row tw:md:items-center tw:md:justify-between tw:mb-4">
+                    <div>
+                        <h5 class="tw:text-xl tw:font-bold tw:text-slate-900 tw:m-0">Daftar Inventaris</h5>
+                        <p class="tw:text-slate-500 tw:mt-1 tw:mb-0">
+                            Total <?= count($inventaris) ?> barang inventaris tercatat pada kamar ini.
+                        </p>
+                    </div>
+                </div>
+
+                <?php if (!$inventaris): ?>
+                    <div class="tw:rounded-2xl tw:border tw:border-dashed tw:border-gray-300 tw:p-8 tw:text-center tw:text-gray-500">
+                        Belum ada inventaris yang tercatat pada kamar ini.
+                    </div>
+                <?php else: ?>
+                    <div class="doremi-table-wrapper">
+                        <table id="inventarisKamarTable" class="table doremi-table text-center align-middle tw:mb-0 tw:w-full">
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="text-center align-middle">Nama Barang</th>
+                                    <th scope="col" class="text-center align-middle">Jumlah</th>
+                                    <th scope="col" class="text-center align-middle">Keterangan</th>
+                                    <th scope="col" class="text-center align-middle">Diperbarui</th>
+                                    <th scope="col" class="text-center align-middle">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($inventaris as $item): ?>
+                                    <tr>
+                                        <td class="tw:text-start tw:font-semibold"><?= htmlspecialchars($item['NamaBarang']) ?></td>
+                                        <td><?= (int) $item['Jumlah'] ?></td>
+                                        <td class="tw:text-start truncate-text" title="<?= htmlspecialchars($item['Keterangan'] ?? '') ?>">
+                                            <?= !empty($item['Keterangan']) ? htmlspecialchars($item['Keterangan']) : '<span class="tw:text-slate-400">-</span>' ?>
+                                        </td>
+                                        <td><?= htmlspecialchars(formatDateTime($item['UpdatedAt'] ?? null)) ?></td>
+                                        <td>
+                                            <a href="/doremi-app/dashboard/inventaris/edit.php?id=<?= (int) $item['InventarisID'] ?>"
+                                                class="tw:text-slate-700 tw:no-underline" title="Edit Inventaris">
+                                                <i class="iconsax tw:text-lg" icon-name="edit-2"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php endif; ?>
+            </div>
         </div>
     </main>
 
     <?php require '../../bootstrap.php'; ?>
     <?php require '../../validation_alert.php'; ?>
 
-    <?php if ($penghunis): ?>
-        <script>
-            document.addEventListener('DOMContentLoaded', () => {
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const doremiTableLang = {
+                search: "Cari:",
+                lengthMenu: "Tampilkan _MENU_ data",
+                info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                infoEmpty: "Tidak ada data",
+                zeroRecords: "Data tidak ditemukan",
+                paginate: {
+                    first: "Pertama",
+                    last: "Terakhir",
+                    next: "Berikutnya",
+                    previous: "Sebelumnya"
+                }
+            };
+
+            <?php if ($penghunis): ?>
                 new DataTable('#penghuniKamarTable', {
                     autoWidth: false,
                     ordering: true,
@@ -165,38 +232,31 @@ $sisaKapasitas = max(0, (int) $kamar['KapasitasPenghuni'] - (int) $kamar['Jumlah
                     paging: true,
                     info: true,
                     columnDefs: [
-                        {
-                            targets: 5,
-                            orderable: false
-                        },
-                        {
-                            targets: '_all',
-                            className: 'text-center align-middle'
-                        }
+                        { targets: 5, orderable: false },
+                        { targets: '_all', className: 'text-center align-middle' }
                     ],
-                    layout: {
-                        topStart: 'pageLength',
-                        topEnd: null,
-                        bottomStart: 'info',
-                        bottomEnd: 'paging'
-                    },
-                    language: {
-                        search: "Cari:",
-                        lengthMenu: "Tampilkan _MENU_ data",
-                        info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
-                        infoEmpty: "Tidak ada data",
-                        zeroRecords: "Data tidak ditemukan",
-                        paginate: {
-                            first: "Pertama",
-                            last: "Terakhir",
-                            next: "Berikutnya",
-                            previous: "Sebelumnya"
-                        }
-                    }
+                    layout: { topStart: 'pageLength', topEnd: null, bottomStart: 'info', bottomEnd: 'paging' },
+                    language: doremiTableLang
                 });
-            });
-        </script>
-    <?php endif; ?>
+            <?php endif; ?>
+
+            <?php if ($inventaris): ?>
+                new DataTable('#inventarisKamarTable', {
+                    autoWidth: false,
+                    ordering: true,
+                    searching: false,
+                    paging: true,
+                    info: true,
+                    columnDefs: [
+                        { targets: 5, orderable: false },
+                        { targets: '_all', className: 'text-center align-middle' }
+                    ],
+                    layout: { topStart: 'pageLength', topEnd: null, bottomStart: 'info', bottomEnd: 'paging' },
+                    language: doremiTableLang
+                });
+            <?php endif; ?>
+        });
+    </script>
 </body>
 
 </html>

@@ -26,6 +26,7 @@ function collectMaintenanceReportInput(array $source): array
         'jenisLaporan' => trim($source['jenisLaporan'] ?? $source['skala_prioritas'] ?? ''),
         'targetType' => $targetType,
         'targetValue' => $targetValue,
+        'kamarId' => trim($source['kamar_id'] ?? ''),
         'deskripsi' => str_replace("\r\n", "\n", trim($source['deskripsi'] ?? '')),
     ];
 }
@@ -66,5 +67,6 @@ function resolveMaintenanceTargetIds(array $input): array
     return [
         'ruanganId' => $input['targetType'] === 'ruangan' ? (int) $input['targetValue'] : null,
         'inventarisId' => $input['targetType'] === 'inventaris' ? (int) $input['targetValue'] : null,
+        'kamarId' => ($input['kamarId'] ?? '') !== '' ? (int) $input['kamarId'] : null,
     ];
 }

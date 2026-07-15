@@ -77,7 +77,9 @@ if (isset($_GET['export']) && $_GET['export'] === 'pdf') {
         ];
     }
     
-    \Utils\generateReportPdf($filename, 'Laporan Maintenance', $rangeLabelFull, $headers, $widths, $rows);
+    $charts = \Utils\reportPdfCollectPostedCharts();
+
+    \Utils\generateReportPdf($filename, 'Laporan Maintenance', $rangeLabelFull, $headers, $widths, $rows, $charts);
     exit;
 }
 
@@ -224,9 +226,9 @@ $rangeQueryParams = $range === 'custom'
                 <div class="tw:flex tw:gap-2 tw:mt-4">
                     <a href="?<?= $rangeQueryParams ?>&export=excel"
                         class="tw:inline-flex tw:items-center tw:gap-[6px] tw:text-xs tw:font-semibold tw:px-4 tw:py-[7px] tw:rounded-[10px] tw:bg-emerald-500 tw:text-white tw:no-underline tw:border-none">
-                        <i class="fa-solid fa-file-excel"></i> Export Excel
+                        <i class="fa-solid fa-file-excel"></i> Export CSV
                     </a>
-                    <a href="?<?= $rangeQueryParams ?>&export=pdf"
+                    <a href="?<?= $rangeQueryParams ?>&export=pdf" id="exportPdfBtn"
                         class="tw:inline-flex tw:items-center tw:gap-[6px] tw:text-xs tw:font-semibold tw:px-4 tw:py-[7px] tw:rounded-[10px] tw:bg-red-500 tw:text-white tw:no-underline tw:border-none">
                         <i class="fa-solid fa-file-pdf"></i> Export PDF
                     </a>
@@ -597,6 +599,16 @@ $rangeQueryParams = $range === 'custom'
             });
         })();
     </script>
+
+    <script>
+        window.reportChartSpecs = [
+            { id: 'chartPriority', title: 'Distribusi Jenis Laporan (Skala Prioritas)' },
+            { id: 'chartTrend', title: 'Trend Laporan Masuk' },
+            { id: 'chartRuangan', title: 'Top 5 Ruangan Terbanyak' },
+            { id: 'chartStacked', title: 'Status per Jenis Laporan' },
+        ];
+    </script>
+    <script src="/doremi-app/js/report-pdf-export.js?v=<?= filemtime(dirname(__DIR__, 2) . '/js/report-pdf-export.js') ?>"></script>
 
     <style>
         @media print {

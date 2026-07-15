@@ -40,6 +40,7 @@ function createMaintenanceReport(
     ?int $petugasId,
     ?int $ruanganId,
     ?int $inventarisId,
+    ?int $kamarId,
     string $jenisLaporan,
     string $deskripsi,
     string $fotoLaporan,
@@ -47,9 +48,9 @@ function createMaintenanceReport(
 ): bool {
     dbExecute(
         $db,
-        "CALL sp_createMaintenanceReport(?, ?, ?, ?, ?, ?, ?, ?)",
-        'iiiissss',
-        [$penghuniId, $petugasId, $ruanganId, $inventarisId, $jenisLaporan, $deskripsi, $fotoLaporan, $tanggalLapor]
+        "CALL sp_createMaintenanceReport(?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        'iiiiissss',
+        [$penghuniId, $petugasId, $ruanganId, $inventarisId, $kamarId, $jenisLaporan, $deskripsi, $fotoLaporan, $tanggalLapor]
     );
 
     return true;
@@ -60,15 +61,16 @@ function updateMaintenanceReport(
     int $maintenanceId,
     ?int $ruanganId,
     ?int $inventarisId,
+    ?int $kamarId,
     string $jenisLaporan,
     string $deskripsi,
     string $fotoLaporan
 ): bool {
     dbExecute(
         $db,
-        "CALL sp_updateMaintenanceReport(?, ?, ?, ?, ?, ?)",
-        'iiisss',
-        [$maintenanceId, $ruanganId, $inventarisId, $jenisLaporan, $deskripsi, $fotoLaporan]
+        "CALL sp_updateMaintenanceReport(?, ?, ?, ?, ?, ?, ?)",
+        'iiiisss',
+        [$maintenanceId, $ruanganId, $inventarisId, $kamarId, $jenisLaporan, $deskripsi, $fotoLaporan]
     );
 
     return true;
