@@ -97,6 +97,18 @@ function validatePenghuniCommonInput(
         return penghuni_duplicate_identity_message($duplicatePenghuni, $input['nim'], $input['email'], $input['no']);
     }
 
+    $deletedMatches = penghuni_find_identity_matches(
+        $db,
+        $input['nim'],
+        $input['email'],
+        $input['no'],
+        1,
+        $excludePenghuniId
+    );
+    if ($deletedMatches && count($deletedMatches) > 1) {
+        return 'Data NIM, email, atau No. HP terkait dengan lebih dari satu data penghuni terhapus. Mohon periksa data lama atau gunakan data yang berbeda.';
+    }
+
     return penghuni_validate_room_assignment(
         $db,
         (int) $input['kamarId'],

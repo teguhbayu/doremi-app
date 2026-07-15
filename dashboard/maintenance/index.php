@@ -67,7 +67,7 @@ $totalReports = count($reports);
                                             <div class="tw:text-xs tw:text-slate-500">-</div>
                                         <?php endif; ?>
                                     </td>
-                                    <td class="tw:max-w-48 tw:truncate" title="<?php
+                                    <td class="truncate-text" title="<?php
                                          if (!empty($r['NamaRuangan'])) {
                                              echo 'Ruangan: ' . htmlspecialchars($r['NamaRuangan']) . ' (Lantai ' . htmlspecialchars($r['LantaiRuangan']) . ')';
                                          } elseif (!empty($r['NamaBarang'])) {

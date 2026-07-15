@@ -82,16 +82,16 @@ if (!empty($old['penghuniId'])) {
                 </div>
 
                 <div class="mb-3 tw:col-span-full">
-                    <label for="penghuniSearch" class="form-label">Penghuni Tujuan</label>
-                    <input type="text" class="form-control" id="penghuniSearch" list="penghuniOptions"
-                        value="<?= htmlspecialchars($oldPenghuniLabel) ?>"
-                        placeholder="Ketik nama, NIM, atau kamar penghuni" autocomplete="off" required>
-                    <input type="hidden" name="penghuniId" id="penghuniId" value="<?= htmlspecialchars($old['penghuniId'] ?? '') ?>">
-                    <datalist id="penghuniOptions">
+                    <label for="penghuniId" class="form-label">Penghuni Tujuan</label>
+                    <select name="penghuniId" id="penghuniId" class="form-select" required>
+                        <option value="" disabled <?= empty($old['penghuniId']) ? 'selected' : '' ?>>Pilih Penghuni</option>
                         <?php foreach ($penghuniList as $penghuni): ?>
-                            <option value="<?= htmlspecialchars(paket_penghuni_option_label($penghuni)) ?>" data-id="<?= (int) $penghuni['PenghuniID'] ?>"></option>
+                            <option value="<?= (int) $penghuni['PenghuniID'] ?>" <?= (string) ($old['penghuniId'] ?? '') === (string) $penghuni['PenghuniID'] ? 'selected' : '' ?>>
+                                <?= htmlspecialchars(paket_penghuni_option_label($penghuni)) ?>
+                            </option>
                         <?php endforeach; ?>
-                    </datalist>
+                    </select>
+                    <span class="form-hint">Pilih penghuni penerima paket dari daftar.</span>
                 </div>
 
                 <div class="mb-3">
@@ -109,11 +109,13 @@ if (!empty($old['penghuniId'])) {
                     <label for="namaPengirim" class="form-label">Nama Pengirim</label>
                     <input type="text" name="namaPengirim" class="form-control" id="namaPengirim" maxlength="100"
                         value="<?= htmlspecialchars($old['namaPengirim'] ?? '') ?>" required>
+                    <span class="form-hint">Maksimal 100 karakter</span>
                 </div>
                 <div class="mb-3">
                     <label for="kurir" class="form-label">Kurir</label>
                     <input type="text" name="kurir" class="form-control" id="kurir" maxlength="50"
                         value="<?= htmlspecialchars($old['kurir'] ?? '') ?>" required>
+                    <span class="form-hint">Maksimal 50 karakter</span>
                 </div>
 
                 <div class="tw:col-span-full tw:flex tw:justify-end tw:mt-2">
@@ -128,21 +130,6 @@ if (!empty($old['penghuniId'])) {
     <?php require '../../bootstrap.php'; ?>
     <?php require '../../validation_alert.php'; ?>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const penghuniSearch = document.getElementById('penghuniSearch');
-            const penghuniId = document.getElementById('penghuniId');
-            const penghuniOptions = Array.from(document.querySelectorAll('#penghuniOptions option'));
-
-            const syncPenghuniSelection = () => {
-                const match = penghuniOptions.find(option => option.value === penghuniSearch.value);
-                penghuniId.value = match ? match.dataset.id : '';
-            };
-
-            penghuniSearch.addEventListener('input', syncPenghuniSelection);
-            penghuniSearch.form?.addEventListener('submit', syncPenghuniSelection);
-        });
-    </script>
 </body>
 
 </html>

@@ -54,9 +54,9 @@ $totalInventaris = count($inventarisList);
                 <tbody>
                     <?php foreach ($inventarisList as $inventaris) { ?>
                         <tr>
-                            <td class="tw:max-w-48 tw:truncate" title="<?php echo htmlspecialchars($inventaris["NamaBarang"]); ?>"><?php echo htmlspecialchars($inventaris["NamaBarang"]); ?></td>
+                            <td class="truncate-text" title="<?php echo htmlspecialchars($inventaris["NamaBarang"]); ?>"><?php echo htmlspecialchars($inventaris["NamaBarang"]); ?></td>
                             <td><?php echo htmlspecialchars($inventaris["Jumlah"]); ?></td>
-                            <?php 
+                            <?php
                                 $lokasiStr = "N/A";
                                 if ($inventaris["NomorKamar"]) {
                                     $lokasiStr = "Kamar: " . $inventaris["NomorKamar"];
@@ -64,7 +64,7 @@ $totalInventaris = count($inventarisList);
                                     $lokasiStr = "Ruangan: " . $inventaris["NamaRuangan"];
                                 }
                             ?>
-                            <td class="tw:max-w-48 tw:truncate" title="<?php echo htmlspecialchars($lokasiStr); ?>">
+                            <td class="truncate-text" title="<?php echo htmlspecialchars($lokasiStr); ?>">
                                 <?php echo htmlspecialchars($lokasiStr); ?>
                             </td>
                             <td>

@@ -1,53 +1,7 @@
 {
   "directed": false,
   "multigraph": false,
-  "graph": {
-    "hyperedges": [
-      {
-        "id": "db_layer_triad",
-        "label": "Database Layer: Stored Procedures + UDFs + Triggers",
-        "nodes": [
-          "_agents_skills_doremi_app_context_skill_stored_procedures",
-          "_agents_skills_doremi_app_context_skill_udfs",
-          "_agents_skills_doremi_app_context_skill_triggers"
-        ],
-        "relation": "implement",
-        "confidence": "EXTRACTED",
-        "confidence_score": 1.0,
-        "source_file": ".agents/skills/doremi-app-context/SKILL.md"
-      },
-      {
-        "id": "domain_helper_files",
-        "label": "Domain DB Helper Files (auth, paket, inout, maintenance, penghuni, photos)",
-        "nodes": [
-          "_agents_skills_doremi_app_context_skill_database_auth_php",
-          "_agents_skills_doremi_app_context_skill_database_paket_php",
-          "_agents_skills_doremi_app_context_skill_database_inout_php",
-          "_agents_skills_doremi_app_context_skill_database_maintenance_php",
-          "_agents_skills_doremi_app_context_skill_database_penghuni_php",
-          "_agents_skills_doremi_app_context_skill_database_photos_php"
-        ],
-        "relation": "participate_in",
-        "confidence": "EXTRACTED",
-        "confidence_score": 1.0,
-        "source_file": ".agents/skills/doremi-app-context/SKILL.md"
-      },
-      {
-        "id": "coding_guideline_principles",
-        "label": "Karpathy Coding Guideline Principles",
-        "nodes": [
-          "_agents_skills_coding_guideline_skill_think_before_coding",
-          "_agents_skills_coding_guideline_skill_simplicity_first",
-          "_agents_skills_coding_guideline_skill_surgical_changes",
-          "_agents_skills_coding_guideline_skill_goal_driven_execution"
-        ],
-        "relation": "form",
-        "confidence": "EXTRACTED",
-        "confidence_score": 1.0,
-        "source_file": ".agents/skills/coding-guideline/SKILL.md"
-      }
-    ]
-  },
+  "graph": {},
   "nodes": [
     {
       "label": "graphify_check.py",
@@ -515,7 +469,7 @@
       "source_file": "assets/datatables/datatables.min.js",
       "source_location": "L4",
       "_origin": "ast",
-      "id": "d_utils_laragon_www_doremi_app_assets_datatables_datatables_min",
+      "id": "c_xampp_htdocs_doremi_app_assets_datatables_datatables_min",
       "community": 0,
       "norm_label": "$()"
     },
@@ -980,13 +934,23 @@
       "norm_label": "google/apiclient"
     },
     {
+      "label": "fpdf/fpdf",
+      "file_type": "code",
+      "source_file": "composer.json",
+      "source_location": "L15",
+      "_origin": "ast",
+      "id": "composer_require_fpdf_fpdf",
+      "community": 8,
+      "norm_label": "fpdf/fpdf"
+    },
+    {
       "label": "csrf.php",
       "file_type": "code",
       "source_file": "csrf.php",
       "source_location": "L1",
       "_origin": "ast",
       "id": "csrf",
-      "community": 16,
+      "community": 6,
       "norm_label": "csrf.php"
     },
     {
@@ -996,7 +960,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "csrf_csrf_token",
-      "community": 16,
+      "community": 6,
       "norm_label": "csrf_token()"
     },
     {
@@ -1006,7 +970,7 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "csrf_csrf_field",
-      "community": 16,
+      "community": 6,
       "norm_label": "csrf_field()"
     },
     {
@@ -1016,7 +980,7 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "csrf_csrf_validate",
-      "community": 16,
+      "community": 6,
       "norm_label": "csrf_validate()"
     },
     {
@@ -1103,7 +1067,7 @@
       "label": "inout_format_duration()",
       "file_type": "code",
       "source_file": "dashboard/inout/report.php",
-      "source_location": "L28",
+      "source_location": "L26",
       "_origin": "ast",
       "id": "dashboard_inout_report_inout_format_duration",
       "community": 23,
@@ -1336,7 +1300,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "dashboard_maintenance_helpers",
-      "community": 11,
+      "community": 6,
       "norm_label": "helpers.php"
     },
     {
@@ -1346,7 +1310,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "dashboard_maintenance_helpers_maintenance_redirect",
-      "community": 11,
+      "community": 6,
       "norm_label": "maintenance_redirect()"
     },
     {
@@ -1356,7 +1320,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "dashboard_maintenance_helpers_maintenance_require_roles",
-      "community": 11,
+      "community": 6,
       "norm_label": "maintenance_require_roles()"
     },
     {
@@ -1366,7 +1330,7 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "dashboard_maintenance_helpers_maintenance_status_meta",
-      "community": 11,
+      "community": 6,
       "norm_label": "maintenance_status_meta()"
     },
     {
@@ -1376,7 +1340,7 @@
       "source_location": "L49",
       "_origin": "ast",
       "id": "dashboard_maintenance_helpers_maintenance_severity_meta",
-      "community": 11,
+      "community": 6,
       "norm_label": "maintenance_severity_meta()"
     },
     {
@@ -1386,7 +1350,7 @@
       "source_location": "L70",
       "_origin": "ast",
       "id": "dashboard_maintenance_helpers_maintenance_store_photo",
-      "community": 11,
+      "community": 6,
       "norm_label": "maintenance_store_photo()"
     },
     {
@@ -1426,7 +1390,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "dashboard_maintenance_validation",
-      "community": 3,
+      "community": 11,
       "norm_label": "validation.php"
     },
     {
@@ -1436,17 +1400,17 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "dashboard_maintenance_validation_collectmaintenancereportinput",
-      "community": 3,
+      "community": 11,
       "norm_label": "collectmaintenancereportinput()"
     },
     {
       "label": "validateMaintenanceReportInput()",
       "file_type": "code",
       "source_file": "dashboard/maintenance/validation.php",
-      "source_location": "L29",
+      "source_location": "L33",
       "_origin": "ast",
       "id": "dashboard_maintenance_validation_validatemaintenancereportinput",
-      "community": 3,
+      "community": 11,
       "norm_label": "validatemaintenancereportinput()"
     },
     {
@@ -1456,27 +1420,27 @@
       "source_location": "",
       "_origin": "ast",
       "id": "dashboard_maintenance_validation_php_mysqli",
-      "community": 3,
+      "community": 11,
       "norm_label": "mysqli"
     },
     {
       "label": "validateMaintenanceUrgencyInput()",
       "file_type": "code",
       "source_file": "dashboard/maintenance/validation.php",
-      "source_location": "L51",
+      "source_location": "L55",
       "_origin": "ast",
       "id": "dashboard_maintenance_validation_validatemaintenanceurgencyinput",
-      "community": 3,
+      "community": 11,
       "norm_label": "validatemaintenanceurgencyinput()"
     },
     {
       "label": "resolveMaintenanceTargetIds()",
       "file_type": "code",
       "source_file": "dashboard/maintenance/validation.php",
-      "source_location": "L60",
+      "source_location": "L64",
       "_origin": "ast",
       "id": "dashboard_maintenance_validation_resolvemaintenancetargetids",
-      "community": 3,
+      "community": 11,
       "norm_label": "resolvemaintenancetargetids()"
     },
     {
@@ -1536,7 +1500,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "dashboard_paket_helpers_paket_require_roles",
-      "community": 5,
+      "community": 6,
       "norm_label": "paket_require_roles()"
     },
     {
@@ -1546,7 +1510,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "dashboard_paket_helpers_paket_is_valid_length",
-      "community": 5,
+      "community": 1,
       "norm_label": "paket_is_valid_length()"
     },
     {
@@ -1690,6 +1654,16 @@
       "norm_label": "pickup.php"
     },
     {
+      "label": "process.php",
+      "file_type": "code",
+      "source_file": "dashboard/paket/process.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "dashboard_paket_process",
+      "community": 57,
+      "norm_label": "process.php"
+    },
+    {
       "label": "report.php",
       "file_type": "code",
       "source_file": "dashboard/paket/report.php",
@@ -1703,21 +1677,11 @@
       "label": "paket_format_duration()",
       "file_type": "code",
       "source_file": "dashboard/paket/report.php",
-      "source_location": "L22",
+      "source_location": "L20",
       "_origin": "ast",
       "id": "dashboard_paket_report_paket_format_duration",
       "community": 24,
       "norm_label": "paket_format_duration()"
-    },
-    {
-      "label": "review.php",
-      "file_type": "code",
-      "source_file": "dashboard/paket/review.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "dashboard_paket_review",
-      "community": 57,
-      "norm_label": "review.php"
     },
     {
       "label": "validation.php",
@@ -1746,7 +1710,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "dashboard_paket_validation_validatepaketinput",
-      "community": 5,
+      "community": 1,
       "norm_label": "validatepaketinput()"
     },
     {
@@ -1756,14 +1720,14 @@
       "source_location": "",
       "_origin": "ast",
       "id": "dashboard_paket_validation_php_mysqli",
-      "community": 5,
+      "community": 1,
       "norm_label": "mysqli"
     },
     {
       "label": "collectPaketReviewInput()",
       "file_type": "code",
       "source_file": "dashboard/paket/validation.php",
-      "source_location": "L46",
+      "source_location": "L58",
       "_origin": "ast",
       "id": "dashboard_paket_validation_collectpaketreviewinput",
       "community": 5,
@@ -1773,7 +1737,7 @@
       "label": "validatePaketReviewInput()",
       "file_type": "code",
       "source_file": "dashboard/paket/validation.php",
-      "source_location": "L54",
+      "source_location": "L66",
       "_origin": "ast",
       "id": "dashboard_paket_validation_validatepaketreviewinput",
       "community": 5,
@@ -1963,7 +1927,7 @@
       "label": "penghuni_validate_room_assignment()",
       "file_type": "code",
       "source_file": "dashboard/penghuni/helpers.php",
-      "source_location": "L121",
+      "source_location": "L125",
       "_origin": "ast",
       "id": "dashboard_penghuni_helpers_penghuni_validate_room_assignment",
       "community": 3,
@@ -2043,7 +2007,7 @@
       "label": "validateCreatePenghuniInput()",
       "file_type": "code",
       "source_file": "dashboard/penghuni/validation.php",
-      "source_location": "L108",
+      "source_location": "L120",
       "_origin": "ast",
       "id": "dashboard_penghuni_validation_validatecreatepenghuniinput",
       "community": 3,
@@ -2053,7 +2017,7 @@
       "label": "validateEditPenghuniInput()",
       "file_type": "code",
       "source_file": "dashboard/penghuni/validation.php",
-      "source_location": "L113",
+      "source_location": "L125",
       "_origin": "ast",
       "id": "dashboard_penghuni_validation_validateeditpenghuniinput",
       "community": 3,
@@ -2346,7 +2310,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "database_inout",
-      "community": 133,
+      "community": 4,
       "norm_label": "inout.php"
     },
     {
@@ -2356,7 +2320,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "database_inout_fetchinouthistoryforpenghuni",
-      "community": 133,
+      "community": 4,
       "norm_label": "fetchinouthistoryforpenghuni()"
     },
     {
@@ -2366,7 +2330,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "database_inout_php_mysqli",
-      "community": 133,
+      "community": 4,
       "norm_label": "mysqli"
     },
     {
@@ -2376,7 +2340,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "database_inout_countactiveinoutrequests",
-      "community": 133,
+      "community": 4,
       "norm_label": "countactiveinoutrequests()"
     },
     {
@@ -2386,7 +2350,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "database_inout_fetchpendinginoutrequests",
-      "community": 133,
+      "community": 4,
       "norm_label": "fetchpendinginoutrequests()"
     },
     {
@@ -2396,7 +2360,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "database_inout_fetchoutsideinoutrequests",
-      "community": 133,
+      "community": 4,
       "norm_label": "fetchoutsideinoutrequests()"
     },
     {
@@ -2406,7 +2370,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "database_inout_fetchallinoutlogs",
-      "community": 133,
+      "community": 4,
       "norm_label": "fetchallinoutlogs()"
     },
     {
@@ -2416,7 +2380,7 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "database_inout_createinoutrequest",
-      "community": 133,
+      "community": 4,
       "norm_label": "createinoutrequest()"
     },
     {
@@ -2426,7 +2390,7 @@
       "source_location": "L45",
       "_origin": "ast",
       "id": "database_inout_confirminoutexit",
-      "community": 133,
+      "community": 4,
       "norm_label": "confirminoutexit()"
     },
     {
@@ -2436,7 +2400,7 @@
       "source_location": "L51",
       "_origin": "ast",
       "id": "database_inout_confirminoutentry",
-      "community": 133,
+      "community": 4,
       "norm_label": "confirminoutentry()"
     },
     {
@@ -2576,7 +2540,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "database_inventaris",
-      "community": 4,
+      "community": 1,
       "norm_label": "inventaris.php"
     },
     {
@@ -2586,7 +2550,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "database_inventaris_fetchallinventariswithlokasi",
-      "community": 4,
+      "community": 1,
       "norm_label": "fetchallinventariswithlokasi()"
     },
     {
@@ -2596,7 +2560,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "database_inventaris_php_mysqli",
-      "community": 4,
+      "community": 1,
       "norm_label": "mysqli"
     },
     {
@@ -2606,7 +2570,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "database_inventaris_fetchactivekamaroptions",
-      "community": 4,
+      "community": 1,
       "norm_label": "fetchactivekamaroptions()"
     },
     {
@@ -2616,7 +2580,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "database_inventaris_fetchactiveruanganoptions",
-      "community": 4,
+      "community": 1,
       "norm_label": "fetchactiveruanganoptions()"
     },
     {
@@ -2626,7 +2590,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "database_inventaris_checkkamaractive",
-      "community": 4,
+      "community": 1,
       "norm_label": "checkkamaractive()"
     },
     {
@@ -2636,7 +2600,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "database_inventaris_checkruanganactive",
-      "community": 4,
+      "community": 1,
       "norm_label": "checkruanganactive()"
     },
     {
@@ -2646,7 +2610,7 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "database_inventaris_fetchinventarisbyid",
-      "community": 4,
+      "community": 1,
       "norm_label": "fetchinventarisbyid()"
     },
     {
@@ -2656,7 +2620,7 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "database_inventaris_createinventaris",
-      "community": 4,
+      "community": 1,
       "norm_label": "createinventaris()"
     },
     {
@@ -2666,7 +2630,7 @@
       "source_location": "L44",
       "_origin": "ast",
       "id": "database_inventaris_updateinventaris",
-      "community": 4,
+      "community": 1,
       "norm_label": "updateinventaris()"
     },
     {
@@ -2676,7 +2640,7 @@
       "source_location": "L50",
       "_origin": "ast",
       "id": "database_inventaris_deleteinventaris",
-      "community": 4,
+      "community": 1,
       "norm_label": "deleteinventaris()"
     },
     {
@@ -2756,7 +2720,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "database_maintenance",
-      "community": 1,
+      "community": 4,
       "norm_label": "maintenance.php"
     },
     {
@@ -2766,7 +2730,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "database_maintenance_fetchmaintenancereportsforrole",
-      "community": 1,
+      "community": 4,
       "norm_label": "fetchmaintenancereportsforrole()"
     },
     {
@@ -2776,7 +2740,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "database_maintenance_php_mysqli",
-      "community": 1,
+      "community": 4,
       "norm_label": "mysqli"
     },
     {
@@ -2786,7 +2750,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "database_maintenance_fetchmaintenancereportbyid",
-      "community": 1,
+      "community": 4,
       "norm_label": "fetchmaintenancereportbyid()"
     },
     {
@@ -2796,7 +2760,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "database_maintenance_fetchmaintenancerooms",
-      "community": 1,
+      "community": 4,
       "norm_label": "fetchmaintenancerooms()"
     },
     {
@@ -2806,7 +2770,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "database_maintenance_fetchmaintenanceinventory",
-      "community": 1,
+      "community": 4,
       "norm_label": "fetchmaintenanceinventory()"
     },
     {
@@ -2816,7 +2780,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "database_maintenance_checkmaintenancetargetexists",
-      "community": 1,
+      "community": 11,
       "norm_label": "checkmaintenancetargetexists()"
     },
     {
@@ -2826,7 +2790,7 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "database_maintenance_createmaintenancereport",
-      "community": 1,
+      "community": 4,
       "norm_label": "createmaintenancereport()"
     },
     {
@@ -2836,7 +2800,7 @@
       "source_location": "L58",
       "_origin": "ast",
       "id": "database_maintenance_updatemaintenancereport",
-      "community": 1,
+      "community": 4,
       "norm_label": "updatemaintenancereport()"
     },
     {
@@ -2846,7 +2810,7 @@
       "source_location": "L77",
       "_origin": "ast",
       "id": "database_maintenance_updatemaintenanceurgency",
-      "community": 1,
+      "community": 4,
       "norm_label": "updatemaintenanceurgency()"
     },
     {
@@ -2856,7 +2820,7 @@
       "source_location": "L89",
       "_origin": "ast",
       "id": "database_maintenance_claimmaintenancereport",
-      "community": 1,
+      "community": 4,
       "norm_label": "claimmaintenancereport()"
     },
     {
@@ -2866,7 +2830,7 @@
       "source_location": "L94",
       "_origin": "ast",
       "id": "database_maintenance_checkmaintenancetechnicianownership",
-      "community": 1,
+      "community": 4,
       "norm_label": "checkmaintenancetechnicianownership()"
     },
     {
@@ -2876,7 +2840,7 @@
       "source_location": "L99",
       "_origin": "ast",
       "id": "database_maintenance_completemaintenancereport",
-      "community": 1,
+      "community": 4,
       "norm_label": "completemaintenancereport()"
     },
     {
@@ -2886,7 +2850,7 @@
       "source_location": "L111",
       "_origin": "ast",
       "id": "database_maintenance_deletemaintenancereport",
-      "community": 1,
+      "community": 4,
       "norm_label": "deletemaintenancereport()"
     },
     {
@@ -2896,7 +2860,7 @@
       "source_location": "L117",
       "_origin": "ast",
       "id": "database_maintenance_ismaintenancereportowner",
-      "community": 1,
+      "community": 4,
       "norm_label": "ismaintenancereportowner()"
     },
     {
@@ -3306,7 +3270,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "database_penghuni",
-      "community": 88,
+      "community": 3,
       "norm_label": "penghuni.php"
     },
     {
@@ -3316,7 +3280,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "database_penghuni_fetchpenghuniidentityrows",
-      "community": 88,
+      "community": 3,
       "norm_label": "fetchpenghuniidentityrows()"
     },
     {
@@ -3326,7 +3290,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "database_penghuni_php_mysqli",
-      "community": 88,
+      "community": 3,
       "norm_label": "mysqli"
     },
     {
@@ -3336,7 +3300,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "database_penghuni_fetchpenghunibyid",
-      "community": 88,
+      "community": 3,
       "norm_label": "fetchpenghunibyid()"
     },
     {
@@ -3346,7 +3310,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "database_penghuni_fetchactivekamarwithoccupancy",
-      "community": 88,
+      "community": 3,
       "norm_label": "fetchactivekamarwithoccupancy()"
     },
     {
@@ -3356,7 +3320,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "database_penghuni_fetchkamarforpenghuniassignment",
-      "community": 88,
+      "community": 3,
       "norm_label": "fetchkamarforpenghuniassignment()"
     },
     {
@@ -3366,7 +3330,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "database_penghuni_fetchpenghuniroomoccupantsummary",
-      "community": 88,
+      "community": 3,
       "norm_label": "fetchpenghuniroomoccupantsummary()"
     },
     {
@@ -3376,7 +3340,7 @@
       "source_location": "L34",
       "_origin": "ast",
       "id": "database_penghuni_fetchpenghunilist",
-      "community": 88,
+      "community": 3,
       "norm_label": "fetchpenghunilist()"
     },
     {
@@ -3386,7 +3350,7 @@
       "source_location": "L39",
       "_origin": "ast",
       "id": "database_penghuni_createpenghuni",
-      "community": 88,
+      "community": 3,
       "norm_label": "createpenghuni()"
     },
     {
@@ -3396,7 +3360,7 @@
       "source_location": "L60",
       "_origin": "ast",
       "id": "database_penghuni_restorepenghuni",
-      "community": 88,
+      "community": 3,
       "norm_label": "restorepenghuni()"
     },
     {
@@ -3406,7 +3370,7 @@
       "source_location": "L82",
       "_origin": "ast",
       "id": "database_penghuni_updatepenghuni",
-      "community": 88,
+      "community": 3,
       "norm_label": "updatepenghuni()"
     },
     {
@@ -3416,7 +3380,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "database_petugas",
-      "community": 1,
+      "community": 4,
       "norm_label": "petugas.php"
     },
     {
@@ -3426,7 +3390,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "database_petugas_fetchallpetugas",
-      "community": 1,
+      "community": 4,
       "norm_label": "fetchallpetugas()"
     },
     {
@@ -3436,7 +3400,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "database_petugas_php_mysqli",
-      "community": 1,
+      "community": 4,
       "norm_label": "mysqli"
     },
     {
@@ -3446,7 +3410,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "database_petugas_findpetugasduplicateactive",
-      "community": 1,
+      "community": 4,
       "norm_label": "findpetugasduplicateactive()"
     },
     {
@@ -3456,7 +3420,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "database_petugas_findpetugasduplicatedeleted",
-      "community": 1,
+      "community": 4,
       "norm_label": "findpetugasduplicatedeleted()"
     },
     {
@@ -3466,7 +3430,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "database_petugas_restorepetugas",
-      "community": 1,
+      "community": 4,
       "norm_label": "restorepetugas()"
     },
     {
@@ -3476,7 +3440,7 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "database_petugas_createpetugas",
-      "community": 1,
+      "community": 4,
       "norm_label": "createpetugas()"
     },
     {
@@ -3486,7 +3450,7 @@
       "source_location": "L35",
       "_origin": "ast",
       "id": "database_petugas_fetchpetugasbyid",
-      "community": 1,
+      "community": 4,
       "norm_label": "fetchpetugasbyid()"
     },
     {
@@ -3496,7 +3460,7 @@
       "source_location": "L40",
       "_origin": "ast",
       "id": "database_petugas_findpetugasduplicateexcluding",
-      "community": 1,
+      "community": 4,
       "norm_label": "findpetugasduplicateexcluding()"
     },
     {
@@ -3506,7 +3470,7 @@
       "source_location": "L45",
       "_origin": "ast",
       "id": "database_petugas_updatepetugaswithpassword",
-      "community": 1,
+      "community": 4,
       "norm_label": "updatepetugaswithpassword()"
     },
     {
@@ -3516,7 +3480,7 @@
       "source_location": "L51",
       "_origin": "ast",
       "id": "database_petugas_updatepetugaswithoutpassword",
-      "community": 1,
+      "community": 4,
       "norm_label": "updatepetugaswithoutpassword()"
     },
     {
@@ -3526,7 +3490,7 @@
       "source_location": "L57",
       "_origin": "ast",
       "id": "database_petugas_deletepetugas",
-      "community": 1,
+      "community": 4,
       "norm_label": "deletepetugas()"
     },
     {
@@ -3566,7 +3530,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "database_query",
-      "community": 1,
+      "community": 4,
       "norm_label": "query.php"
     },
     {
@@ -3576,7 +3540,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "database_query_dbbindparams",
-      "community": 1,
+      "community": 4,
       "norm_label": "dbbindparams()"
     },
     {
@@ -3586,7 +3550,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "mysqli_stmt",
-      "community": 1,
+      "community": 4,
       "norm_label": "mysqli_stmt"
     },
     {
@@ -3606,7 +3570,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "database_query_php_mysqli",
-      "community": 1,
+      "community": 4,
       "norm_label": "mysqli"
     },
     {
@@ -3636,7 +3600,7 @@
       "source_location": "L62",
       "_origin": "ast",
       "id": "database_query_dbexecute",
-      "community": 1,
+      "community": 4,
       "norm_label": "dbexecute()"
     },
     {
@@ -3646,7 +3610,7 @@
       "source_location": "L78",
       "_origin": "ast",
       "id": "database_query_dbclearstoredresults",
-      "community": 1,
+      "community": 4,
       "norm_label": "dbclearstoredresults()"
     },
     {
@@ -3656,7 +3620,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "database_ruangan",
-      "community": 1,
+      "community": 4,
       "norm_label": "ruangan.php"
     },
     {
@@ -3666,7 +3630,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "database_ruangan_createruangan",
-      "community": 1,
+      "community": 4,
       "norm_label": "createruangan()"
     },
     {
@@ -3676,7 +3640,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "database_ruangan_php_mysqli",
-      "community": 1,
+      "community": 4,
       "norm_label": "mysqli"
     },
     {
@@ -3686,7 +3650,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "database_ruangan_updateruangan",
-      "community": 1,
+      "community": 4,
       "norm_label": "updateruangan()"
     },
     {
@@ -3748,6 +3712,26 @@
       "id": "js_animations",
       "community": 79,
       "norm_label": "animations.js"
+    },
+    {
+      "label": "file-upload-validation.js",
+      "file_type": "code",
+      "source_file": "js/file-upload-validation.js",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "js_file_upload_validation",
+      "community": 88,
+      "norm_label": "file-upload-validation.js"
+    },
+    {
+      "label": "showInvalidFileAlert()",
+      "file_type": "code",
+      "source_file": "js/file-upload-validation.js",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "js_file_upload_validation_showinvalidfilealert",
+      "community": 88,
+      "norm_label": "showinvalidfilealert()"
     },
     {
       "label": "login.php",
@@ -3938,13 +3922,133 @@
       "norm_label": "pulloldforminput()"
     },
     {
+      "label": "reportPdf.php",
+      "file_type": "code",
+      "source_file": "utils/reportPdf.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "utils_reportpdf",
+      "community": 6,
+      "norm_label": "reportpdf.php"
+    },
+    {
+      "label": "ReportPDF",
+      "file_type": "code",
+      "source_file": "utils/reportPdf.php",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "utils_reportpdf_reportpdf",
+      "community": 6,
+      "norm_label": "reportpdf"
+    },
+    {
+      "label": "Fpdf",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "fpdf",
+      "community": 6,
+      "norm_label": "fpdf"
+    },
+    {
+      "label": ".__construct()",
+      "file_type": "code",
+      "source_file": "utils/reportPdf.php",
+      "source_location": "L11",
+      "_origin": "ast",
+      "id": "utils_reportpdf_reportpdf_construct",
+      "community": 6,
+      "norm_label": ".__construct()"
+    },
+    {
+      "label": ".Header()",
+      "file_type": "code",
+      "source_file": "utils/reportPdf.php",
+      "source_location": "L18",
+      "_origin": "ast",
+      "id": "utils_reportpdf_reportpdf_header",
+      "community": 6,
+      "norm_label": ".header()"
+    },
+    {
+      "label": ".Footer()",
+      "file_type": "code",
+      "source_file": "utils/reportPdf.php",
+      "source_location": "L42",
+      "_origin": "ast",
+      "id": "utils_reportpdf_reportpdf_footer",
+      "community": 6,
+      "norm_label": ".footer()"
+    },
+    {
+      "label": "generateReportPdf()",
+      "file_type": "code",
+      "source_file": "utils/reportPdf.php",
+      "source_location": "L66",
+      "_origin": "ast",
+      "id": "utils_reportpdf_generatereportpdf",
+      "community": 6,
+      "norm_label": "generatereportpdf()"
+    },
+    {
+      "label": "report_range.php",
+      "file_type": "code",
+      "source_file": "utils/report_range.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "utils_report_range",
+      "community": 16,
+      "norm_label": "report_range.php"
+    },
+    {
+      "label": "resolveReportRangeFilter()",
+      "file_type": "code",
+      "source_file": "utils/report_range.php",
+      "source_location": "L11",
+      "_origin": "ast",
+      "id": "utils_report_range_resolvereportrangefilter",
+      "community": 16,
+      "norm_label": "resolvereportrangefilter()"
+    },
+    {
+      "label": "reportCustomDailyLabels()",
+      "file_type": "code",
+      "source_file": "utils/report_range.php",
+      "source_location": "L70",
+      "_origin": "ast",
+      "id": "utils_report_range_reportcustomdailylabels",
+      "community": 16,
+      "norm_label": "reportcustomdailylabels()"
+    },
+    {
+      "label": "reportCustomMonthlyLabels()",
+      "file_type": "code",
+      "source_file": "utils/report_range.php",
+      "source_location": "L83",
+      "_origin": "ast",
+      "id": "utils_report_range_reportcustommonthlylabels",
+      "community": 16,
+      "norm_label": "reportcustommonthlylabels()"
+    },
+    {
+      "label": "reportCustomRangeIsDaily()",
+      "file_type": "code",
+      "source_file": "utils/report_range.php",
+      "source_location": "L96",
+      "_origin": "ast",
+      "id": "utils_report_range_reportcustomrangeisdaily",
+      "community": 16,
+      "norm_label": "reportcustomrangeisdaily()"
+    },
+    {
       "label": "validation_helpers.php",
       "file_type": "code",
       "source_file": "utils/validation_helpers.php",
       "source_location": "L1",
       "_origin": "ast",
       "id": "utils_validation_helpers",
-      "community": 3,
+      "community": 11,
       "norm_label": "validation_helpers.php"
     },
     {
@@ -3954,7 +4058,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "utils_validation_helpers_firstfielderror",
-      "community": 3,
+      "community": 11,
       "norm_label": "firstfielderror()"
     },
     {
@@ -4311,7 +4415,7 @@
       "label": "Implementation Reference",
       "file_type": "document",
       "source_file": ".agents/skills/doremi-app-context/SKILL.md",
-      "source_location": "L409",
+      "source_location": "L410",
       "_origin": "ast",
       "id": "agents_skills_doremi_app_context_skill_implementation_reference",
       "community": 85,
@@ -4321,7 +4425,7 @@
       "label": "Coding Conventions",
       "file_type": "document",
       "source_file": ".agents/skills/doremi-app-context/SKILL.md",
-      "source_location": "L417",
+      "source_location": "L418",
       "_origin": "ast",
       "id": "agents_skills_doremi_app_context_skill_coding_conventions",
       "community": 85,
@@ -4741,7 +4845,7 @@
       "label": "Implementation Reference",
       "file_type": "document",
       "source_file": ".claude/skills/doremi-app-context/SKILL.md",
-      "source_location": "L409",
+      "source_location": "L410",
       "_origin": "ast",
       "id": "claude_skills_doremi_app_context_skill_implementation_reference",
       "community": 86,
@@ -4751,7 +4855,7 @@
       "label": "Coding Conventions",
       "file_type": "document",
       "source_file": ".claude/skills/doremi-app-context/SKILL.md",
-      "source_location": "L417",
+      "source_location": "L418",
       "_origin": "ast",
       "id": "claude_skills_doremi_app_context_skill_coding_conventions",
       "community": 86,
@@ -6670,7 +6774,7 @@
       "source_location": "L4",
       "weight": 1.0,
       "source": "assets_datatables_datatables_min",
-      "target": "d_utils_laragon_www_doremi_app_assets_datatables_datatables_min",
+      "target": "c_xampp_htdocs_doremi_app_assets_datatables_datatables_min",
       "confidence_score": 1.0
     },
     {
@@ -7132,7 +7236,7 @@
       "source_location": "L4",
       "weight": 1.0,
       "source": "assets_datatables_datatables_min_te",
-      "target": "d_utils_laragon_www_doremi_app_assets_datatables_datatables_min",
+      "target": "c_xampp_htdocs_doremi_app_assets_datatables_datatables_min",
       "confidence_score": 1.0
     },
     {
@@ -8077,6 +8181,28 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "auth/helpers.php",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "auth_helpers_authredirecttodashboard",
+      "target": "utils_reportpdf_reportpdf_header"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "auth/helpers.php",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "auth_helpers_authredirecttologinerror",
+      "target": "utils_reportpdf_reportpdf_header"
+    },
+    {
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "auth/helpers.php",
@@ -8194,6 +8320,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "composer.json",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "composer_require",
+      "target": "composer_require_fpdf_fpdf",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "composer.json",
       "source_location": "L14",
       "weight": 1.0,
       "source": "composer_require",
@@ -8273,10 +8409,21 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "csrf.php",
+      "source_location": "L37",
+      "weight": 1.0,
+      "source": "csrf_csrf_validate",
+      "target": "utils_reportpdf_reportpdf_header"
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/inout/report.php",
-      "source_location": "L28",
+      "source_location": "L26",
       "weight": 1.0,
       "source": "dashboard_inout_report",
       "target": "dashboard_inout_report_inout_format_duration",
@@ -8468,6 +8615,28 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "dashboard/maintenance/helpers.php",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "dashboard_maintenance_helpers_maintenance_redirect",
+      "target": "utils_reportpdf_reportpdf_header"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "dashboard/maintenance/helpers.php",
+      "source_location": "L21",
+      "weight": 1.0,
+      "source": "dashboard_maintenance_helpers_maintenance_require_roles",
+      "target": "utils_reportpdf_reportpdf_header"
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/maintenance/validation.php",
@@ -8481,7 +8650,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/maintenance/validation.php",
-      "source_location": "L60",
+      "source_location": "L64",
       "weight": 1.0,
       "source": "dashboard_maintenance_validation",
       "target": "dashboard_maintenance_validation_resolvemaintenancetargetids",
@@ -8491,7 +8660,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/maintenance/validation.php",
-      "source_location": "L29",
+      "source_location": "L33",
       "weight": 1.0,
       "source": "dashboard_maintenance_validation",
       "target": "dashboard_maintenance_validation_validatemaintenancereportinput",
@@ -8501,7 +8670,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/maintenance/validation.php",
-      "source_location": "L51",
+      "source_location": "L55",
       "weight": 1.0,
       "source": "dashboard_maintenance_validation",
       "target": "dashboard_maintenance_validation_validatemaintenanceurgencyinput",
@@ -8511,7 +8680,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/maintenance/validation.php",
-      "source_location": "L29",
+      "source_location": "L33",
       "weight": 1.0,
       "context": "parameter_type",
       "source": "dashboard_maintenance_validation_validatemaintenancereportinput",
@@ -8524,7 +8693,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "dashboard/maintenance/validation.php",
-      "source_location": "L42",
+      "source_location": "L46",
       "weight": 1.0,
       "source": "dashboard_maintenance_validation_validatemaintenancereportinput",
       "target": "database_maintenance_checkmaintenancetargetexists"
@@ -8535,7 +8704,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "dashboard/maintenance/validation.php",
-      "source_location": "L31",
+      "source_location": "L35",
       "weight": 1.0,
       "source": "dashboard_maintenance_validation_validatemaintenancereportinput",
       "target": "utils_validation_helpers_firstfielderror"
@@ -8695,6 +8864,28 @@
       "context": "call",
       "confidence": "INFERRED",
       "confidence_score": 0.8,
+      "source_file": "dashboard/paket/helpers.php",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "dashboard_paket_helpers_paket_redirect",
+      "target": "utils_reportpdf_reportpdf_header"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "dashboard/paket/helpers.php",
+      "source_location": "L22",
+      "weight": 1.0,
+      "source": "dashboard_paket_helpers_paket_require_roles",
+      "target": "utils_reportpdf_reportpdf_header"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
       "source_file": "dashboard/paket/validation.php",
       "source_location": "L23",
       "weight": 1.0,
@@ -8771,7 +8962,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/paket/report.php",
-      "source_location": "L22",
+      "source_location": "L20",
       "weight": 1.0,
       "source": "dashboard_paket_report",
       "target": "dashboard_paket_report_paket_format_duration",
@@ -8791,7 +8982,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/paket/validation.php",
-      "source_location": "L46",
+      "source_location": "L58",
       "weight": 1.0,
       "source": "dashboard_paket_validation",
       "target": "dashboard_paket_validation_collectpaketreviewinput",
@@ -8811,7 +9002,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/paket/validation.php",
-      "source_location": "L54",
+      "source_location": "L66",
       "weight": 1.0,
       "source": "dashboard_paket_validation",
       "target": "dashboard_paket_validation_validatepaketreviewinput",
@@ -8834,7 +9025,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "dashboard/paket/validation.php",
-      "source_location": "L39",
+      "source_location": "L51",
       "weight": 1.0,
       "source": "dashboard_paket_validation_validatepaketinput",
       "target": "database_paket_checkpenghuniexists"
@@ -8973,7 +9164,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/penghuni/helpers.php",
-      "source_location": "L121",
+      "source_location": "L125",
       "weight": 1.0,
       "source": "dashboard_penghuni_helpers",
       "target": "dashboard_penghuni_helpers_penghuni_validate_room_assignment",
@@ -9225,7 +9416,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/penghuni/helpers.php",
-      "source_location": "L121",
+      "source_location": "L125",
       "weight": 1.0,
       "context": "parameter_type",
       "source": "dashboard_penghuni_helpers_penghuni_validate_room_assignment",
@@ -9237,7 +9428,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/penghuni/helpers.php",
-      "source_location": "L133",
+      "source_location": "L137",
       "weight": 1.0,
       "source": "dashboard_penghuni_helpers_penghuni_validate_room_assignment",
       "target": "dashboard_penghuni_helpers_penghuni_gender_label",
@@ -9248,7 +9439,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/penghuni/helpers.php",
-      "source_location": "L129",
+      "source_location": "L133",
       "weight": 1.0,
       "source": "dashboard_penghuni_helpers_penghuni_validate_room_assignment",
       "target": "dashboard_penghuni_helpers_penghuni_allowed_floors",
@@ -9260,7 +9451,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "dashboard/penghuni/helpers.php",
-      "source_location": "L123",
+      "source_location": "L127",
       "weight": 1.0,
       "source": "dashboard_penghuni_helpers_penghuni_validate_room_assignment",
       "target": "database_penghuni_fetchkamarforpenghuniassignment"
@@ -9271,7 +9462,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "dashboard/penghuni/helpers.php",
-      "source_location": "L140",
+      "source_location": "L144",
       "weight": 1.0,
       "source": "dashboard_penghuni_helpers_penghuni_validate_room_assignment",
       "target": "database_penghuni_fetchpenghuniroomoccupantsummary"
@@ -9282,7 +9473,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "dashboard/penghuni/validation.php",
-      "source_location": "L100",
+      "source_location": "L112",
       "weight": 1.0,
       "source": "dashboard_penghuni_validation_validatepenghunicommoninput",
       "target": "dashboard_penghuni_helpers_penghuni_validate_room_assignment"
@@ -9311,7 +9502,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/penghuni/validation.php",
-      "source_location": "L108",
+      "source_location": "L120",
       "weight": 1.0,
       "source": "dashboard_penghuni_validation",
       "target": "dashboard_penghuni_validation_validatecreatepenghuniinput",
@@ -9321,7 +9512,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/penghuni/validation.php",
-      "source_location": "L113",
+      "source_location": "L125",
       "weight": 1.0,
       "source": "dashboard_penghuni_validation",
       "target": "dashboard_penghuni_validation_validateeditpenghuniinput",
@@ -9374,7 +9565,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/penghuni/validation.php",
-      "source_location": "L110",
+      "source_location": "L122",
       "weight": 1.0,
       "source": "dashboard_penghuni_validation_validatecreatepenghuniinput",
       "target": "dashboard_penghuni_validation_validatepenghunicommoninput",
@@ -9385,7 +9576,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/penghuni/validation.php",
-      "source_location": "L115",
+      "source_location": "L127",
       "weight": 1.0,
       "source": "dashboard_penghuni_validation_validateeditpenghuniinput",
       "target": "dashboard_penghuni_validation_validatepenghunicommoninput",
@@ -9406,7 +9597,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/penghuni/validation.php",
-      "source_location": "L108",
+      "source_location": "L120",
       "weight": 1.0,
       "context": "parameter_type",
       "source": "dashboard_penghuni_validation_validatecreatepenghuniinput",
@@ -9417,7 +9608,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/penghuni/validation.php",
-      "source_location": "L113",
+      "source_location": "L125",
       "weight": 1.0,
       "context": "parameter_type",
       "source": "dashboard_penghuni_validation_validateeditpenghuniinput",
@@ -13341,6 +13532,16 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "js/file-upload-validation.js",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "js_file_upload_validation",
+      "target": "js_file_upload_validation_showinvalidfilealert",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "package.json",
       "source_location": "L2",
       "weight": 1.0,
@@ -13460,6 +13661,117 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/reportPdf.php",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "utils_reportpdf",
+      "target": "fpdf",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/reportPdf.php",
+      "source_location": "L66",
+      "weight": 1.0,
+      "source": "utils_reportpdf",
+      "target": "utils_reportpdf_generatereportpdf",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/reportPdf.php",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "utils_reportpdf",
+      "target": "utils_reportpdf_reportpdf",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/reportPdf.php",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "utils_reportpdf_reportpdf",
+      "target": "fpdf",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/reportPdf.php",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "utils_reportpdf_reportpdf",
+      "target": "utils_reportpdf_reportpdf_construct",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/reportPdf.php",
+      "source_location": "L42",
+      "weight": 1.0,
+      "source": "utils_reportpdf_reportpdf",
+      "target": "utils_reportpdf_reportpdf_footer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/reportPdf.php",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "utils_reportpdf_reportpdf",
+      "target": "utils_reportpdf_reportpdf_header",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/report_range.php",
+      "source_location": "L70",
+      "weight": 1.0,
+      "source": "utils_report_range",
+      "target": "utils_report_range_reportcustomdailylabels",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/report_range.php",
+      "source_location": "L83",
+      "weight": 1.0,
+      "source": "utils_report_range",
+      "target": "utils_report_range_reportcustommonthlylabels",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/report_range.php",
+      "source_location": "L96",
+      "weight": 1.0,
+      "source": "utils_report_range",
+      "target": "utils_report_range_reportcustomrangeisdaily",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/report_range.php",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "utils_report_range",
+      "target": "utils_report_range_resolvereportrangefilter",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "utils/validation_helpers.php",
@@ -13543,7 +13855,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": ".agents/skills/doremi-app-context/SKILL.md",
-      "source_location": "L417",
+      "source_location": "L418",
       "weight": 1.0,
       "source": "agents_skills_doremi_app_context_skill_doremi_dormitory_management_app",
       "target": "agents_skills_doremi_app_context_skill_coding_conventions",
@@ -13773,7 +14085,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": ".agents/skills/doremi-app-context/SKILL.md",
-      "source_location": "L409",
+      "source_location": "L410",
       "weight": 1.0,
       "source": "agents_skills_doremi_app_context_skill_database_layer_stored_procedures_udfs_triggers",
       "target": "agents_skills_doremi_app_context_skill_implementation_reference",
@@ -13943,7 +14255,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": ".claude/skills/doremi-app-context/SKILL.md",
-      "source_location": "L417",
+      "source_location": "L418",
       "weight": 1.0,
       "source": "claude_skills_doremi_app_context_skill_doremi_dormitory_management_app",
       "target": "claude_skills_doremi_app_context_skill_coding_conventions",
@@ -14173,7 +14485,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": ".claude/skills/doremi-app-context/SKILL.md",
-      "source_location": "L409",
+      "source_location": "L410",
       "weight": 1.0,
       "source": "claude_skills_doremi_app_context_skill_database_layer_stored_procedures_udfs_triggers",
       "target": "claude_skills_doremi_app_context_skill_implementation_reference",
@@ -14818,50 +15130,6 @@
       "target": "images_toilet"
     }
   ],
-  "hyperedges": [
-    {
-      "id": "db_layer_triad",
-      "label": "Database Layer: Stored Procedures + UDFs + Triggers",
-      "nodes": [
-        "_agents_skills_doremi_app_context_skill_stored_procedures",
-        "_agents_skills_doremi_app_context_skill_udfs",
-        "_agents_skills_doremi_app_context_skill_triggers"
-      ],
-      "relation": "implement",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": ".agents/skills/doremi-app-context/SKILL.md"
-    },
-    {
-      "id": "domain_helper_files",
-      "label": "Domain DB Helper Files (auth, paket, inout, maintenance, penghuni, photos)",
-      "nodes": [
-        "_agents_skills_doremi_app_context_skill_database_auth_php",
-        "_agents_skills_doremi_app_context_skill_database_paket_php",
-        "_agents_skills_doremi_app_context_skill_database_inout_php",
-        "_agents_skills_doremi_app_context_skill_database_maintenance_php",
-        "_agents_skills_doremi_app_context_skill_database_penghuni_php",
-        "_agents_skills_doremi_app_context_skill_database_photos_php"
-      ],
-      "relation": "participate_in",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": ".agents/skills/doremi-app-context/SKILL.md"
-    },
-    {
-      "id": "coding_guideline_principles",
-      "label": "Karpathy Coding Guideline Principles",
-      "nodes": [
-        "_agents_skills_coding_guideline_skill_think_before_coding",
-        "_agents_skills_coding_guideline_skill_simplicity_first",
-        "_agents_skills_coding_guideline_skill_surgical_changes",
-        "_agents_skills_coding_guideline_skill_goal_driven_execution"
-      ],
-      "relation": "form",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": ".agents/skills/coding-guideline/SKILL.md"
-    }
-  ],
-  "built_at_commit": "8caba64c53b6509e32c040b07be09bdfd172b700"
+  "hyperedges": [],
+  "built_at_commit": "d06af719808284c7622f552bb197d038cec03031"
 }

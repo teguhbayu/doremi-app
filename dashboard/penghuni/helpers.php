@@ -102,11 +102,15 @@ function penghuni_gender_label(string $gender): string
 
 function penghuni_allowed_floors(string $gender): array
 {
-    return $gender === 'P' ? ['3', '4'] : ['5', '6', '7'];
+    return $gender === 'P' ? ['2', '3', '4'] : ['2', '5', '6', '7'];
 }
 
 function penghuni_floor_zone_label(?string $lantai): string
 {
+    if ((string) $lantai === '2') {
+        return 'Zona Universal';
+    }
+
     if (in_array((string) $lantai, ['3', '4'], true)) {
         return 'Zona Perempuan';
     }

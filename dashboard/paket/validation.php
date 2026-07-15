@@ -36,6 +36,18 @@ function validatePaketInput(mysqli $db, array $input): ?string
         return 'Kolom Waktu Sampai wajib diisi.';
     }
 
+    $waktuSampaiTimestamp = strtotime($input['waktuSampai']);
+    if ($waktuSampaiTimestamp === false) {
+        return 'Format waktu sampai tidak valid.';
+    }
+
+    $todayStart = strtotime('today');
+    $tomorrowStart = strtotime('tomorrow');
+
+    if ($waktuSampaiTimestamp >= $tomorrowStart) {
+        return 'Waktu sampai tidak boleh di masa depan. Gunakan tanggal hari ini atau sebelumnya.';
+    }
+
     if (!checkPenghuniExists($db, (int) $input['penghuniId'])) {
         return 'Penghuni tujuan tidak ditemukan.';
     }

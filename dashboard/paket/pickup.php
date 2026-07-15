@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         paket_redirect($_SERVER['PHP_SELF'] . '?id=' . $paketId, 'error', $exception->getMessage());
     }
 
-    $keterangan = $keterangan !== '' ? $keterangan : null;
+    $keterangan = $keterangan !== '' ? $keterangan : '-';
 
     $pengambilanPaketId = !empty($paket['PengambilanPaketID']) ? (int) $paket['PengambilanPaketID'] : null;
     $successMessage = $pengambilanPaketId !== null
@@ -67,7 +67,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $old = pullOldFormInput();
-$keteranganValue = $old['keterangan'] ?? trim((string) ($paket['Keterangan'] ?? ''));
+$existingKeterangan = trim((string) ($paket['Keterangan'] ?? ''));
+$keteranganValue = $old['keterangan'] ?? ($existingKeterangan === '-' ? '' : $existingKeterangan);
 $fotoWajib = empty($paket['FotoPengambilan']);
 $statusMeta = paket_status_meta($paket['Status'] ?? 'Belum Diambil');
 ?>
@@ -81,7 +82,7 @@ $statusMeta = paket_status_meta($paket['Status'] ?? 'Belum Diambil');
     <main class="tw:md:ml-75 tw:grow">
         <div class="tw:pt-20 tw:md:pt-8 tw:px-8 tw:mb-8 tw:flex-1 tw:w-dvw tw:md:w-full">
             <?php require dirname(__DIR__) . '/components/breadcrumb.php'; ?>
-            <h1 class="page-title" data-kicker="Pengambilan Paket" data-subtitle="Lengkapi status, bukti foto, dan catatan pengambilan agar riwayat paket penghuni tercatat rapi dan siap direview SIGAP.">
+            <h1 class="page-title" data-kicker="Pengambilan Paket" data-subtitle="<?= $isLocked ? 'Lihat kembali bukti foto dan catatan pengambilan paket yang sudah tercatat.' : 'Lengkapi status, bukti foto, dan catatan pengambilan agar riwayat paket penghuni tercatat rapi.' ?>">
                 <?= $isLocked ? 'Detail Pengambilan Paket' : 'Catat Pengambilan Paket' ?>
             </h1>
 
@@ -92,11 +93,11 @@ $statusMeta = paket_status_meta($paket['Status'] ?? 'Belum Diambil');
                 </a>
             </div>
 
-            <div class="tw:grid tw:grid-cols-1 tw:lg:grid-cols-3 tw:gap-8">
+            <div class="tw:grid tw:grid-cols-1 tw:lg:grid-cols-<?= $isLocked ? '1' : '3' ?> tw:gap-8">
                 <div class="tw:lg:col-span-1">
                     <div class="tw:relative tw:overflow-hidden tw:p-[1.4rem] tw:rounded-[28px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.88)] tw:shadow-sm tw:h-full">
                         <h5 class="tw:m-0 tw:text-[1.2rem] tw:text-slate-900">Informasi Paket</h5>
-                        <div class="tw:grid tw:gap-[0.85rem]">
+                        <div class="tw:grid tw:gap-[0.85rem] <?= $isLocked ? 'tw:grid-cols-1 tw:sm:grid-cols-2' : 'tw:grid-cols-1' ?>">
                             <div class="tw:p-4 tw:rounded-[18px] tw:bg-[rgba(255,255,255,0.80)] tw:border tw:border-[rgba(22,60,122,0.08)]">
                                 <span class="tw:block tw:mb-[0.3rem] tw:text-slate-500 tw:text-xs tw:font-bold">Tipe Kiriman</span>
                                 <strong><?= htmlspecialchars(paket_type_label($paket['JenisPaket'] ?? null)) ?></strong>
@@ -138,12 +139,8 @@ $statusMeta = paket_status_meta($paket['Status'] ?? 'Belum Diambil');
                     </div>
                 </div>
 
-                <div class="tw:lg:col-span-2">
-                    <?php if ($isLocked): ?>
-                        <div class="tw:p-[1.15rem_1.2rem] tw:rounded-[22px] tw:border tw:border-dashed tw:border-[rgba(22,60,122,0.18)] tw:bg-[rgba(47,127,240,0.04)] tw:text-slate-500 tw:leading-[1.7]">
-                            Catatan pengambilan paket ini sudah final. Status, foto, dan keterangan tidak bisa diubah lagi dari akun penghuni.
-                        </div>
-                    <?php else: ?>
+                <?php if (!$isLocked): ?>
+                    <div class="tw:lg:col-span-2">
                         <form method="POST" enctype="multipart/form-data" class="tw:grid tw:grid-cols-1 tw:lg:grid-cols-2 tw:gap-4 tw:p-[1.45rem] tw:rounded-[24px] tw:border tw:border-[rgba(255,255,255,0.75)] tw:bg-[rgba(255,255,255,0.88)] tw:shadow-sm">
                                 <div class="mb-3 tw:col-span-full">
                                     <label class="form-label">Status Paket</label>
@@ -171,6 +168,7 @@ $statusMeta = paket_status_meta($paket['Status'] ?? 'Belum Diambil');
                                     <label for="keterangan" class="form-label">Keterangan <span class="tw:text-gray-400 tw:text-sm">(opsional)</span></label>
                                     <textarea name="keterangan" class="form-control" id="keterangan" rows="4"
                                         placeholder="Tambahkan catatan pengambilan paket jika diperlukan."><?= htmlspecialchars($keteranganValue) ?></textarea>
+                                    <span class="form-hint">Boleh dikosongkan, tidak wajib diisi.</span>
                                 </div>
 
                                 <div class="tw:col-span-full tw:flex tw:justify-end tw:mt-2">
@@ -180,8 +178,8 @@ $statusMeta = paket_status_meta($paket['Status'] ?? 'Belum Diambil');
                                     </button>
                                 </div>
                         </form>
-                    <?php endif; ?>
-                </div>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
     </main>

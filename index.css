@@ -1060,6 +1060,14 @@ a {
   vertical-align: middle !important;
 }
 
+.doremi-table tbody td.truncate-text,
+.table-panel tbody td.truncate-text {
+  max-width: 250px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .doremi-table tbody tr:hover {
   background: rgba(47, 127, 240, 0.04) !important;
 }

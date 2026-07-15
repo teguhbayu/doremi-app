@@ -2,6 +2,7 @@
 session_start();
 require 'helpers.php';
 paket_require_roles(['SIGAP', 'PENGHUNI']);
+require '../../csrf.php';
 require '../../db.php';
 require_once '../../database/paket.php';
 require_once '../../utils/format.php';
@@ -108,7 +109,7 @@ $belumDiambil = $paketSummary['belumDiambil'];
                                 <?php $statusMeta = paket_status_meta($status); ?>
                                 <?php $isPickupLocked = !empty($paket['PengambilanPaketID']) && paket_is_final_status($status); ?>
                                 <tr>
-                                    <td class="tw:text-start tw:max-w-48 tw:truncate" title="<?php if ($role === 'SIGAP'): ?><?= htmlspecialchars($paket['NamaPenghuni']) ?> (<?= htmlspecialchars($paket['Nim']) ?>)<?php else: ?><?= htmlspecialchars($paket['NamaPetugasPaket'] ?? '') ?><?php endif; ?>">
+                                    <td class="tw:text-start" title="<?php if ($role === 'SIGAP'): ?><?= htmlspecialchars($paket['NamaPenghuni']) ?> (<?= htmlspecialchars($paket['Nim']) ?>)<?php else: ?><?= htmlspecialchars($paket['NamaPetugasPaket'] ?? '') ?><?php endif; ?>">
                                         <?php if ($role === 'SIGAP'): ?>
                                             <div class="tw:font-semibold tw:text-slate-900">
                                                 <?= htmlspecialchars($paket['NamaPenghuni']) ?>
@@ -133,15 +134,26 @@ $belumDiambil = $paketSummary['belumDiambil'];
                                             <?= htmlspecialchars(paket_type_label($paket['JenisPaket'] ?? null)) ?>
                                         </span>
                                     </td>
-                                    <td class="tw:max-w-48 tw:truncate" title="<?= htmlspecialchars($paket['NamaPengirim']) ?>"><?= htmlspecialchars($paket['NamaPengirim']) ?></td>
-                                    <td class="tw:max-w-48 tw:truncate" title="<?= htmlspecialchars($paket['Kurir']) ?>"><?= htmlspecialchars($paket['Kurir']) ?></td>
+                                    <td class="truncate-text" title="<?= htmlspecialchars($paket['NamaPengirim']) ?>"><?= htmlspecialchars($paket['NamaPengirim']) ?></td>
+                                    <td class="truncate-text" title="<?= htmlspecialchars($paket['Kurir']) ?>"><?= htmlspecialchars($paket['Kurir']) ?></td>
                                     <td>
                                         <?= formatDateTime($paket['WaktuSampai'] ?? null) ?>
                                     </td>
                                     <td>
-                                        <span class="badge <?= htmlspecialchars($statusMeta['class']) ?>">
-                                            <?= htmlspecialchars($statusMeta['label']) ?>
-                                        </span>
+                                        <?php
+                                            $canMarkTertukar = $role === 'SIGAP' && ($paket['Status'] ?? '') === 'Sudah Diambil';
+                                        ?>
+                                        <?php if ($canMarkTertukar): ?>
+                                            <button type="button" class="badge <?= htmlspecialchars($statusMeta['class']) ?> tw:border-0 tw:cursor-pointer tw:inline-flex tw:items-center tw:gap-1 tw:hover:opacity-80 tw:transition-opacity"
+                                                    data-bs-toggle="modal" data-bs-target="#statusModal<?= $paket['PaketID'] ?>" title="Klik untuk ubah status">
+                                                <?= htmlspecialchars($statusMeta['label']) ?>
+                                                <i class="iconsax tw:text-[0.7rem]" icon-name="edit-2"></i>
+                                            </button>
+                                        <?php else: ?>
+                                            <span class="badge <?= htmlspecialchars($statusMeta['class']) ?>">
+                                                <?= htmlspecialchars($statusMeta['label']) ?>
+                                            </span>
+                                        <?php endif; ?>
 
                                         <?php if (!empty($paket['WaktuPengambilan'])): ?>
                                             <div class="tw:text-xs tw:text-slate-500 tw:mt-1">
@@ -152,11 +164,6 @@ $belumDiambil = $paketSummary['belumDiambil'];
                                     <td>
                                         <div class="tw:inline-flex tw:flex-wrap tw:justify-center tw:items-center tw:gap-2 tw:text-black">
                                             <?php if ($role === 'SIGAP'): ?>
-                                                <a href="review.php?id=<?= (int) $paket['PaketID'] ?>"
-                                                    class="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:min-h-10 tw:px-[0.95rem] tw:py-[0.7rem] tw:rounded-[14px] tw:border tw:border-[rgba(22,60,122,0.18)] tw:bg-accent/40 tw:text-primary tw:font-extrabold tw:no-underline tw:hover:bg-accent/70 tw:transition-all tw:text-sm" title="Review Status Pengambilan">
-                                                    <i class="iconsax tw:text-lg" icon-name="document-text-1"></i>
-                                                    <span>Review</span>
-                                                </a>
                                                 <a href="edit.php?id=<?= (int) $paket['PaketID'] ?>"
                                                     class="tw:w-9 tw:h-9 tw:inline-flex tw:items-center tw:justify-center tw:rounded-[12px] tw:bg-[rgba(47,127,240,0.08)] tw:text-primary tw:no-underline tw:hover:bg-[rgba(47,127,240,0.16)] tw:transition-all" title="Edit Paket">
                                                     <i class="iconsax tw:text-lg" icon-name="edit-2"></i>
@@ -182,6 +189,57 @@ $belumDiambil = $paketSummary['belumDiambil'];
                                         </div>
                                     </td>
                                 </tr>
+
+                                <?php if ($role === 'SIGAP' && ($paket['Status'] ?? '') === 'Sudah Diambil'): ?>
+                                    <div class="modal fade text-start" id="statusModal<?= $paket['PaketID'] ?>" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Ubah Status Paket</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <form method="POST" action="process.php" class="tw:contents">
+                                                    <?php echo csrf_field(); ?>
+                                                    <div class="modal-body">
+                                                        <div class="tw:flex tw:flex-col tw:gap-3">
+                                                            <div>
+                                                                <label class="tw:text-xs tw:text-slate-500 tw:block tw:mb-2">Status Saat Ini</label>
+                                                                <p class="tw:font-semibold tw:mb-4">
+                                                                    <span class="badge bg-success text-white">Sudah Diambil</span>
+                                                                </p>
+                                                            </div>
+                                                            <div>
+                                                                <label class="tw:text-xs tw:text-slate-500 tw:block tw:mb-2">Tandai Sebagai</label>
+                                                                <div class="form-check">
+                                                                    <input class="form-check-input" type="radio" name="status" id="status_diambil<?= $paket['PaketID'] ?>" value="Sudah Diambil" checked>
+                                                                    <label class="form-check-label" for="status_diambil<?= $paket['PaketID'] ?>">
+                                                                        <span class="badge bg-success text-white">Sudah Diambil</span>
+                                                                    </label>
+                                                                </div>
+                                                                <div class="form-check">
+                                                                    <input class="form-check-input" type="radio" name="status" id="status_tertukar<?= $paket['PaketID'] ?>" value="TERTUKAR">
+                                                                    <label class="form-check-label" for="status_tertukar<?= $paket['PaketID'] ?>">
+                                                                        <span class="badge bg-danger text-white">PAKET TERTUKAR</span>
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                            <div>
+                                                                <label for="keterangan<?= $paket['PaketID'] ?>" class="tw:text-xs tw:text-slate-500 tw:block tw:mb-2">Keterangan (Opsional)</label>
+                                                                <textarea name="keterangan" class="form-control" id="keterangan<?= $paket['PaketID'] ?>" rows="3" placeholder="Jelaskan alasan paket tertukar atau catatan penting..."></textarea>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                                        <input type="hidden" name="paketId" value="<?= (int) $paket['PaketID'] ?>">
+                                                        <input type="hidden" name="action" value="updateStatus">
+                                                        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php endif; ?>
                             <?php endforeach; ?>
                         </tbody>
                     </table>
