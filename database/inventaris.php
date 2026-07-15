@@ -10,6 +10,11 @@ function fetchAllInventarisWithLokasi(mysqli $db): array
     return dbFetchAll($db, "CALL sp_getAllInventarisWithLokasi()");
 }
 
+function fetchInventarisByKamar(mysqli $db, int $kamarId): array
+{
+    return dbFetchAll($db, "CALL sp_getInventarisByKamar(?)", 'i', [$kamarId]);
+}
+
 function fetchActiveKamarOptions(mysqli $db): array
 {
     return dbFetchAll($db, "CALL sp_getActiveKamarOptions()");

@@ -54,6 +54,136 @@ class ReportPDF extends Fpdf
 }
 
 /**
+ * Read and validate chart images posted from the report page's export form.
+ * Returns a list of ['title' => string, 'image' => data-URI] entries.
+ *
+ * @return array
+ */
+function reportPdfCollectPostedCharts()
+{
+    $charts = [];
+    if (empty($_POST['chart_images'])) {
+        return $charts;
+    }
+
+    $decoded = json_decode($_POST['chart_images'], true);
+    if (!is_array($decoded)) {
+        return $charts;
+    }
+
+    foreach ($decoded as $chart) {
+        if (!empty($chart['image']) && str_starts_with($chart['image'], 'data:image/png;base64,')) {
+            $charts[] = [
+                'title' => $chart['title'] ?? '',
+                'image' => $chart['image'],
+            ];
+        }
+    }
+
+    return $charts;
+}
+
+/**
+ * Convert a UTF-8 string to Windows-1252 for FPDF's standard core fonts.
+ */
+function reportPdfEncode($text)
+{
+    if (function_exists('iconv')) {
+        return iconv('UTF-8', 'windows-1252//TRANSLIT', (string) $text);
+    }
+    return (string) $text;
+}
+
+/**
+ * Render captured chart images (base64 PNG data URIs) as a 2-column grid.
+ * Returns the list of temp files created so the caller can clean them up.
+ *
+ * @param ReportPDF $pdf
+ * @param array $charts Each: ['title' => string, 'image' => 'data:image/png;base64,...']
+ * @return array List of temp file paths to unlink after Output()
+ */
+function reportPdfRenderCharts($pdf, array $charts)
+{
+    $tempFiles = [];
+
+    // Section heading
+    $pdf->SetFont('Arial', 'B', 11);
+    $pdf->SetTextColor(20, 108, 148);
+    $pdf->Cell(0, 7, reportPdfEncode('Ringkasan Visual'), 0, 1, 'L');
+    $pdf->Ln(1);
+
+    $margin = 10;
+    $usableW = 297 - (2 * $margin); // A4 landscape width minus margins
+    $gap = 8;
+    $colW = ($usableW - $gap) / 2;
+    $titleH = 6;
+    $imgMaxH = 62;
+    $cellH = $titleH + $imgMaxH + 8;
+    $bottomLimit = 200; // keep clear of the footer
+
+    $col = 0;
+    $rowY = $pdf->GetY();
+
+    foreach ($charts as $chart) {
+        $raw = $chart['image'] ?? '';
+        $commaPos = strpos($raw, ',');
+        if ($commaPos !== false) {
+            $raw = substr($raw, $commaPos + 1);
+        }
+        $binary = base64_decode($raw, true);
+        if ($binary === false || $binary === '') {
+            continue;
+        }
+
+        $tmp = tempnam(sys_get_temp_dir(), 'doremi_chart_');
+        if ($tmp === false) {
+            continue;
+        }
+        file_put_contents($tmp, $binary);
+        $tempFiles[] = $tmp;
+
+        $size = @getimagesize($tmp);
+        if (!$size || $size[0] <= 0) {
+            continue;
+        }
+        $ratio = $size[1] / $size[0];
+
+        // Fit within the cell box, preserving aspect ratio
+        $drawW = $colW;
+        $drawH = $drawW * $ratio;
+        if ($drawH > $imgMaxH) {
+            $drawH = $imgMaxH;
+            $drawW = $drawH / $ratio;
+        }
+
+        $x = $margin + $col * ($colW + $gap);
+
+        // Chart title
+        $pdf->SetXY($x, $rowY);
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->SetTextColor(51, 65, 85);
+        $pdf->Cell($colW, $titleH, reportPdfEncode($chart['title'] ?? ''), 0, 0, 'C');
+
+        // Chart image, centered inside the column
+        $imgX = $x + ($colW - $drawW) / 2;
+        $imgY = $rowY + $titleH + 2;
+        $pdf->Image($tmp, $imgX, $imgY, $drawW, $drawH, 'PNG');
+
+        $col++;
+        if ($col >= 2) {
+            $col = 0;
+            $rowY += $cellH;
+            if ($rowY + $cellH > $bottomLimit) {
+                $pdf->AddPage();
+                $rowY = $pdf->GetY();
+            }
+        }
+    }
+
+    return $tempFiles;
+}
+
+/**
  * Generate and download a PDF report table.
  *
  * @param string $filename File name for download
@@ -62,13 +192,21 @@ class ReportPDF extends Fpdf
  * @param array $headers Header columns text
  * @param array $widths Numeric widths in mm for each column
  * @param array $rows 2D array containing row values
+ * @param array $charts Optional captured charts ['title' => .., 'image' => data URI]
  */
-function generateReportPdf($filename, $title, $rangeLabel, $headers, $widths, $rows)
+function generateReportPdf($filename, $title, $rangeLabel, $headers, $widths, $rows, $charts = [])
 {
     $pdf = new ReportPDF($title, $rangeLabel);
     $pdf->AliasNbPages();
     $pdf->AddPage();
-    
+
+    $chartTempFiles = [];
+    if (!empty($charts)) {
+        $chartTempFiles = reportPdfRenderCharts($pdf, $charts);
+        // Start the data table on a fresh page for a clean layout
+        $pdf->AddPage();
+    }
+
     // Table Header styling
     $pdf->SetFillColor(20, 108, 148); // Primary (#146c94)
     $pdf->SetTextColor(255, 255, 255);
@@ -119,6 +257,11 @@ function generateReportPdf($filename, $title, $rangeLabel, $headers, $widths, $r
         $pdf->Ln();
         $fill = !$fill;
     }
-    
+
     $pdf->Output('D', $filename);
+
+    // Clean up temporary chart images
+    foreach ($chartTempFiles as $tempFile) {
+        @unlink($tempFile);
+    }
 }
