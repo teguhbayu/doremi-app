@@ -7,7 +7,7 @@ require_once __DIR__ . '/query.php';
 
 function fetchAllInventarisWithLokasi(mysqli $db): array
 {
-    return dbFetchAll($db, 'SELECT i.*, k.NomorKamar, r.NamaRuangan FROM inventaris i LEFT JOIN kamar k ON i.KamarID = k.KamarID LEFT JOIN ruangan r ON i.RuanganID = r.RuanganID WHERE i.IsDeleted = 0');
+    return dbFetchAll($db, 'SELECT i.*, k.NomorKamar, r.NamaRuangan FROM inventaris i LEFT JOIN kamar k ON i.KamarID = k.KamarID LEFT JOIN ruangan r ON i.RuanganID = r.RuanganID WHERE i.IsDeleted = 0  ORDER BY UpdatedAt DESC');
 }
 
 function fetchInventarisByKamar(mysqli $db, int $kamarId): array

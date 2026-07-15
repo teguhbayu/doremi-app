@@ -7,7 +7,7 @@ if (!isset($_SESSION['userId'])) {
 }
 require '../../db.php';
 
-$query = mysqli_query($db, "SELECT p.*, k.NomorKamar FROM penghuni p LEFT JOIN kamar k ON p.KamarID = k.KamarID WHERE p.IsDeleted = 0 SORT BY p.nama ASC;");
+$query = mysqli_query($db, "SELECT p.*, k.NomorKamar FROM penghuni p LEFT JOIN kamar k ON p.KamarID = k.KamarID WHERE p.IsDeleted = 0 ORDER BY p.UpdateAt DESC;");
 $totalPenghuni = mysqli_num_rows($query);
 ?>
 
@@ -53,7 +53,8 @@ $totalPenghuni = mysqli_num_rows($query);
                                     <td class="truncate-text"><?php echo $penghuni["Nim"]; ?></td>
                                     <td class="tw:text-left truncate-text"
                                         title="<?php echo htmlspecialchars($penghuni["NamaPenghuni"]); ?>">
-                                        <?php echo $penghuni["NamaPenghuni"]; ?></td>
+                                        <?php echo $penghuni["NamaPenghuni"]; ?>
+                                    </td>
                                     <td class="truncate-text"><?php echo $penghuni["NomorKamar"] ?? 'N/A'; ?></td>
                                     <td>
                                         <div
