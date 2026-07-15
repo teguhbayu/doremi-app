@@ -72,7 +72,7 @@ function updateMaintenanceReport(
     dbExecute(
         $db,
         "CALL sp_updateMaintenanceReport(?, ?, ?, ?, ?, ?, ?)",
-        'iiiiiss',
+        'iiiisss',
         [$maintenanceId, $ruanganId, $inventarisId, $kamarId, $jenisLaporan, $deskripsi, $fotoLaporan]
     );
 

@@ -73,11 +73,17 @@ $totalKamar = mysqli_num_rows($query);
                                             <i class="iconsax tw:text-lg" icon-name="edit-2"></i>
                                         </a>
 
-                                        <button type="button" class="tw:w-9 tw:h-9 tw:inline-flex tw:items-center tw:justify-center tw:rounded-[12px] tw:bg-[rgba(188,79,69,0.08)] tw:text-red-600 tw:no-underline tw:hover:bg-[rgba(188,79,69,0.16)] tw:transition-all"
-                                            data-bs-toggle="modal" data-bs-target="#deleteModal"
-                                            data-bs-id="<?php echo $kamar["KamarID"]; ?>" title="Hapus Kamar">
-                                            <i class="iconsax tw:text-lg" icon-name="trash"></i>
-                                        </button>
+                                        <?php if ((int) $kamar["JumlahPenghuniAktual"] > 0): ?>
+                                            <button type="button" class="tw:w-9 tw:h-9 tw:inline-flex tw:items-center tw:justify-center tw:rounded-[12px] tw:bg-[rgba(188,79,69,0.04)] tw:text-red-300 tw:cursor-not-allowed" disabled title="Kamar masih memiliki penghuni">
+                                                <i class="iconsax tw:text-lg" icon-name="trash"></i>
+                                            </button>
+                                        <?php else: ?>
+                                            <button type="button" class="tw:w-9 tw:h-9 tw:inline-flex tw:items-center tw:justify-center tw:rounded-[12px] tw:bg-[rgba(188,79,69,0.08)] tw:text-red-600 tw:no-underline tw:hover:bg-[rgba(188,79,69,0.16)] tw:transition-all"
+                                                data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                                data-bs-id="<?php echo $kamar["KamarID"]; ?>" title="Hapus Kamar">
+                                                <i class="iconsax tw:text-lg" icon-name="trash"></i>
+                                            </button>
+                                        <?php endif; ?>
                                     </div>
                                 </td>
                             </tr>

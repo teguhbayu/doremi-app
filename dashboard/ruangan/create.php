@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $keterangan = trim($_POST['keteranganRuangan'] ?? '');
 
     $ruanganSchema = v::keySet(
-        v::key('nama', v::stringType()->length(1, 100)),
+        v::key('nama', v::stringType()->length(4, 100)),
         v::key('jenis', v::in($ruanganTypes)),
         v::key('lantai', v::in(['1', '2', '3', '4', '5', '6', '7', '1 Gedung Sekretariat', '2 Gedung Sekretariat'])),
         v::key('keterangan', v::stringType()->length(0, 500))
@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ];
 
     if (!$ruanganSchema->validate($postData)) {
-        header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Data Ruangan tidak Valid!');
+        header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Nama ruangan minimal 4 karakter dan data ruangan harus valid!');
         exit;
     }
 
@@ -90,10 +90,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
               <div class="mb-3">
                     <label for="namaRuangan" class="form-label">Nama Ruangan</label>
-                    <input type="text" name="namaRuangan" class="form-control" id="namaRuangan" x-model="nama" maxlength="100" required>
+                    <input type="text" name="namaRuangan" class="form-control" id="namaRuangan" x-model="nama" minlength="4" maxlength="100" required>
                     <div class="tw:text-xs tw:text-slate-400 tw:mt-1 tw:text-right">
                         <span :class="nama.length >= 100 ? 'tw:text-red-600 tw:font-semibold' : (nama.length >= 90 ? 'tw:text-amber-700 tw:font-semibold' : '')" x-text="nama.length">0</span>/100 karakter
                     </div>
+                    <div class="tw:text-xs tw:text-slate-500 tw:mt-1">Minimal 4 karakter</div>
                 </div>
                 <div class="mb-3">
                     <label for="jenisRuangan" class="form-label">Jenis Ruangan</label>
