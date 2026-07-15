@@ -69,6 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $old = pullOldFormInput();
 $existingKeterangan = trim((string) ($paket['Keterangan'] ?? ''));
 $keteranganValue = $old['keterangan'] ?? ($existingKeterangan === '-' ? '' : $existingKeterangan);
+$hasKeterangan = $existingKeterangan !== '' && $existingKeterangan !== '-';
 $fotoWajib = empty($paket['FotoPengambilan']);
 $statusMeta = paket_status_meta($paket['Status'] ?? 'Belum Diambil');
 ?>
@@ -133,6 +134,12 @@ $statusMeta = paket_status_meta($paket['Status'] ?? 'Belum Diambil');
                                             alt="Foto Pengambilan Paket"
                                             class="tw:w-full tw:h-48 tw:object-cover tw:rounded-2xl tw:border tw:border-slate-200">
                                     </a>
+                                </div>
+                            <?php endif; ?>
+                            <?php if ($hasKeterangan): ?>
+                                <div class="tw:col-span-full tw:p-4 tw:rounded-[18px] tw:bg-[rgba(255,255,255,0.80)] tw:border tw:border-[rgba(22,60,122,0.08)]">
+                                    <span class="tw:block tw:mb-[0.3rem] tw:text-slate-500 tw:text-xs tw:font-bold">Keterangan</span>
+                                    <p class="tw:mb-0 tw:whitespace-pre-wrap"><?= htmlspecialchars($existingKeterangan) ?></p>
                                 </div>
                             <?php endif; ?>
                         </div>
