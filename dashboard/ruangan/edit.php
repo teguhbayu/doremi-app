@@ -42,7 +42,7 @@ if (!in_array($ruangan['JenisRuangan'], $ruanganTypes, true)) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    csrf_validate($_SERVER['PHP_SELF'] . '?id=' . $id);
+    csrf_validate('dashboard/ruangan/edit.php?id=' . $id);
     if (isset($_POST['keteranganRuangan'])) {
         $_POST['keteranganRuangan'] = str_replace("\r\n", "\n", $_POST['keteranganRuangan']);
     }

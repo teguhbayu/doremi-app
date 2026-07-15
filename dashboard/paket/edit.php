@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $validationMessage = validatePaketInput($db, $paketInput);
     if ($validationMessage !== null) {
         setOldFormInput($_POST);
-        paket_redirect($_SERVER['PHP_SELF'] . '?id=' . $paketId, 'error', $validationMessage);
+        paket_redirect('dashboard/paket/edit.php?id=' . $paketId, 'error', $validationMessage);
     }
 
     try {
@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         );
     } catch (RuntimeException) {
         setOldFormInput($_POST);
-        paket_redirect($_SERVER['PHP_SELF'] . '?id=' . $paketId, 'error', 'Gagal memperbarui data paket.');
+        paket_redirect('dashboard/paket/edit.php?id=' . $paketId, 'error', 'Gagal memperbarui data paket.');
     }
 
         paket_redirect('dashboard/paket/', 'success', 'Data paket berhasil diperbarui.');

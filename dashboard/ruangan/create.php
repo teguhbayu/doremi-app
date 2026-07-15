@@ -17,7 +17,7 @@ require '../../db.php';
 $ruanganTypes = ['Tempat Ibadah', 'Ruang Publik', 'Ruang Jemur', 'Lapangan Olahraga', 'Balkon', 'Kamar Mandi'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    csrf_validate($_SERVER['PHP_SELF']);
+    csrf_validate('dashboard/ruangan/create.php');
     if (isset($_POST['keteranganRuangan'])) {
         $_POST['keteranganRuangan'] = str_replace("\r\n", "\n", $_POST['keteranganRuangan']);
     }

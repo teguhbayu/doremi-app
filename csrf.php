@@ -6,6 +6,7 @@
 if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
     die('Access denied');
 }
+require_once __DIR__ . '/utils/url.php';
 
 /**
  * Generate (or retrieve existing) CSRF token for the current session.
@@ -34,7 +35,7 @@ function csrf_validate(string $redirectOnFail = '/'): void
 {
     $token = $_POST['csrf_token'] ?? $_GET['csrf_token'] ?? '';
     if (!hash_equals(csrf_token(), $token)) {
-        header('Location: ' . $redirectOnFail);
+        header('Location: ' . app_url($redirectOnFail));
         exit;
     }
 }

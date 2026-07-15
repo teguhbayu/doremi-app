@@ -18,23 +18,23 @@ if ($action === 'create_request') {
     $validationMessage = validateInOutRequestInput($requestInput);
     if ($validationMessage !== null) {
         setOldFormInput($_POST);
-        header("Location: index.php?status=error&message=" . urlencode($validationMessage));
+        header('Location: ' . app_url('dashboard/inout/?status=error&message=' . urlencode($validationMessage)));
         exit;
     }
 
     $dateTimes = buildInOutDateTimes($requestInput);
 
     if (countActiveInOutRequests($db, $userId) > 0) {
-        header("Location: index.php?status=error&message=Anda masih memiliki izin keluar yang aktif!");
+        header('Location: ' . app_url('dashboard/inout/?status=error&message=Anda masih memiliki izin keluar yang aktif!'));
         exit;
     }
 
     try {
         createInOutRequest($db, $userId, $requestInput['keperluan'], $dateTimes['waktuKeluar'], $dateTimes['waktuMasuk']);
-        header("Location: index.php?status=success&message=Permintaan izin keluar berhasil dikirim!");
+        header('Location: ' . app_url('dashboard/inout/?status=success&message=Permintaan izin keluar berhasil dikirim!'));
     } catch (RuntimeException) {
         setOldFormInput($_POST);
-        header("Location: index.php?status=error&message=Gagal mengirim permintaan!");
+        header('Location: ' . app_url('dashboard/inout/?status=error&message=Gagal mengirim permintaan!'));
     }
 }
 
@@ -43,15 +43,15 @@ elseif ($action === 'confirm_exit') {
     $now = date('Y-m-d H:i:s');
 
     if (!$id) {
-        header("Location: index.php?status=error&message=Data izin keluar tidak valid!");
+        header('Location: ' . app_url('dashboard/inout/?status=error&message=Data izin keluar tidak valid!'));
         exit;
     }
     
     try {
         confirmInOutExit($db, $id, $now, $userId);
-        header("Location: index.php?status=success&message=Konfirmasi keluar berhasil!");
+        header('Location: ' . app_url('dashboard/inout/?status=success&message=Konfirmasi keluar berhasil!'));
     } catch (RuntimeException) {
-        header("Location: index.php?status=error&message=Gagal konfirmasi keluar!");
+        header('Location: ' . app_url('dashboard/inout/?status=error&message=Gagal konfirmasi keluar!'));
     }
 }
 
@@ -60,19 +60,19 @@ elseif ($action === 'confirm_entry') {
     $now = date('Y-m-d H:i:s');
 
     if (!$id) {
-        header("Location: index.php?status=error&message=Data izin masuk tidak valid!");
+        header('Location: ' . app_url('dashboard/inout/?status=error&message=Data izin masuk tidak valid!'));
         exit;
     }
 
     try {
         confirmInOutEntry($db, $id, $now);
-        header("Location: index.php?status=success&message=Konfirmasi masuk berhasil!");
+        header('Location: ' . app_url('dashboard/inout/?status=success&message=Konfirmasi masuk berhasil!'));
     } catch (RuntimeException) {
-        header("Location: index.php?status=error&message=Gagal konfirmasi masuk!");
+        header('Location: ' . app_url('dashboard/inout/?status=error&message=Gagal konfirmasi masuk!'));
     }
 }
 
 else {
-    header("Location: index.php");
+    header('Location: ' . app_url('dashboard/inout/'));
 }
 exit;

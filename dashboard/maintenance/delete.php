@@ -7,9 +7,9 @@ require '../../csrf.php';
 
 // Only accept POST to prevent CSRF via URL
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    maintenance_redirect('index.php');
+    maintenance_redirect('dashboard/maintenance/');
 }
-csrf_validate('index.php');
+    csrf_validate('dashboard/maintenance/');
 
 require '../../db.php';
 require_once '../../database/maintenance.php';
@@ -19,30 +19,30 @@ $userId = (int)$_SESSION['userId'];
 $role = $_SESSION['userRole'];
 
 if (!$id) {
-    maintenance_redirect('index.php', 'error', 'ID laporan tidak valid.');
+    maintenance_redirect('dashboard/maintenance/', 'error', 'ID laporan tidak valid.');
 }
 
 $report = fetchMaintenanceReportById($db, $id);
 
 if (!$report) {
-    maintenance_redirect('index.php', 'error', 'Laporan tidak ditemukan.');
+    maintenance_redirect('dashboard/maintenance/', 'error', 'Laporan tidak ditemukan.');
 }
 
 // Validation: Only allow deletion if status is still "Diajukan"
 if ($report['StatusMaintenance'] !== 'Diajukan') {
-    maintenance_redirect('index.php', 'error', 'Laporan yang sedang diproses atau sudah selesai tidak dapat dihapus.');
+    maintenance_redirect('dashboard/maintenance/', 'error', 'Laporan yang sedang diproses atau sudah selesai tidak dapat dihapus.');
 }
 
 // Ownership verification
 $isOwner = isMaintenanceReportOwner($report, $role, $userId);
 
 if (!$isOwner) {
-    maintenance_redirect('index.php', 'error', 'Anda tidak memiliki wewenang untuk menghapus laporan ini.');
+    maintenance_redirect('dashboard/maintenance/', 'error', 'Anda tidak memiliki wewenang untuk menghapus laporan ini.');
 }
 
 try {
     deleteMaintenanceReport($db, $id);
-    maintenance_redirect('index.php', 'success', 'Laporan kerusakan berhasil dihapus.');
+    maintenance_redirect('dashboard/maintenance/', 'success', 'Laporan kerusakan berhasil dihapus.');
 } catch (RuntimeException) {
-    maintenance_redirect('index.php', 'error', 'Gagal menghapus laporan.');
+    maintenance_redirect('dashboard/maintenance/', 'error', 'Gagal menghapus laporan.');
 }
