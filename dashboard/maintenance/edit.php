@@ -14,23 +14,23 @@ $userId = (int)$_SESSION['userId'];
 $role = $_SESSION['userRole'];
 
 if (!$id) {
-    maintenance_redirect('index.php', 'error', 'ID laporan tidak valid.');
+    maintenance_redirect('dashboard/maintenance/', 'error', 'ID laporan tidak valid.');
 }
 
 $report = fetchMaintenanceReportById($db, $id);
 
 if (!$report) {
-    maintenance_redirect('index.php', 'error', 'Laporan tidak ditemukan.');
+    maintenance_redirect('dashboard/maintenance/', 'error', 'Laporan tidak ditemukan.');
 }
 
 if ($report['StatusMaintenance'] !== 'Diajukan') {
-    maintenance_redirect('index.php', 'error', 'Laporan yang sedang diproses atau selesai tidak dapat diubah.');
+    maintenance_redirect('dashboard/maintenance/', 'error', 'Laporan yang sedang diproses atau selesai tidak dapat diubah.');
 }
 
 $isOwner = isMaintenanceReportOwner($report, $role, $userId);
 
 if (!$isOwner) {
-    maintenance_redirect('index.php', 'error', 'Anda tidak memiliki hak akses untuk mengedit laporan ini.');
+    maintenance_redirect('dashboard/maintenance/', 'error', 'Anda tidak memiliki hak akses untuk mengedit laporan ini.');
 }
 
 require_once '../../database/penghuni.php';
@@ -89,7 +89,7 @@ if (!empty($report['KamarID'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    csrf_validate($_SERVER['PHP_SELF'] . '?id=' . $id);
+    csrf_validate('dashboard/maintenance/edit.php?id=' . $id);
     if (isset($_POST['deskripsi'])) {
         $_POST['deskripsi'] = str_replace("\r\n", "\n", $_POST['deskripsi']);
     }
@@ -97,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $validationMessage = validateMaintenanceReportInput($db, $reportInput);
     if ($validationMessage !== null) {
         setOldFormInput($_POST);
-        maintenance_redirect($_SERVER['PHP_SELF'] . '?id=' . $id, 'error', $validationMessage);
+        maintenance_redirect('dashboard/maintenance/edit.php?id=' . $id, 'error', $validationMessage);
     }
     $targetIds = resolveMaintenanceTargetIds($reportInput);
 
@@ -105,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $fotoLaporan = maintenance_store_photo($_FILES['foto_laporan'] ?? [], $report['FotoLaporan']);
     } catch (RuntimeException $e) {
         setOldFormInput($_POST);
-        maintenance_redirect($_SERVER['PHP_SELF'] . '?id=' . $id, 'error', $e->getMessage());
+        maintenance_redirect('dashboard/maintenance/edit.php?id=' . $id, 'error', $e->getMessage());
     }
 
     try {
@@ -119,10 +119,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $reportInput['deskripsi'],
             $fotoLaporan
         );
-        maintenance_redirect('index.php', 'success', 'Laporan kerusakan berhasil diperbarui!');
+        maintenance_redirect('dashboard/maintenance/', 'success', 'Laporan kerusakan berhasil diperbarui!');
     } catch (RuntimeException) {
         setOldFormInput($_POST);
-        maintenance_redirect($_SERVER['PHP_SELF'] . '?id=' . $id, 'error', 'Terjadi kesalahan sistem saat menyimpan perubahan.');
+        maintenance_redirect('dashboard/maintenance/edit.php?id=' . $id, 'error', 'Terjadi kesalahan sistem saat menyimpan perubahan.');
     }
 }
 

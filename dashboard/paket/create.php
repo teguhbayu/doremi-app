@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $validationMessage = validatePaketInput($db, $paketInput);
     if ($validationMessage !== null) {
         setOldFormInput($_POST);
-        paket_redirect($_SERVER['PHP_SELF'], 'error', $validationMessage);
+        paket_redirect('dashboard/paket/create.php', 'error', $validationMessage);
     }
 
     $petugasId = (int) $_SESSION['userId'];
@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         );
     } catch (RuntimeException) {
         setOldFormInput($_POST);
-        paket_redirect($_SERVER['PHP_SELF'], 'error', 'Gagal menyimpan data paket.');
+        paket_redirect('dashboard/paket/create.php', 'error', 'Gagal menyimpan data paket.');
     }
 
         paket_redirect('dashboard/paket/', 'success', 'Data paket berhasil ditambahkan.');

@@ -4,7 +4,7 @@ require 'helpers.php';
 
 paket_require_roles(['SIGAP']);
 require '../../csrf.php';
-csrf_validate('index.php');
+csrf_validate('dashboard/paket/');
 
 require '../../db.php';
 require_once '../../database/paket.php';

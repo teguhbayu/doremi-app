@@ -18,7 +18,7 @@ $kamars = fetchActiveKamarWithOccupancy($db);
 $inventory = fetchMaintenanceInventory($db, true);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    csrf_validate('create.php');
+    csrf_validate('dashboard/maintenance/create.php');
     if (isset($_POST['deskripsi'])) {
         $_POST['deskripsi'] = str_replace("\r\n", "\n", $_POST['deskripsi']);
     }
@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $validationMessage = validateMaintenanceReportInput($db, $reportInput);
     if ($validationMessage !== null) {
         setOldFormInput($_POST);
-        maintenance_redirect('create.php', 'error', $validationMessage);
+        maintenance_redirect('dashboard/maintenance/create.php', 'error', $validationMessage);
     }
     $targetIds = resolveMaintenanceTargetIds($reportInput);
 
@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $fotoBase64 = maintenance_store_photo($_FILES['foto_laporan'] ?? []);
     } catch (RuntimeException $e) {
         setOldFormInput($_POST);
-        maintenance_redirect('create.php', 'error', $e->getMessage());
+        maintenance_redirect('dashboard/maintenance/create.php', 'error', $e->getMessage());
     }
 
     try {
@@ -60,10 +60,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $fotoBase64,
             $tanggalLapor
         );
-        maintenance_redirect('index.php', 'success', 'Laporan kerusakan berhasil dibuat.');
+        maintenance_redirect('dashboard/maintenance/', 'success', 'Laporan kerusakan berhasil dibuat.');
     } catch (RuntimeException) {
         setOldFormInput($_POST);
-        maintenance_redirect('create.php', 'error', 'Terjadi kesalahan sistem saat mengirim laporan.');
+        maintenance_redirect('dashboard/maintenance/create.php', 'error', 'Terjadi kesalahan sistem saat mengirim laporan.');
     }
 }
 

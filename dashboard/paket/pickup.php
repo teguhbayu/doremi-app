@@ -23,7 +23,7 @@ $isLocked = !empty($paket['PengambilanPaketID']) && paket_is_final_status($paket
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($isLocked) {
-        paket_redirect($_SERVER['PHP_SELF'] . '?id=' . $paketId, 'error', 'Status paket yang sudah diambil tidak dapat diubah lagi.');
+        paket_redirect('dashboard/paket/pickup.php?id=' . $paketId, 'error', 'Status paket yang sudah diambil tidak dapat diubah lagi.');
     }
 
     $petugasId = !empty($paket['PickupPetugasID']) ? (int) $paket['PickupPetugasID'] : (int) $paket['PetugasID'];
@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         || !in_array($status, ['Sudah Diambil'], true)
     ) {
         setOldFormInput($_POST);
-        paket_redirect($_SERVER['PHP_SELF'] . '?id=' . $paketId, 'error', 'Data pengambilan paket tidak valid.');
+        paket_redirect('dashboard/paket/pickup.php?id=' . $paketId, 'error', 'Data pengambilan paket tidak valid.');
     }
 
     try {
@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         );
     } catch (RuntimeException $exception) {
         setOldFormInput($_POST);
-        paket_redirect($_SERVER['PHP_SELF'] . '?id=' . $paketId, 'error', $exception->getMessage());
+        paket_redirect('dashboard/paket/pickup.php?id=' . $paketId, 'error', $exception->getMessage());
     }
 
     $keterangan = $keterangan !== '' ? $keterangan : '-';
@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         savePaketPickup($db, $pengambilanPaketId, $paketId, $userId, $petugasId, $fotoPengambilan, $waktuPengambilan, $status, $keterangan);
     } catch (RuntimeException) {
         setOldFormInput($_POST);
-        paket_redirect($_SERVER['PHP_SELF'] . '?id=' . $paketId, 'error', 'Gagal menyimpan data pengambilan paket.');
+        paket_redirect('dashboard/paket/pickup.php?id=' . $paketId, 'error', 'Gagal menyimpan data pengambilan paket.');
     }
 
         paket_redirect('dashboard/paket/', 'success', $successMessage);

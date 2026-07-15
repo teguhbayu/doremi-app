@@ -18,7 +18,7 @@ $kamars = mysqli_fetch_all(mysqli_query($db, "SELECT KamarID, NomorKamar FROM ka
 $ruangans = mysqli_fetch_all(mysqli_query($db, "SELECT RuanganID, NamaRuangan FROM ruangan WHERE IsDeleted = 0"), MYSQLI_ASSOC);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    csrf_validate($_SERVER['PHP_SELF']);
+    csrf_validate('dashboard/inventaris/create.php');
     if (isset($_POST['keteranganBarang'])) {
         $_POST['keteranganBarang'] = str_replace("\r\n", "\n", $_POST['keteranganBarang']);
     }
