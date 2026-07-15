@@ -25,7 +25,27 @@ function app_base_path(): string
 
 function app_url(string $path = ''): string
 {
-    return app_base_path() . '/' . ltrim($path, '/');
+    if ($path === '') {
+        return app_base_path() ?: '/';
+    }
+
+    if (preg_match('#^[a-z][a-z0-9+.-]*://#i', $path) || str_starts_with($path, '//')) {
+        return $path;
+    }
+
+    $basePath = app_base_path();
+    $normalizedPath = '/' . ltrim($path, '/');
+
+    if (
+        $basePath === ''
+        || $normalizedPath === $basePath
+        || str_starts_with($normalizedPath, $basePath . '/')
+        || str_starts_with($normalizedPath, $basePath . '?')
+    ) {
+        return $normalizedPath;
+    }
+
+    return $basePath . $normalizedPath;
 }
 
 function app_redirect(string $path, int $statusCode = 302): never
