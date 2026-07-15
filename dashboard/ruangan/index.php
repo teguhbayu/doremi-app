@@ -12,7 +12,7 @@ if ($_SESSION['userRole'] !== 'PENGURUS') {
 require '../../csrf.php';
 require '../../db.php';
 
-$query = mysqli_query($db, "CALL sp_getAllRuangan()");
+$query = mysqli_query($db, "SELECT * FROM ruangan WHERE IsDeleted = 0");
 $totalRuangan = mysqli_num_rows($query);
 ?>
 
