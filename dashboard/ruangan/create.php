@@ -14,7 +14,7 @@ if ($_SESSION['userRole'] !== 'PENGURUS') {
 require '../../csrf.php';
 require '../../db.php';
 
-$ruanganTypes = ['Tempat Ibadah', 'Ruang Publik', 'Ruang Jemur', 'Lapangan Olahraga', 'Balkon', 'Kamar Mandi'];
+$ruanganTypes = ['Tempat Ibadah', 'Ruang Publik', 'Fasilitas Umum', 'Ruang Jemur', 'Lapangan Olahraga', 'Balkon', 'Kamar Mandi'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_validate('dashboard/ruangan/create.php');
