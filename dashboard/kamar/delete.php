@@ -17,7 +17,7 @@ if ($id) {
         exit;
     }
 
-    $stmt = mysqli_prepare($db, "CALL sp_deleteKamar(?)");
+    $stmt = mysqli_prepare($db, "UPDATE kamar SET IsDeleted = 1 WHERE KamarID = ?");
     mysqli_stmt_bind_param($stmt, "i", $id);
 
     if (mysqli_stmt_execute($stmt)) {

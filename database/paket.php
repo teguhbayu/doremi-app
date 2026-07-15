@@ -7,7 +7,7 @@ require_once __DIR__ . '/query.php';
 
 function fetchPaketsForRole(mysqli $db, string $role, int $userId): array
 {
-    return dbFetchAll($db, "CALL sp_getPaketListForRole(?, ?)", 'si', [$role, $userId]);
+    return dbFetchAll($db, "SELECT pk.*, ph.NamaPenghuni, ph.Nim, k.NomorKamar, pt.NamaPetugas, pp.PengambilanPaketID, pp.Status, pp.WaktuPengambilan, pp.Keterangan, pp.HasFotoPengambilan FROM paket pk JOIN penghuni ph ON pk.PenghuniID = ph.PenghuniID LEFT JOIN kamar k ON ph.KamarID = k.KamarID JOIN petugas pt ON pk.PetugasID = pt.PetugasID LEFT JOIN (SELECT pp1.PengambilanPaketID, pp1.PaketID, pp1.PenghuniID, pp1.PetugasID, pp1.FotoPengambilan, pp1.WaktuPengambilan, pp1.Status, pp1.Keterangan, (pp1.FotoPengambilan IS NOT NULL AND pp1.FotoPengambilan != '') AS HasFotoPengambilan FROM pengambilanpaket pp1 INNER JOIN (SELECT PaketID, MAX(PengambilanPaketID) AS LatestPengambilanPaketID FROM pengambilanpaket GROUP BY PaketID) latest ON latest.LatestPengambilanPaketID = pp1.PengambilanPaketID) pp ON pp.PaketID = pk.PaketID WHERE ? IN ('SIGAP', 'PENGURUS') OR pk.PenghuniID = ? ORDER BY pk.PaketID DESC", 'si', [$role, $userId]);
 }
 
 function summarizePaketStatuses(array $pakets): array
@@ -36,22 +36,23 @@ function summarizePaketStatuses(array $pakets): array
 
 function fetchActivePenghuniOptions(mysqli $db): array
 {
-    return dbFetchAll($db, "CALL sp_getActivePenghuniForSelect()");
+    return dbFetchAll($db, 'SELECT p.PenghuniID, p.NamaPenghuni, p.Nim, k.NomorKamar, udf_formatPenghuniLabel(p.NamaPenghuni, p.Nim, k.NomorKamar) AS OptionLabel FROM penghuni p LEFT JOIN kamar k ON p.KamarID = k.KamarID WHERE p.IsDeleted = 0 ORDER BY p.NamaPenghuni');
 }
 
 function fetchPaketDetail(mysqli $db, int $paketId): ?array
 {
-    return dbFetchOne($db, "CALL sp_getPaketDetail(?)", 'i', [$paketId]);
+    return dbFetchOne($db, 'SELECT pk.*, pt.NamaPetugas FROM paket pk JOIN petugas pt ON pk.PetugasID = pt.PetugasID WHERE pk.PaketID = ? LIMIT 1', 'i', [$paketId]);
 }
 
 function fetchPaketWithLatestPickup(mysqli $db, int $paketId, ?int $penghuniId = null): ?array
 {
-    return dbFetchOne($db, "CALL sp_getPaketWithLatestPickup(?, ?)", 'ii', [$paketId, $penghuniId ?? 0]);
+    $penghuniId ??= 0;
+    return dbFetchOne($db, "SELECT pk.*, ph.NamaPenghuni, ph.Nim, k.NomorKamar, pt.NamaPetugas AS NamaPetugasPaket, pp.PengambilanPaketID, pp.PetugasID AS PickupPetugasID, pp.FotoPengambilan, pp.WaktuPengambilan, pp.Status, pp.Keterangan FROM paket pk JOIN penghuni ph ON pk.PenghuniID = ph.PenghuniID LEFT JOIN kamar k ON ph.KamarID = k.KamarID JOIN petugas pt ON pk.PetugasID = pt.PetugasID LEFT JOIN (SELECT pp1.PengambilanPaketID, pp1.PaketID, pp1.PenghuniID, pp1.PetugasID, pp1.FotoPengambilan, pp1.WaktuPengambilan, pp1.Status, pp1.Keterangan FROM pengambilanpaket pp1 INNER JOIN (SELECT PaketID, MAX(PengambilanPaketID) AS LatestPengambilanPaketID FROM pengambilanpaket GROUP BY PaketID) latest ON latest.LatestPengambilanPaketID = pp1.PengambilanPaketID) pp ON pp.PaketID = pk.PaketID WHERE pk.PaketID = ? AND (? = 0 OR pk.PenghuniID = ?) LIMIT 1", 'iii', [$paketId, $penghuniId, $penghuniId]);
 }
 
 function checkPenghuniExists(mysqli $db, int $penghuniId): bool
 {
-    return dbFetchOne($db, "CALL sp_checkPenghuniExist(?)", 'i', [$penghuniId]) !== null;
+    return dbFetchOne($db, 'SELECT PenghuniID FROM penghuni WHERE PenghuniID = ? AND IsDeleted = 0 LIMIT 1', 'i', [$penghuniId]) !== null;
 }
 
 function createPaket(
@@ -65,7 +66,7 @@ function createPaket(
 ): bool {
     dbExecute(
         $db,
-        "CALL sp_createPaket(?, ?, ?, ?, ?, ?)",
+        'INSERT INTO paket (PetugasID, NamaPengirim, Kurir, JenisPaket, WaktuSampai, PenghuniID) VALUES (?, ?, ?, ?, ?, ?)',
         'issssi',
         [$petugasId, $namaPengirim, $kurir, $jenisPaket, $waktuSampai, $penghuniId]
     );
@@ -84,9 +85,9 @@ function updatePaket(
 ): bool {
     dbExecute(
         $db,
-        "CALL sp_updatePaket(?, ?, ?, ?, ?, ?)",
-        'issssi',
-        [$paketId, $namaPengirim, $kurir, $jenisPaket, $waktuSampai, $penghuniId]
+        'UPDATE paket SET NamaPengirim = ?, Kurir = ?, JenisPaket = ?, WaktuSampai = ?, PenghuniID = ? WHERE PaketID = ?',
+        'ssssii',
+        [$namaPengirim, $kurir, $jenisPaket, $waktuSampai, $penghuniId, $paketId]
     );
 
     return true;
@@ -94,12 +95,12 @@ function updatePaket(
 
 function countPackagePickupsByPaketId(mysqli $db, int $paketId): int
 {
-    return (int) dbFetchValue($db, "CALL sp_countPackagePickupByPaketId(?)", 'i', [$paketId]);
+    return (int) dbFetchValue($db, 'SELECT COUNT(*) AS total FROM pengambilanpaket WHERE PaketID = ?', 'i', [$paketId]);
 }
 
 function deletePaket(mysqli $db, int $paketId): bool
 {
-    dbExecute($db, "CALL sp_deletePaket(?)", 'i', [$paketId]);
+    dbExecute($db, 'DELETE FROM paket WHERE PaketID = ?', 'i', [$paketId]);
     return true;
 }
 
@@ -143,7 +144,7 @@ function updatePaketPickupReview(mysqli $db, int $pengambilanPaketId, int $petug
 
 function fetchPaketPickupPhoto(mysqli $db, int $paketId): ?string
 {
-    $row = dbFetchOne($db, "CALL sp_getFotoPengambilanFromPengambilanPaket(?)", 'i', [$paketId]);
+    $row = dbFetchOne($db, 'SELECT FotoPengambilan FROM pengambilanpaket WHERE PaketID = ?', 'i', [$paketId]);
     if ($row === null) {
         return null;
     }

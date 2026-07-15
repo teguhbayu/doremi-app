@@ -7,12 +7,22 @@ require_once __DIR__ . '/query.php';
 
 function fetchPetugasByEmail(mysqli $db, string $email): ?array
 {
-    return dbFetchOne($db, "CALL sp_getPetugasByEmail(?)", 's', [$email]);
+    return dbFetchOne(
+        $db,
+        'SELECT PetugasID, NamaPetugas, Password, Jabatan FROM petugas WHERE Email = ? AND IsDeleted = 0 LIMIT 1',
+        's',
+        [$email]
+    );
 }
 
 function fetchPenghuniByEmail(mysqli $db, string $email): ?array
 {
-    return dbFetchOne($db, "CALL sp_getPenghuniByEmail(?)", 's', [$email]);
+    return dbFetchOne(
+        $db,
+        'SELECT PenghuniID, NamaPenghuni, Password FROM penghuni WHERE Email = ? AND IsDeleted = 0 LIMIT 1',
+        's',
+        [$email]
+    );
 }
 
 function findAuthUserByEmail(mysqli $db, string $email): ?array
