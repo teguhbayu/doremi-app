@@ -1,6 +1,7 @@
 <?php
+require_once __DIR__ . '/../../utils/url.php';
 $currentPath = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH) ?? '';
-$dashboardBasePath = '/doremi-app/dashboard';
+$dashboardBasePath = app_url('dashboard');
 $relativePath = trim((string) str_replace($dashboardBasePath, '', $currentPath), '/');
 
 if ($relativePath === '' || $relativePath === 'index.php') {

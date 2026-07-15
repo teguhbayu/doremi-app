@@ -52,7 +52,7 @@ if (
 }
 
 // Otherwise, serve it if it's a local file relative to document root
-$filePath = $_SERVER['DOCUMENT_ROOT'] . '/doremi-app/' . ltrim($photoData, '/');
+$filePath = $_SERVER['DOCUMENT_ROOT'] . app_url($photoData);
 if (file_exists($filePath)) {
     $mimeType = mime_content_type($filePath);
     header("Content-Type: $mimeType");

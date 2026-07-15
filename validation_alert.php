@@ -2,6 +2,7 @@
 if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
     die('Access denied');
 }
+require_once __DIR__ . '/utils/url.php';
 ?>
 
 
@@ -10,8 +11,8 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
     document.addEventListener("DOMContentLoaded", () => {
         const urlParams = new URLSearchParams(window.location.search);
         const url = new URL(window.location.href);
-        const suksesIcon = `<img src="/doremi-app/images/gif/success.gif" alt="sukses.gif" class="tw:size-12 tw:rounded-full tw:object-cover tw:aspect-square"></img>`
-        const errorIcon = `<img src="/doremi-app/images/gif/error.gif" alt="sukses.gif" class="tw:size-12 tw:rounded-full tw:object-cover tw:aspect-square"></img>`
+        const suksesIcon = `<img src="<?= app_url('images/gif/success.gif') ?>" alt="sukses.gif" class="tw:size-12 tw:rounded-full tw:object-cover tw:aspect-square"></img>`
+        const errorIcon = `<img src="<?= app_url('images/gif/error.gif') ?>" alt="sukses.gif" class="tw:size-12 tw:rounded-full tw:object-cover tw:aspect-square"></img>`
         switch (urlParams.get("status")) {
             case "success":
                 Swal.fire({

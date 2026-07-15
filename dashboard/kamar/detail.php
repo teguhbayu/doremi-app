@@ -1,9 +1,9 @@
 <?php
+require_once '../../utils/url.php';
 session_start();
 
 if (!isset($_SESSION['userId'])) {
-    header("Location: /doremi-app/login.php");
-    exit;
+    app_redirect('login.php');
 }
 
 require '../../db.php';
@@ -12,7 +12,7 @@ require_once '../../utils/format.php';
 
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 if (!$id) {
-    header("Location: /doremi-app/dashboard/kamar/");
+    header('Location: ' . app_url('dashboard/kamar/'));
     exit;
 }
 
@@ -24,7 +24,7 @@ $kamar = mysqli_fetch_assoc($kamarResult);
 mysqli_stmt_close($kamarStmt);
 
 if (!$kamar) {
-    header("Location: /doremi-app/dashboard/kamar/?status=error&message=Data kamar tidak ditemukan!");
+    header('Location: ' . app_url('dashboard/kamar/?status=error&message=Data kamar tidak ditemukan!'));
     exit;
 }
 
@@ -141,7 +141,7 @@ $sisaKapasitas = max(0, (int) $kamar['KapasitasPenghuni'] - (int) $kamar['Jumlah
                                         <td><?= $penghuni['JenisKelamin'] === 'L' ? 'Laki-laki' : 'Perempuan' ?></td>
                                         <td><?= htmlspecialchars($penghuni['NoHP']) ?></td>
                                         <td>
-                                            <a href="/doremi-app/dashboard/penghuni/edit.php?id=<?= (int) $penghuni['PenghuniID'] ?>"
+                                <a href="<?= app_url('dashboard/penghuni/edit.php') ?>?id=<?= (int) $penghuni['PenghuniID'] ?>"
                                                 class="tw:text-slate-700 tw:no-underline" title="Edit Penghuni">
                                                 <i class="iconsax tw:text-lg" icon-name="edit-2"></i>
                                             </a>
@@ -190,7 +190,7 @@ $sisaKapasitas = max(0, (int) $kamar['KapasitasPenghuni'] - (int) $kamar['Jumlah
                                         </td>
                                         <td><?= htmlspecialchars(formatDateTime($item['UpdatedAt'] ?? null)) ?></td>
                                         <td>
-                                            <a href="/doremi-app/dashboard/inventaris/edit.php?id=<?= (int) $item['InventarisID'] ?>"
+                                <a href="<?= app_url('dashboard/inventaris/edit.php') ?>?id=<?= (int) $item['InventarisID'] ?>"
                                                 class="tw:text-slate-700 tw:no-underline" title="Edit Inventaris">
                                                 <i class="iconsax tw:text-lg" icon-name="edit-2"></i>
                                             </a>

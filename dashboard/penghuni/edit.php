@@ -1,10 +1,10 @@
 <?php
+require_once '../../utils/url.php';
 require '../../vendor/autoload.php';
 session_start();
 
 if (!isset($_SESSION['userId'])) {
-    header("Location: /doremi-app/login.php");
-    exit;
+    app_redirect('login.php');
 }
 require '../../db.php';
 require '../../utils/old_input.php';
@@ -13,14 +13,14 @@ require 'validation.php';
 
 $id = $_GET['id'] ?? null;
 if (!$id) {
-    header("Location: /doremi-app/dashboard/penghuni/");
+    header('Location: ' . app_url('dashboard/penghuni/'));
     exit;
 }
 
 $penghuni = fetchPenghuniById($db, (int) $id);
 
 if (!$penghuni) {
-    header("Location: /doremi-app/dashboard/penghuni/");
+    header('Location: ' . app_url('dashboard/penghuni/'));
     exit;
 }
 
@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    header("Location: /doremi-app/dashboard/penghuni/?status=success&message=Penghuni Berhasil Diupdate!");
+        header('Location: ' . app_url('dashboard/penghuni/?status=success&message=Penghuni Berhasil Diupdate!'));
     exit;
 }
 

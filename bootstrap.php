@@ -2,6 +2,7 @@
 if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
     die('Access denied');
 }
+require_once __DIR__ . '/utils/url.php';
 ?>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
@@ -9,8 +10,8 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
     crossorigin="anonymous"></script>
 
 <script src="https://cdn.datatables.net/2.3.4/js/dataTables.min.js"></script>
-<script src="/doremi-app/js/animations.js?v=<?= filemtime(__DIR__ . '/js/animations.js') ?>"></script>
-<script src="/doremi-app/js/file-upload-validation.js?v=<?= filemtime(__DIR__ . '/js/file-upload-validation.js') ?>"></script>
+<script src="<?= app_url('js/animations.js') ?>?v=<?= filemtime(__DIR__ . '/js/animations.js') ?>"></script>
+<script src="<?= app_url('js/file-upload-validation.js') ?>?v=<?= filemtime(__DIR__ . '/js/file-upload-validation.js') ?>"></script>
 <script>
     (() => {
         const tables = document.querySelectorAll('table.doremi-table');

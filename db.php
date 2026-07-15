@@ -5,6 +5,7 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
 require 'vendor/autoload.php';
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->safeload();
+require_once __DIR__ . '/utils/url.php';
 
 date_default_timezone_set($_ENV["APP_TIMEZONE"] ?? 'Asia/Bangkok');
 

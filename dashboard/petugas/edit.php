@@ -1,18 +1,18 @@
 <?php
+require_once '../../utils/url.php';
 require '../../vendor/autoload.php';
 
 use Respect\Validation\Validator as v;
 session_start();
 
 if (!isset($_SESSION['userId'])) {
-    header("Location: /doremi-app/login.php");
-    exit;
+    app_redirect('login.php');
 }
 require '../../db.php';
 
 $id = $_GET['id'] ?? null;
 if (!$id) {
-    header("Location: /doremi-app/dashboard/petugas/");
+    header('Location: ' . app_url('dashboard/petugas/'));
     exit;
 }
 
@@ -24,7 +24,7 @@ $petugas = mysqli_fetch_assoc($result);
 mysqli_stmt_close($stmt);
 
 if (!$petugas) {
-    header("Location: /doremi-app/dashboard/petugas/");
+    header('Location: ' . app_url('dashboard/petugas/'));
     exit;
 }
 
@@ -118,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     mysqli_stmt_close($stmt);
 
-    header("Location: /doremi-app/dashboard/petugas/?status=success&message=Petugas Berhasil Diupdate!");
+        header('Location: ' . app_url('dashboard/petugas/?status=success&message=Petugas Berhasil Diupdate!'));
     exit;
 }
 ?>

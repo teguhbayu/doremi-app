@@ -9,14 +9,14 @@ require_once '../../utils/old_input.php';
 
 $paketId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 if (!$paketId) {
-    paket_redirect('/doremi-app/dashboard/paket/', 'error', 'Data paket tidak valid.');
+        paket_redirect('dashboard/paket/', 'error', 'Data paket tidak valid.');
 }
 
 $userId = (int) $_SESSION['userId'];
 $paket = fetchPaketWithLatestPickup($db, $paketId, $userId);
 
 if (!$paket) {
-    paket_redirect('/doremi-app/dashboard/paket/', 'error', 'Data paket tidak ditemukan.');
+        paket_redirect('dashboard/paket/', 'error', 'Data paket tidak ditemukan.');
 }
 
 $isLocked = !empty($paket['PengambilanPaketID']) && paket_is_final_status($paket['Status'] ?? null);
@@ -63,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         paket_redirect($_SERVER['PHP_SELF'] . '?id=' . $paketId, 'error', 'Gagal menyimpan data pengambilan paket.');
     }
 
-    paket_redirect('/doremi-app/dashboard/paket/', 'success', $successMessage);
+        paket_redirect('dashboard/paket/', 'success', $successMessage);
 }
 
 $old = pullOldFormInput();

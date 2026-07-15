@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         paket_redirect($_SERVER['PHP_SELF'], 'error', 'Gagal menyimpan data paket.');
     }
 
-    paket_redirect('/doremi-app/dashboard/paket/', 'success', 'Data paket berhasil ditambahkan.');
+        paket_redirect('dashboard/paket/', 'success', 'Data paket berhasil ditambahkan.');
 }
 
 $old = pullOldFormInput();

@@ -1,8 +1,8 @@
 <?php
+require_once '../../utils/url.php';
 session_start();
 if (!isset($_SESSION['userId']) || $_SESSION['userRole'] !== 'SIGAP') {
-    header("Location: /doremi-app/dashboard/");
-    exit;
+    app_redirect('dashboard/');
 }
 
 require '../../db.php';

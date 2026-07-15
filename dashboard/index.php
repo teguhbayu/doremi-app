@@ -1,8 +1,8 @@
 ﻿<?php
+require_once '../utils/url.php';
 session_start();
 if (!isset($_SESSION['userId'])) {
-    header("Location: /doremi-app/login.php");
-    exit;
+    app_redirect('login.php');
 }
 require '../db.php';
 require '../database/dashboard.php';
@@ -520,7 +520,7 @@ if ($role === 'MAINTENANCE') {
                             </div>
                         </div>
                         <div class="tw:inline-flex tw:items-center tw:gap-3 tw:flex-wrap tw:mt-4">
-                            <a href="/doremi-app/dashboard/paket/"
+                            <a href="<?= app_url('dashboard/paket/') ?>"
                                 class="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:min-h-12 tw:px-4 tw:py-[0.85rem] tw:rounded-2xl tw:border tw:border-[rgba(22,60,122,0.12)] tw:font-extrabold tw:no-underline tw:text-slate-900 tw:bg-[rgba(255,255,255,0.82)] tw:hover:bg-gray-50 tw:transition-all tw:text-sm">Buka
                                 Menu Paket</a>
                         </div>
@@ -555,7 +555,7 @@ if ($role === 'MAINTENANCE') {
                             </div>
                         </div>
                         <div class="tw:inline-flex tw:items-center tw:gap-3 tw:flex-wrap tw:mt-4">
-                            <a href="/doremi-app/dashboard/maintenance/"
+                            <a href="<?= app_url('dashboard/maintenance/') ?>"
                                 class="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:min-h-12 tw:px-4 tw:py-[0.85rem] tw:rounded-2xl tw:border tw:border-[rgba(22,60,122,0.12)] tw:font-extrabold tw:no-underline tw:text-slate-900 tw:bg-[rgba(255,255,255,0.82)] tw:hover:bg-gray-50 tw:transition-all tw:text-sm">Kelola
                                 Semua Pekerjaan</a>
                         </div>
@@ -588,7 +588,7 @@ if ($role === 'MAINTENANCE') {
                             </div>
                         </div>
                         <div class="tw:inline-flex tw:items-center tw:gap-3 tw:flex-wrap tw:mt-4">
-                            <a href="/doremi-app/dashboard/inout/"
+                            <a href="<?= app_url('dashboard/inout/') ?>"
                                 class="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:min-h-12 tw:px-4 tw:py-[0.85rem] tw:rounded-2xl tw:border tw:border-[rgba(22,60,122,0.12)] tw:font-extrabold tw:no-underline tw:text-slate-900 tw:bg-[rgba(255,255,255,0.82)] tw:hover:bg-gray-50 tw:transition-all tw:text-sm">Buka
                                 Konfirmasi In/Out</a>
                         </div>
@@ -617,7 +617,7 @@ if ($role === 'MAINTENANCE') {
                             </div>
                         </div>
                         <div class="tw:inline-flex tw:items-center tw:gap-3 tw:flex-wrap tw:mt-4">
-                            <a href="/doremi-app/dashboard/paket/"
+                            <a href="<?= app_url('dashboard/paket/') ?>"
                                 class="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:min-h-12 tw:px-4 tw:py-[0.85rem] tw:rounded-2xl tw:border tw:border-[rgba(22,60,122,0.12)] tw:font-extrabold tw:no-underline tw:text-slate-900 tw:bg-[rgba(255,255,255,0.82)] tw:hover:bg-gray-50 tw:transition-all tw:text-sm">Buka
                                 Menu Paket</a>
                         </div>
@@ -648,7 +648,7 @@ if ($role === 'MAINTENANCE') {
                                     kerusakan darurat / berat yang belum selesai. Tangani segera sesuai protokol prioritas OSHA.
                                 </p>
                             </div>
-                            <a href="/doremi-app/dashboard/maintenance/"
+                            <a href="<?= app_url('dashboard/maintenance/') ?>"
                                 class="tw:bg-[rgba(255,255,255,0.18)] tw:text-white tw:border tw:border-[rgba(255,255,255,0.3)] tw:text-xs tw:font-bold tw:px-4 tw:py-2 tw:rounded-[10px] tw:no-underline tw:whitespace-nowrap tw:flex-shrink-0">Lihat
                                 Semua &rarr;</a>
                         </div>
@@ -686,7 +686,7 @@ if ($role === 'MAINTENANCE') {
                                                     class="fa-solid fa-calendar-days tw:mr-1"></i><?= date('d M Y', strtotime($em['TanggalLapor'])) ?></span>
                                         </div>
                                     </div>
-                                    <a href="/doremi-app/dashboard/maintenance/"
+                                    <a href="<?= app_url('dashboard/maintenance/') ?>"
                                         class="tw:text-[11px] tw:font-bold tw:text-red-600 tw:bg-red-100 tw:px-3 tw:py-[6px] tw:rounded-lg tw:no-underline tw:whitespace-nowrap tw:flex-shrink-0 tw:mt-[2px]">Proses
                                         &rarr;</a>
                                 </div>
@@ -781,7 +781,7 @@ if ($role === 'MAINTENANCE') {
                         </div>
 
                         <div class="tw:inline-flex tw:items-center tw:gap-3 tw:flex-wrap tw:mt-4">
-                            <a href="/doremi-app/dashboard/maintenance/"
+                            <a href="<?= app_url('dashboard/maintenance/') ?>"
                                 class="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:min-h-12 tw:px-4 tw:py-[0.85rem] tw:rounded-2xl tw:border tw:border-[rgba(22,60,122,0.12)] tw:font-extrabold tw:no-underline tw:text-slate-900 tw:bg-[rgba(255,255,255,0.82)] tw:hover:bg-gray-50 tw:transition-all tw:text-sm">Buka
                                 Seluruh Laporan</a>
                         </div>

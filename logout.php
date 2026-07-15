@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/utils/url.php';
 session_start();
 
 $_SESSION = array();
@@ -17,5 +18,4 @@ if (ini_get("session.use_cookies")) {
 
 session_destroy();
 
-header("Location: /doremi-app/login.php");
-exit;
+app_redirect('login.php');

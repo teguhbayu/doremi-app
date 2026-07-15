@@ -1,12 +1,11 @@
 <?php
+require_once '../../utils/url.php';
 session_start();
 if (!isset($_SESSION['userId'])) {
-    header('Location: /doremi-app/login.php');
-    exit;
+    app_redirect('login.php');
 }
 if (!in_array($_SESSION['userRole'] ?? '', ['SIGAP', 'PENGURUS'], true)) {
-    header('Location: /doremi-app/dashboard/');
-    exit;
+    app_redirect('dashboard/');
 }
 require '../../db.php';
 require '../../database/inoutReport.php';
@@ -679,7 +678,7 @@ $rangeQueryParams = $range === 'custom'
             { id: 'chartKeperluan', title: 'Keperluan Terbanyak' },
         ];
     </script>
-    <script src="/doremi-app/js/report-pdf-export.js?v=<?= filemtime(dirname(__DIR__, 2) . '/js/report-pdf-export.js') ?>"></script>
+<script src="<?= app_url('js/report-pdf-export.js') ?>?v=<?= filemtime(dirname(__DIR__, 2) . '/js/report-pdf-export.js') ?>"></script>
 
 
     <style>

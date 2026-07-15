@@ -1,12 +1,12 @@
 <?php
+require_once '../../utils/url.php';
 require '../../vendor/autoload.php';
 
 use Respect\Validation\Validator as v;
 session_start();
 
 if (!isset($_SESSION['userId'])) {
-    header("Location: /doremi-app/login.php");
-    exit;
+    app_redirect('login.php');
 }
 require '../../db.php';
 
@@ -140,7 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         mysqli_stmt_close($restoreStmt);
         unset($_SESSION['form_data']);
 
-        header("Location: " . '/doremi-app/dashboard/petugas/' . '?status=success&message=Petugas berhasil ditambahkan kembali dari data yang pernah dihapus!');
+        header('Location: ' . app_url('dashboard/petugas/?status=success&message=Petugas berhasil ditambahkan kembali dari data yang pernah dihapus!'));
         exit;
     }
 
@@ -157,7 +157,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     mysqli_stmt_close($stmt);
     unset($_SESSION['form_data']);
 
-    header("Location: " . '/doremi-app/dashboard/petugas/' . '?status=success&message=Petugas Berhasil Ditambahkan!');
+        header('Location: ' . app_url('dashboard/petugas/?status=success&message=Petugas Berhasil Ditambahkan!'));
     exit;
 }
 

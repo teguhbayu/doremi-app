@@ -2,6 +2,7 @@
 if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
     die('Access denied');
 }
+require_once __DIR__ . '/../../utils/url.php';
 
 function maintenance_redirect(string $path, ?string $status = null, ?string $message = null): void
 {
@@ -11,20 +12,18 @@ function maintenance_redirect(string $path, ?string $status = null, ?string $mes
             'message' => $message ?? '',
         ]);
     }
-    header("Location: $path");
+    header('Location: ' . app_url($path));
     exit;
 }
 
 function maintenance_require_roles(array $allowedRoles): void
 {
     if (!isset($_SESSION['userId'])) {
-        header('Location: /doremi-app/login.php');
-        exit;
+        app_redirect('login.php');
     }
 
     if (!in_array($_SESSION['userRole'] ?? '', $allowedRoles, true)) {
-        header('Location: /doremi-app/dashboard/');
-        exit;
+        app_redirect('dashboard/');
     }
 }
 
