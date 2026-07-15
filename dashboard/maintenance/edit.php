@@ -214,7 +214,7 @@ $currentDeskripsi = str_replace("\r\n", "\n", $old['deskripsi'] ?? $report['Desk
                                     this.selectedKamar = '';
                                     this.selectedInventaris = '';
                                 }
-                            }">
+                            }" x-init="$nextTick(() => { if (selectedInventaris !== '') { $refs.inventaris.value = selectedInventaris; } })">
                             <div class="mb-3">
                                 <label class="form-label">Lokasi Kerusakan</label>
                                 <div class="tw:flex tw:gap-4 tw:mt-1">
@@ -256,7 +256,7 @@ $currentDeskripsi = str_replace("\r\n", "\n", $old['deskripsi'] ?? $report['Desk
 
                             <div class="mb-3" x-show="(locationType === 'ruangan' && selectedRuangan !== '') || (locationType === 'kamar' && selectedKamar !== '')" x-cloak>
                                 <label for="inventaris_id" class="form-label" x-text="locationType === 'ruangan' ? 'Inventaris di Ruangan Ini (Opsional)' : 'Inventaris di Kamar Ini (Opsional)'"></label>
-                                <select name="inventaris_id" id="inventaris_id" class="form-select" x-model="selectedInventaris">
+                                <select name="inventaris_id" id="inventaris_id" class="form-select" x-ref="inventaris" x-model="selectedInventaris">
                                     <option value="" x-text="locationType === 'ruangan' ? '-- Laporkan Ruangan Secara Umum --' : '-- Laporkan Kamar Secara Umum --'"></option>
                                     <template x-for="item in filteredInventory" :key="item.InventarisID">
                                         <option :value="item.InventarisID" x-text="item.NamaBarang"></option>
