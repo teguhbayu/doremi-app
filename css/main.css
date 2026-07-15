@@ -316,6 +316,9 @@
   .tw\:mt-4 {
     margin-top: calc(var(--tw-spacing) * 4) !important;
   }
+  .tw\:mt-6 {
+    margin-top: calc(var(--tw-spacing) * 6) !important;
+  }
   .tw\:mt-8 {
     margin-top: calc(var(--tw-spacing) * 8) !important;
   }
@@ -575,6 +578,9 @@
   .tw\:animate-pulse {
     animation: var(--tw-animate-pulse) !important;
   }
+  .tw\:cursor-not-allowed {
+    cursor: not-allowed !important;
+  }
   .tw\:cursor-pointer {
     cursor: pointer !important;
   }
@@ -815,6 +821,9 @@
   }
   .tw\:bg-\[rgba\(47\,127\,240\,0\.08\)\] {
     background-color: rgba(47,127,240,0.08) !important;
+  }
+  .tw\:bg-\[rgba\(188\,79\,69\,0\.04\)\] {
+    background-color: rgba(188,79,69,0.04) !important;
   }
   .tw\:bg-\[rgba\(188\,79\,69\,0\.08\)\] {
     background-color: rgba(188,79,69,0.08) !important;
@@ -1274,6 +1283,9 @@
   .tw\:whitespace-pre-line {
     white-space: pre-line !important;
   }
+  .tw\:whitespace-pre-wrap {
+    white-space: pre-wrap !important;
+  }
   .tw\:text-\[\#146c94\]\! {
     color: #146c94 !important;
   }
@@ -1327,6 +1339,9 @@
   }
   .tw\:text-primary {
     color: var(--tw-color-primary) !important;
+  }
+  .tw\:text-red-300 {
+    color: var(--tw-color-red-300) !important;
   }
   .tw\:text-red-600 {
     color: var(--tw-color-red-600) !important;
@@ -2328,6 +2343,9 @@ a {
 }
 .modal {
   z-index: 1090;
+}
+.swal2-container {
+  z-index: 1100 !important;
 }
 .dt-container .dt-length, .dt-container .dt-search, .dt-container .dt-info, .dt-container .dt-paging {
   padding: 1rem 0.25rem;
