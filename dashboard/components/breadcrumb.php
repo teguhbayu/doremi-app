@@ -26,7 +26,6 @@ $actionMap = [
     'edit.php' => 'Edit',
     'detail.php' => 'Detail',
     'pickup.php' => 'Pengambilan',
-    'review.php' => 'Review',
     'log.php' => 'Log',
 ];
 

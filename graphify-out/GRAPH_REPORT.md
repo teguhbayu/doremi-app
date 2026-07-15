@@ -1,16 +1,16 @@
-# Graph Report - doremi-app  (2026-07-14)
+# Graph Report - doremi-app  (2026-07-15)
 
 ## Corpus Check
-- 105 files · ~1,218,194 words
+- 114 files · ~1,254,490 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 569 nodes · 837 edges · 135 communities (89 shown, 46 thin omitted)
-- Extraction: 80% EXTRACTED · 20% INFERRED · 0% AMBIGUOUS · INFERRED: 167 edges (avg confidence: 0.75)
+- 584 nodes · 857 edges · 134 communities (88 shown, 46 thin omitted)
+- Extraction: 80% EXTRACTED · 20% INFERRED · 0% AMBIGUOUS · INFERRED: 174 edges (avg confidence: 0.75)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `8caba64c`
+- Built from commit: `d06af719`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -26,11 +26,11 @@
 - [[_COMMUNITY_Composer Project Config|Composer Project Config]]
 - [[_COMMUNITY_Coding Guidelines|Coding Guidelines]]
 - [[_COMMUNITY_Room (Kamar) Helpers|Room (Kamar) Helpers]]
+- [[_COMMUNITY_Maintenance Helpers|Maintenance Helpers]]
 - [[_COMMUNITY_Room Facility Images|Room Facility Images]]
 - [[_COMMUNITY_Dining Facility Images|Dining Facility Images]]
 - [[_COMMUNITY_Recreation Facility Images|Recreation Facility Images]]
 - [[_COMMUNITY_Dormitory Staff & Org|Dormitory Staff & Org]]
-- [[_COMMUNITY_CSRF Security Layer|CSRF Security Layer]]
 - [[_COMMUNITY_Outdoor Facilities Images|Outdoor Facilities Images]]
 - [[_COMMUNITY_Node.js  Tailwind Config|Node.js / Tailwind Config]]
 - [[_COMMUNITY_Error UI Feedback|Error UI Feedback]]
@@ -45,7 +45,6 @@
 - [[_COMMUNITY_Database Schema|Database Schema]]
 - [[_COMMUNITY_Database Schema|Database Schema]]
 - [[_COMMUNITY_Database Dump — `astrador_doremiapp`|Database Dump — `astrador_doremiapp`]]
-- [[_COMMUNITY_penghuni.php|penghuni.php]]
 - [[_COMMUNITY_Doremi App — Agent Instructions|Doremi App — Agent Instructions]]
 - [[_COMMUNITY_Graphify — Codebase Knowledge Graph|Graphify — Codebase Knowledge Graph]]
 - [[_COMMUNITY_Karpathy behavioral guidelines|Karpathy behavioral guidelines]]
@@ -89,7 +88,6 @@
 - [[_COMMUNITY_DB Data penghuni rows|DB Data: penghuni rows]]
 - [[_COMMUNITY_DB Data petugas rows|DB Data: petugas rows]]
 - [[_COMMUNITY_DB Data ruangan rows|DB Data: ruangan rows]]
-- [[_COMMUNITY_inout.php|inout.php]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `dbFetchAll()` - 58 edges
@@ -104,62 +102,61 @@
 10. `ne()` - 10 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `validatePenghuniInputSchema()` --calls--> `firstFieldError()`  [INFERRED]
+  dashboard/penghuni/validation.php → utils/validation_helpers.php
+- `authAttemptPasswordLogin()` --calls--> `findAuthUserByEmail()`  [INFERRED]
+  auth/helpers.php → database/auth.php
+- `authAttemptEmailLogin()` --calls--> `findAuthUserByEmail()`  [INFERRED]
+  auth/helpers.php → database/auth.php
+- `validateInOutRequestInput()` --calls--> `textLength()`  [INFERRED]
+  dashboard/inout/validation.php → utils/format.php
 - `validateMaintenanceReportInput()` --calls--> `checkMaintenanceTargetExists()`  [INFERRED]
   dashboard/maintenance/validation.php → database/maintenance.php
-- `validatePaketInput()` --calls--> `checkPenghuniExists()`  [INFERRED]
-  dashboard/paket/validation.php → database/paket.php
-- `penghuni_find_identity_matches()` --calls--> `fetchPenghuniIdentityRows()`  [INFERRED]
-  dashboard/penghuni/helpers.php → database/penghuni.php
-- `penghuni_validate_room_assignment()` --calls--> `fetchKamarForPenghuniAssignment()`  [INFERRED]
-  dashboard/penghuni/helpers.php → database/penghuni.php
-- `penghuni_validate_room_assignment()` --calls--> `fetchPenghuniRoomOccupantSummary()`  [INFERRED]
-  dashboard/penghuni/helpers.php → database/penghuni.php
 
 ## Import Cycles
 - None detected.
 
-## Hyperedges (group relationships)
-- **Database Layer: Stored Procedures + UDFs + Triggers** — _agents_skills_doremi_app_context_skill_stored_procedures, _agents_skills_doremi_app_context_skill_udfs, _agents_skills_doremi_app_context_skill_triggers [EXTRACTED 1.00]
-- **Domain DB Helper Files (auth, paket, inout, maintenance, penghuni, photos)** — _agents_skills_doremi_app_context_skill_database_auth_php, _agents_skills_doremi_app_context_skill_database_paket_php, _agents_skills_doremi_app_context_skill_database_inout_php, _agents_skills_doremi_app_context_skill_database_maintenance_php, _agents_skills_doremi_app_context_skill_database_penghuni_php, _agents_skills_doremi_app_context_skill_database_photos_php [EXTRACTED 1.00]
-- **Karpathy Coding Guideline Principles** — _agents_skills_coding_guideline_skill_think_before_coding, _agents_skills_coding_guideline_skill_simplicity_first, _agents_skills_coding_guideline_skill_surgical_changes, _agents_skills_coding_guideline_skill_goal_driven_execution [EXTRACTED 1.00]
-
-## Communities (135 total, 46 thin omitted)
+## Communities (134 total, 46 thin omitted)
 
 ### Community 0 - "DataTables JS Library"
 Cohesion: 0.08
 Nodes (60): A(), ae(), at(), B(), be(), c(), ce(), ct() (+52 more)
 
 ### Community 1 - "In/Out Request Management"
-Cohesion: 0.07
-Nodes (56): countActivePenghuniByKamar(), createKamar(), fetchKamarById(), findKamarDuplicateNomor(), mysqli, updateKamar(), checkMaintenanceTargetExists(), checkMaintenanceTechnicianOwnership() (+48 more)
+Cohesion: 0.08
+Nodes (37): paket_is_valid_length(), mysqli, validatePaketInput(), checkKamarActive(), checkRuanganActive(), createInventaris(), deleteInventaris(), fetchActiveKamarOptions() (+29 more)
 
 ### Community 3 - "Resident (Penghuni) Helpers"
 Cohesion: 0.12
-Nodes (23): mysqli, validateMaintenanceReportInput(), penghuni_allowed_floors(), penghuni_duplicate_identity_message(), penghuni_find_identity_matches(), penghuni_gender_label(), penghuni_is_valid_nim(), penghuni_is_valid_phone() (+15 more)
+Nodes (30): penghuni_allowed_floors(), penghuni_duplicate_identity_message(), penghuni_find_identity_matches(), penghuni_gender_label(), penghuni_is_valid_nim(), penghuni_is_valid_phone(), penghuni_nim_max_length(), penghuni_nim_min_length() (+22 more)
 
 ### Community 4 - "Maintenance Report Validation"
-Cohesion: 0.33
-Nodes (10): checkKamarActive(), checkRuanganActive(), createInventaris(), deleteInventaris(), fetchActiveKamarOptions(), fetchActiveRuanganOptions(), fetchAllInventarisWithLokasi(), fetchInventarisById() (+2 more)
+Cohesion: 0.08
+Nodes (40): confirmInOutEntry(), confirmInOutExit(), countActiveInOutRequests(), createInOutRequest(), fetchAllInOutLogs(), fetchInOutHistoryForPenghuni(), fetchOutsideInOutRequests(), fetchPendingInOutRequests() (+32 more)
 
 ### Community 5 - "Package (Paket) Helpers"
-Cohesion: 0.12
-Nodes (11): paket_allowed_types(), paket_cleanup_legacy_photo(), paket_is_valid_length(), paket_normalize_datetime(), paket_normalize_type(), paket_store_photo(), paket_type_badge_class(), paket_type_label() (+3 more)
+Cohesion: 0.14
+Nodes (9): paket_allowed_types(), paket_cleanup_legacy_photo(), paket_normalize_datetime(), paket_normalize_type(), paket_redirect(), paket_store_photo(), paket_type_badge_class(), paket_type_label() (+1 more)
 
 ### Community 6 - "Authentication Flow"
-Cohesion: 0.26
-Nodes (7): authAttemptEmailLogin(), authAttemptPasswordLogin(), mysqli, fetchPenghuniByEmail(), fetchPetugasByEmail(), findAuthUserByEmail(), mysqli
+Cohesion: 0.09
+Nodes (17): authAttemptEmailLogin(), authAttemptPasswordLogin(), authRedirectToDashboard(), authRedirectToLoginError(), mysqli, csrf_field(), csrf_token(), csrf_validate() (+9 more)
 
 ### Community 7 - "In/Out Input & Validation"
 Cohesion: 0.22
 Nodes (4): validateInOutRequestInput(), formatDateTime(), normalizeDateTimeInputValue(), textLength()
 
 ### Community 8 - "Composer Project Config"
-Cohesion: 0.22
-Nodes (8): authors, description, name, require, google/apiclient, respect/validation, vlucas/phpdotenv, type
+Cohesion: 0.20
+Nodes (9): authors, description, name, require, fpdf/fpdf, google/apiclient, respect/validation, vlucas/phpdotenv (+1 more)
 
 ### Community 10 - "Room (Kamar) Helpers"
 Cohesion: 0.60
 Nodes (4): kamar_build_nomor(), kamar_extract_bagian(), kamar_has_lantai_prefix(), kamar_normalize_segment()
+
+### Community 11 - "Maintenance Helpers"
+Cohesion: 0.22
+Nodes (4): mysqli, validateMaintenanceReportInput(), checkMaintenanceTargetExists(), firstFieldError()
 
 ### Community 12 - "Room Facility Images"
 Cohesion: 0.50
@@ -176,10 +173,6 @@ Nodes (5): Dormitory Facilities, Dormitory Music Room Facility, Musholla Facilit
 ### Community 15 - "Dormitory Staff & Org"
 Cohesion: 0.67
 Nodes (4): Dormitory Staff / Organization, Staff Meeting / Presentation, Whiteboard Presentation, Organisasi - Staff Meeting Photo
-
-### Community 16 - "CSRF Security Layer"
-Cohesion: 0.83
-Nodes (3): csrf_field(), csrf_token(), csrf_validate()
 
 ### Community 17 - "Outdoor Facilities Images"
 Cohesion: 0.67
@@ -217,10 +210,6 @@ Nodes (29): Auth Helpers, Authentication, Coding Conventions, Color Palette, CSS
 Cohesion: 0.17
 Nodes (11): Database Dump — `astrador_doremiapp`, inoutpenghuni, inventaris, kamar, maintenance, paket, pengambilanpaket, penghuni (+3 more)
 
-### Community 88 - "penghuni.php"
-Cohesion: 0.33
-Nodes (10): createPenghuni(), fetchActiveKamarWithOccupancy(), fetchKamarForPenghuniAssignment(), fetchPenghuniById(), fetchPenghuniIdentityRows(), fetchPenghuniList(), fetchPenghuniRoomOccupantSummary(), mysqli (+2 more)
-
 ### Community 89 - "Doremi App — Agent Instructions"
 Cohesion: 0.25
 Nodes (7): Codebase Conventions, Community map (what lives where), Doremi App — Agent Instructions, How to use the graph, Knowledge Graph (graphify), Project Overview, Python interpreter for graphify
@@ -237,24 +226,18 @@ Nodes (5): 1. Think Before Coding, 2. Simplicity First, 3. Surgical Changes, 4. 
 Cohesion: 0.33
 Nodes (5): 1. Think Before Coding, 2. Simplicity First, 3. Surgical Changes, 4. Goal-Driven Execution, Karpathy behavioral guidelines
 
-### Community 133 - "inout.php"
-Cohesion: 0.36
-Nodes (9): confirmInOutEntry(), confirmInOutExit(), countActiveInOutRequests(), createInOutRequest(), fetchAllInOutLogs(), fetchInOutHistoryForPenghuni(), fetchOutsideInOutRequests(), fetchPendingInOutRequests() (+1 more)
-
 ## Knowledge Gaps
-- **122 isolated node(s):** `name`, `description`, `type`, `authors`, `vlucas/phpdotenv` (+117 more)
+- **123 isolated node(s):** `name`, `description`, `type`, `authors`, `vlucas/phpdotenv` (+118 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **46 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `dbFetchOne()` connect `In/Out Request Management` to `penghuni.php`, `dbFetchAll`, `Maintenance Report Validation`, `Authentication Flow`?**
-  _High betweenness centrality (0.070) - this node is a cross-community bridge._
-- **Why does `dbFetchAll()` connect `dbFetchAll` to `penghuni.php`, `In/Out Request Management`, `Maintenance Report Validation`, `inout.php`?**
-  _High betweenness centrality (0.065) - this node is a cross-community bridge._
-- **Why does `checkPenghuniExists()` connect `In/Out Request Management` to `Package (Paket) Helpers`?**
-  _High betweenness centrality (0.027) - this node is a cross-community bridge._
+- **Why does `dbFetchOne()` connect `In/Out Request Management` to `Resident (Penghuni) Helpers`, `Maintenance Report Validation`, `Authentication Flow`, `Maintenance Helpers`, `dbFetchAll`?**
+  _High betweenness centrality (0.081) - this node is a cross-community bridge._
+- **Why does `dbFetchAll()` connect `dbFetchAll` to `In/Out Request Management`, `Resident (Penghuni) Helpers`, `Maintenance Report Validation`?**
+  _High betweenness centrality (0.067) - this node is a cross-community bridge._
 - **Are the 53 inferred relationships involving `dbFetchAll()` (e.g. with `fetchDashboardEmergencyList()` and `fetchDashboardGenderStats()`) actually correct?**
   _`dbFetchAll()` has 53 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 29 inferred relationships involving `dbExecute()` (e.g. with `confirmInOutEntry()` and `confirmInOutExit()`) actually correct?**
@@ -263,3 +246,5 @@ _Questions this graph is uniquely positioned to answer:_
   _`dbFetchOne()` has 27 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 10 inferred relationships involving `n()` (e.g. with `A()` and `_e()`) actually correct?**
   _`n()` has 10 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 5 inferred relationships involving `se()` (e.g. with `c()` and `D()`) actually correct?**
+  _`se()` has 5 INFERRED edges - model-reasoned connections that need verification._

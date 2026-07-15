@@ -105,16 +105,16 @@ $formData = [
                 </div>
 
                 <div class="mb-3 tw:col-span-full">
-                    <label for="penghuniSearch" class="form-label">Penghuni Tujuan</label>
-                    <input type="text" class="form-control" id="penghuniSearch" list="penghuniOptions"
-                        value="<?= htmlspecialchars($selectedPenghuniLabel) ?>" placeholder="Ketik nama, NIM, atau kamar penghuni" autocomplete="off" required>
-                    <input type="hidden" name="penghuniId" id="penghuniId" value="<?= (int) $formData['penghuniId'] ?>">
-                    <datalist id="penghuniOptions">
+                    <label for="penghuniId" class="form-label">Penghuni Tujuan</label>
+                    <select name="penghuniId" id="penghuniId" class="form-select" required>
+                        <option value="" disabled <?= empty($formData['penghuniId']) ? 'selected' : '' ?>>Pilih Penghuni</option>
                         <?php foreach ($penghuniList as $penghuni): ?>
-                            <option value="<?= htmlspecialchars(paket_penghuni_option_label($penghuni)) ?>" data-id="<?= (int) $penghuni['PenghuniID'] ?>"></option>
+                            <option value="<?= (int) $penghuni['PenghuniID'] ?>" <?= (int) $formData['penghuniId'] === (int) $penghuni['PenghuniID'] ? 'selected' : '' ?>>
+                                <?= htmlspecialchars(paket_penghuni_option_label($penghuni)) ?>
+                            </option>
                         <?php endforeach; ?>
-                    </datalist>
-                    <span class="form-hint">Ketik untuk mencari penghuni lebih cepat tanpa harus scroll daftar panjang.</span>
+                    </select>
+                    <span class="form-hint">Pilih penghuni penerima paket dari daftar.</span>
                 </div>
 
                 <div class="mb-3">
@@ -132,11 +132,13 @@ $formData = [
                     <label for="namaPengirim" class="form-label">Nama Pengirim</label>
                     <input type="text" name="namaPengirim" class="form-control" id="namaPengirim" maxlength="100"
                         value="<?= htmlspecialchars($formData['namaPengirim']) ?>" required>
+                    <span class="form-hint">Maksimal 100 karakter</span>
                 </div>
                 <div class="mb-3">
                     <label for="kurir" class="form-label">Kurir</label>
                     <input type="text" name="kurir" class="form-control" id="kurir" maxlength="50"
                         value="<?= htmlspecialchars($formData['kurir']) ?>" required>
+                    <span class="form-hint">Maksimal 50 karakter</span>
                 </div>
 
                 <div class="tw:col-span-full tw:flex tw:justify-end tw:mt-2">
@@ -151,21 +153,6 @@ $formData = [
     <?php require '../../bootstrap.php'; ?>
     <?php require '../../validation_alert.php'; ?>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const penghuniSearch = document.getElementById('penghuniSearch');
-            const penghuniId = document.getElementById('penghuniId');
-            const penghuniOptions = Array.from(document.querySelectorAll('#penghuniOptions option'));
-
-            const syncPenghuniSelection = () => {
-                const match = penghuniOptions.find(option => option.value === penghuniSearch.value);
-                penghuniId.value = match ? match.dataset.id : '';
-            };
-
-            penghuniSearch.addEventListener('input', syncPenghuniSelection);
-            penghuniSearch.form?.addEventListener('submit', syncPenghuniSelection);
-        });
-    </script>
 </body>
 
 </html>

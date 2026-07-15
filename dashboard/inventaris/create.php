@@ -26,14 +26,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $keterangan = trim($_POST['keteranganBarang'] ?? '');
 
     $inventarisSchema = v::keySet(
-        v::key('nama', v::stringType()->length(1, 100)->regex('/^[A-Za-z0-9\s\-\.\/()]+$/')),
+        v::key('nama', v::stringType()->length(3, 100)->notEmpty()->regex('/^[A-Za-z0-9\s\-\.\/()&]+$/')),
         v::key('jumlah', v::numericVal()->min(0)->max(999999)),
         v::key('lokasi', v::stringType()->length(1, 50)),
         v::key('keterangan', v::stringType()->length(0, 500))
     );
 
     if (!$inventarisSchema->validate(['nama' => $nama, 'jumlah' => $jumlah, 'lokasi' => $lokasi, 'keterangan' => $keterangan])) {
-        header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Data Inventaris tidak Valid!');
+        header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Nama barang harus 3-100 karakter dan hanya boleh mengandung huruf, angka, spasi, dan simbol (-()./&)!');
         exit;
     }
 
@@ -108,10 +108,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                
               <div class="mb-3">
                     <label for="namaBarang" class="form-label">Nama Barang</label>
-                    <input type="text" name="namaBarang" class="form-control" id="namaBarang" x-model="nama" maxlength="100" pattern="^[A-Za-z0-9\s\-\.\/()]+$" title="Nama barang hanya boleh berisi huruf, angka, spasi, tanda hubung, titik, garis miring, dan tanda kurung." required>
+                    <input type="text" name="namaBarang" class="form-control" id="namaBarang" x-model="nama" maxlength="100" minlength="3"
+                        pattern="[a-zA-Z0-9\s\-\(\)\.\/&]+" title="Hanya huruf, angka, spasi, dan simbol (-()./&)" required>
                     <div class="tw:text-xs tw:text-slate-400 tw:mt-1 tw:text-right">
                         <span :class="nama.length >= 100 ? 'tw:text-red-600 tw:font-semibold' : (nama.length >= 90 ? 'tw:text-amber-700 tw:font-semibold' : '')" x-text="nama.length">0</span>/100 karakter
                     </div>
+                    <div class="tw:text-xs tw:text-slate-500 tw:mt-1">Minimal 3 karakter</div>
                 </div>
                 <div class="mb-3">
                     <label for="jumlahBarang" class="form-label">Jumlah</label>

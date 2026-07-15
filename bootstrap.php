@@ -10,6 +10,7 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
 
 <script src="https://cdn.datatables.net/2.3.4/js/dataTables.min.js"></script>
 <script src="/doremi-app/js/animations.js?v=<?= filemtime(__DIR__ . '/js/animations.js') ?>"></script>
+<script src="/doremi-app/js/file-upload-validation.js?v=<?= filemtime(__DIR__ . '/js/file-upload-validation.js') ?>"></script>
 <script>
     (() => {
         const tables = document.querySelectorAll('table.doremi-table');
