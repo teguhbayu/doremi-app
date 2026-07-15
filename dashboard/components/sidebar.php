@@ -12,7 +12,7 @@ switch ($_SESSION["userRole"]) {
             ["title" => "Inventaris", "target" => "/doremi-app/dashboard/inventaris/", "icon" => "archive-book"],
             ["title" => "Lapor Perbaikan", "target" => "/doremi-app/dashboard/maintenance/", "icon" => "setting-2"],
             ["title" => "Laporan", "target" => "#", "icon" => "fa-solid fa-file-lines", "children" => [
-                ["title" => "Laporan Maintenance", "target" => "/doremi-app/dashboard/maintenance/report.php", "icon" => "fa-solid fa-chart-bar"],
+                ["title" => "Laporan Perbaikan", "target" => "/doremi-app/dashboard/maintenance/report.php", "icon" => "fa-solid fa-chart-bar"],
                 ["title" => "Laporan Izin Keluar", "target" => "/doremi-app/dashboard/inout/report.php", "icon" => "fa-solid fa-chart-line"],
                 ["title" => "Laporan Paket", "target" => "/doremi-app/dashboard/paket/report.php", "icon" => "fa-solid fa-chart-column"]
             ]],

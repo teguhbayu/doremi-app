@@ -30,6 +30,9 @@ function checkMaintenanceTargetExists(mysqli $db, string $targetType, int $targe
     if ($targetType === 'ruangan') {
         return dbFetchOne($db, "CALL sp_checkRuanganActive(?)", 'i', [$targetId]) !== null;
     }
+    if ($targetType === 'kamar') {
+        return dbFetchOne($db, "CALL sp_checkKamarActive(?)", 'i', [$targetId]) !== null;
+    }
 
     return dbFetchOne($db, "CALL sp_checkInventarisActive(?)", 'i', [$targetId]) !== null;
 }

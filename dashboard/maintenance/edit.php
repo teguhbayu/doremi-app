@@ -72,6 +72,22 @@ if (!empty($report['RuanganID'])) {
     }
 }
 
+if (!empty($report['KamarID'])) {
+    $found = false;
+    foreach ($kamars as $k) {
+        if ((int)$k['KamarID'] === (int)$report['KamarID']) {
+            $found = true;
+            break;
+        }
+    }
+    if (!$found) {
+        $deletedKamar = dbFetchOne($db, "SELECT KamarID, NomorKamar, KapasitasPenghuni, Lantai, 0 AS JumlahPenghuniAktual FROM kamar WHERE KamarID = ?", 'i', [$report['KamarID']]);
+        if ($deletedKamar) {
+            $kamars[] = $deletedKamar;
+        }
+    }
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_validate($_SERVER['PHP_SELF'] . '?id=' . $id);
     if (isset($_POST['deskripsi'])) {
@@ -127,6 +143,11 @@ if (!empty($old)) {
         $initialLocationType = 'ruangan';
         $selectedRuangan = $report['RuanganID'];
         $selectedKamar = '';
+        $selectedInventaris = '';
+    } else if (!empty($report['KamarID'])) {
+        $initialLocationType = 'kamar';
+        $selectedRuangan = '';
+        $selectedKamar = $report['KamarID'];
         $selectedInventaris = '';
     } else {
         $initialLocationType = 'ruangan';
@@ -234,9 +255,9 @@ $currentDeskripsi = str_replace("\r\n", "\n", $old['deskripsi'] ?? $report['Desk
                             </div>
 
                             <div class="mb-3" x-show="(locationType === 'ruangan' && selectedRuangan !== '') || (locationType === 'kamar' && selectedKamar !== '')" x-cloak>
-                                <label for="inventaris_id" class="form-label" x-text="locationType === 'ruangan' ? 'Inventaris di Ruangan Ini (Opsional)' : 'Pilih Barang yang Rusak'"></label>
-                                <select name="inventaris_id" id="inventaris_id" class="form-select" x-model="selectedInventaris" :required="locationType === 'kamar'">
-                                    <option value="" :disabled="locationType === 'kamar'" x-text="locationType === 'ruangan' ? '-- Laporkan Ruangan Secara Umum --' : '-- Pilih Barang --'"></option>
+                                <label for="inventaris_id" class="form-label" x-text="locationType === 'ruangan' ? 'Inventaris di Ruangan Ini (Opsional)' : 'Inventaris di Kamar Ini (Opsional)'"></label>
+                                <select name="inventaris_id" id="inventaris_id" class="form-select" x-model="selectedInventaris">
+                                    <option value="" x-text="locationType === 'ruangan' ? '-- Laporkan Ruangan Secara Umum --' : '-- Laporkan Kamar Secara Umum --'"></option>
                                     <template x-for="item in filteredInventory" :key="item.InventarisID">
                                         <option :value="item.InventarisID" x-text="item.NamaBarang"></option>
                                     </template>
