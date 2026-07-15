@@ -11,6 +11,11 @@ function fetchPenghuniIdentityRows(mysqli $db, int $isDeleted, ?int $excludePeng
     return dbFetchAll($db, 'SELECT PenghuniID, Nim, Email, NoHP FROM penghuni WHERE IsDeleted = ? AND (? = 0 OR PenghuniID != ?)', 'iii', [$isDeleted, $excludePenghuniId, $excludePenghuniId]);
 }
 
+function findActivePetugasByEmail(mysqli $db, string $email): ?array
+{
+    return dbFetchOne($db, 'SELECT PetugasID FROM petugas WHERE IsDeleted = 0 AND LOWER(Email) = LOWER(?) LIMIT 1', 's', [$email]);
+}
+
 function fetchPenghuniById(mysqli $db, int $penghuniId): ?array
 {
     return dbFetchOne($db, 'SELECT * FROM penghuni WHERE PenghuniID = ? AND IsDeleted = 0 LIMIT 1', 'i', [$penghuniId]);

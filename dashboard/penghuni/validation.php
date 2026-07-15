@@ -97,6 +97,10 @@ function validatePenghuniCommonInput(
         return penghuni_duplicate_identity_message($duplicatePenghuni, $input['nim'], $input['email'], $input['no']);
     }
 
+    if (findActivePetugasByEmail($db, $input['email']) !== null) {
+        return 'Email sudah terdaftar sebagai petugas!';
+    }
+
     $deletedMatches = penghuni_find_identity_matches(
         $db,
         $input['nim'],

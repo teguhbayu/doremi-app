@@ -79,6 +79,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
+    $penghuniEmailStmt = mysqli_prepare($db, 'SELECT PenghuniID FROM penghuni WHERE IsDeleted = 0 AND LOWER(Email) = LOWER(?) LIMIT 1');
+    mysqli_stmt_bind_param($penghuniEmailStmt, 's', $email);
+    mysqli_stmt_execute($penghuniEmailStmt);
+    $activePenghuni = mysqli_fetch_assoc(mysqli_stmt_get_result($penghuniEmailStmt));
+    mysqli_stmt_close($penghuniEmailStmt);
+
+    if ($activePenghuni) {
+        $_SESSION['form_data'] = $postData;
+        header("Location: " . $_SERVER['PHP_SELF'] . '?status=error&message=Email sudah terdaftar sebagai penghuni!');
+        exit;
+    }
+
     $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
     $deletedCheckStmt = mysqli_prepare(
         $db,
