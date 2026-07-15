@@ -13,9 +13,9 @@ require 'validation.php';
 $role = $_SESSION['userRole'];
 $userId = (int)$_SESSION['userId'];
 
-$rooms = fetchMaintenanceRooms($db, false);
+$rooms = fetchMaintenanceRooms($db, true);
 $kamars = fetchActiveKamarWithOccupancy($db);
-$inventory = fetchMaintenanceInventory($db, false);
+$inventory = fetchMaintenanceInventory($db, true);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_validate('create.php');
