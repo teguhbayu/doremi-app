@@ -78,6 +78,8 @@ $totalReports = count($reports);
                                                  $loc .= ' (Kamar ' . htmlspecialchars($r['InvKamarNomor']) . ')';
                                              }
                                              echo $loc;
+                                         } elseif (!empty($r['InvKamarNomor'])) {
+                                             echo 'Kamar: ' . htmlspecialchars($r['InvKamarNomor']);
                                          } else {
                                              echo '-';
                                          }
@@ -87,6 +89,11 @@ $totalReports = count($reports);
                                             <div class="tw:text-xs tw:text-slate-500">Lantai <?= htmlspecialchars($r['LantaiRuangan']) ?></div>
                                         <?php elseif (!empty($r['NamaBarang'])): ?>
                                             <div>Inventaris: <strong><?= htmlspecialchars($r['NamaBarang']) ?></strong></div>
+                                            <?php if (!empty($r['InvKamarNomor'])): ?>
+                                                <div class="tw:text-xs tw:text-slate-500">Kamar <?= htmlspecialchars($r['InvKamarNomor']) ?></div>
+                                            <?php endif; ?>
+                                        <?php elseif (!empty($r['InvKamarNomor'])): ?>
+                                            <div>Kamar: <strong><?= htmlspecialchars($r['InvKamarNomor']) ?></strong></div>
                                         <?php else: ?>
                                             <div class="tw:text-xs tw:text-slate-500">-</div>
                                         <?php endif; ?>

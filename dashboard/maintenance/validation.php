@@ -70,8 +70,11 @@ function resolveMaintenanceTargetIds(array $input): array
 {
     return [
         'ruanganId' => $input['targetType'] === 'ruangan' ? (int) $input['targetValue'] : null,
-        'kamarId' => $input['targetType'] === 'kamar' ? (int) $input['targetValue'] : null,
+        'kamarId' => $input['targetType'] === 'kamar'
+            ? (int) $input['targetValue']
+            : ($input['targetType'] === 'inventaris' && ($input['kamarId'] ?? '') !== ''
+                ? (int) $input['kamarId']
+                : null),
         'inventarisId' => $input['targetType'] === 'inventaris' ? (int) $input['targetValue'] : null,
-        'kamarId' => ($input['kamarId'] ?? '') !== '' ? (int) $input['kamarId'] : null,
     ];
 }
