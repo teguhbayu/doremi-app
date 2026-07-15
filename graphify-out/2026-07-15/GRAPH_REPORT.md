@@ -1,7 +1,7 @@
 # Graph Report - doremi-app  (2026-07-15)
 
 ## Corpus Check
-- 112 files · ~1,254,417 words
+- 112 files · ~1,254,566 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary

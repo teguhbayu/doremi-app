@@ -54,6 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $petugasId,
             $targetIds['ruanganId'],
             $targetIds['inventarisId'],
+            $targetIds['kamarId'],
             $reportInput['jenisLaporan'],
             $reportInput['deskripsi'],
             $fotoBase64,
@@ -174,9 +175,9 @@ $initialLocationType = !empty($old['kamar_id']) ? 'kamar' : 'ruangan';
                             </div>
 
                             <div class="mb-3" x-show="(locationType === 'ruangan' && selectedRuangan !== '') || (locationType === 'kamar' && selectedKamar !== '')" x-cloak>
-                                <label for="inventaris_id" class="form-label" x-text="locationType === 'ruangan' ? 'Inventaris di Ruangan Ini (Opsional)' : 'Pilih Barang yang Rusak'"></label>
-                                <select name="inventaris_id" id="inventaris_id" class="form-select" x-model="selectedInventaris" :required="locationType === 'kamar'">
-                                    <option value="" :disabled="locationType === 'kamar'" x-text="locationType === 'ruangan' ? '-- Laporkan Ruangan Secara Umum --' : '-- Pilih Barang --'"></option>
+                                <label for="inventaris_id" class="form-label" x-text="locationType === 'ruangan' ? 'Inventaris di Ruangan Ini (Opsional)' : 'Inventaris di Kamar Ini (Opsional)'"></label>
+                                <select name="inventaris_id" id="inventaris_id" class="form-select" x-model="selectedInventaris">
+                                    <option value="" x-text="locationType === 'ruangan' ? '-- Laporkan Ruangan Secara Umum --' : '-- Laporkan Kamar Secara Umum --'"></option>
                                     <template x-for="item in filteredInventory" :key="item.InventarisID">
                                         <option :value="item.InventarisID" x-text="item.NamaBarang"></option>
                                     </template>

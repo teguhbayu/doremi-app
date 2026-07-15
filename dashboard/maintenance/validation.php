@@ -9,17 +9,17 @@ use Respect\Validation\Validator as v;
 
 function collectMaintenanceReportInput(array $source): array
 {
+    $locationType = trim($source['location_type'] ?? '');
     $ruanganId = trim($source['ruangan_id'] ?? '');
+    $kamarId = trim($source['kamar_id'] ?? '');
     $inventarisId = trim($source['inventaris_id'] ?? '');
 
-    $targetType = trim($source['targetType'] ?? $source['target_tipe'] ?? '');
-    if ($targetType === '') {
-        $targetType = $inventarisId !== '' ? 'inventaris' : 'ruangan';
-    }
-
-    $targetValue = trim($source['targetValue'] ?? '');
-    if ($targetValue === '') {
-        $targetValue = $targetType === 'ruangan' ? $ruanganId : $inventarisId;
+    if ($inventarisId !== '') {
+        $targetType = 'inventaris';
+        $targetValue = $inventarisId;
+    } else {
+        $targetType = $locationType !== '' ? $locationType : ($ruanganId !== '' ? 'ruangan' : ($kamarId !== '' ? 'kamar' : 'ruangan'));
+        $targetValue = $targetType === 'ruangan' ? $ruanganId : $kamarId;
     }
 
     return [
@@ -27,6 +27,10 @@ function collectMaintenanceReportInput(array $source): array
         'targetType' => $targetType,
         'targetValue' => $targetValue,
         'deskripsi' => str_replace("\r\n", "\n", trim($source['deskripsi'] ?? '')),
+        'location_type' => $locationType,
+        'ruangan_id' => $ruanganId,
+        'kamar_id' => $kamarId,
+        'inventaris_id' => $inventarisId,
     ];
 }
 
@@ -34,7 +38,7 @@ function validateMaintenanceReportInput(mysqli $db, array $input): ?string
 {
     $fieldError = firstFieldError($input, [
         'jenisLaporan' => ['label' => 'Skala Prioritas', 'rule' => v::in(['Kerusakan Ringan', 'Kerusakan Sedang', 'Kerusakan Darurat / Berat'])],
-        'targetType' => ['label' => 'Tipe Target', 'rule' => v::in(['ruangan', 'inventaris'])],
+        'targetType' => ['label' => 'Tipe Target', 'rule' => v::in(['ruangan', 'kamar', 'inventaris'])],
         'targetValue' => ['label' => 'Target Lokasi', 'rule' => v::numericVal()],
         'deskripsi' => ['label' => 'Deskripsi', 'rule' => v::stringType()->length(1, 1000)],
     ]);
@@ -46,7 +50,7 @@ function validateMaintenanceReportInput(mysqli $db, array $input): ?string
     if (!checkMaintenanceTargetExists($db, $input['targetType'], (int) $input['targetValue'])) {
         return $input['targetType'] === 'ruangan'
             ? 'Ruangan yang dipilih tidak ditemukan.'
-            : 'Inventaris yang dipilih tidak ditemukan.';
+            : ($input['targetType'] === 'kamar' ? 'Kamar yang dipilih tidak ditemukan.' : 'Inventaris yang dipilih tidak ditemukan.');
     }
 
     return null;
@@ -65,6 +69,7 @@ function resolveMaintenanceTargetIds(array $input): array
 {
     return [
         'ruanganId' => $input['targetType'] === 'ruangan' ? (int) $input['targetValue'] : null,
+        'kamarId' => $input['targetType'] === 'kamar' ? (int) $input['targetValue'] : null,
         'inventarisId' => $input['targetType'] === 'inventaris' ? (int) $input['targetValue'] : null,
     ];
 }

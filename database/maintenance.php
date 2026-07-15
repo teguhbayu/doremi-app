@@ -30,6 +30,9 @@ function checkMaintenanceTargetExists(mysqli $db, string $targetType, int $targe
     if ($targetType === 'ruangan') {
         return dbFetchOne($db, "CALL sp_checkRuanganActive(?)", 'i', [$targetId]) !== null;
     }
+    if ($targetType === 'kamar') {
+        return dbFetchOne($db, "CALL sp_checkKamarActive(?)", 'i', [$targetId]) !== null;
+    }
 
     return dbFetchOne($db, "CALL sp_checkInventarisActive(?)", 'i', [$targetId]) !== null;
 }
@@ -40,6 +43,7 @@ function createMaintenanceReport(
     ?int $petugasId,
     ?int $ruanganId,
     ?int $inventarisId,
+    ?int $kamarId,
     string $jenisLaporan,
     string $deskripsi,
     string $fotoLaporan,
@@ -47,9 +51,9 @@ function createMaintenanceReport(
 ): bool {
     dbExecute(
         $db,
-        "CALL sp_createMaintenanceReport(?, ?, ?, ?, ?, ?, ?, ?)",
-        'iiiissss',
-        [$penghuniId, $petugasId, $ruanganId, $inventarisId, $jenisLaporan, $deskripsi, $fotoLaporan, $tanggalLapor]
+        "CALL sp_createMaintenanceReport(?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        'iiiiissss',
+        [$penghuniId, $petugasId, $ruanganId, $inventarisId, $kamarId, $jenisLaporan, $deskripsi, $fotoLaporan, $tanggalLapor]
     );
 
     return true;
@@ -60,15 +64,16 @@ function updateMaintenanceReport(
     int $maintenanceId,
     ?int $ruanganId,
     ?int $inventarisId,
+    ?int $kamarId,
     string $jenisLaporan,
     string $deskripsi,
     string $fotoLaporan
 ): bool {
     dbExecute(
         $db,
-        "CALL sp_updateMaintenanceReport(?, ?, ?, ?, ?, ?)",
-        'iiisss',
-        [$maintenanceId, $ruanganId, $inventarisId, $jenisLaporan, $deskripsi, $fotoLaporan]
+        "CALL sp_updateMaintenanceReport(?, ?, ?, ?, ?, ?, ?)",
+        'iiiiiss',
+        [$maintenanceId, $ruanganId, $inventarisId, $kamarId, $jenisLaporan, $deskripsi, $fotoLaporan]
     );
 
     return true;
